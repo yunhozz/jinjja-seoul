@@ -1,6 +1,7 @@
 package com.jinjjaseoul.auth.model;
 
 import com.jinjjaseoul.common.enums.Role;
+import lombok.Builder;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,22 +17,17 @@ public class UserPrincipal implements UserDetails, OAuth2User {
     private final String email;
     private final String password;
     private final String name;
+    private final String imageUrl;
     private final Role role;
     private Map<String, Object> attributes;
 
-    public UserPrincipal(Long id, String email, String password, String name, Role role) {
+    @Builder
+    private UserPrincipal(Long id, String email, String password, String name, String imageUrl, Role role, Map<String, Object> attributes) {
         this.id = id;
         this.email = email;
         this.password = password;
         this.name = name;
-        this.role = role;
-    }
-
-    public UserPrincipal(Long id, String email, String password, String name, Role role, Map<String, Object> attributes) {
-        this.id = id;
-        this.email = email;
-        this.password = password;
-        this.name = name;
+        this.imageUrl = imageUrl;
         this.role = role;
         this.attributes = attributes;
     }
@@ -58,6 +54,20 @@ public class UserPrincipal implements UserDetails, OAuth2User {
     }
 
     @Override
+    public String getName() {
+        return name;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    @Override
+    public Map<String, Object> getAttributes() {
+        return attributes;
+    }
+
+    @Override
     public boolean isAccountNonExpired() {
         return true;
     }
@@ -75,15 +85,5 @@ public class UserPrincipal implements UserDetails, OAuth2User {
     @Override
     public boolean isEnabled() {
         return true;
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public Map<String, Object> getAttributes() {
-        return attributes;
     }
 }
