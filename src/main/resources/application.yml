@@ -1,0 +1,18 @@
+spring:
+  profiles:
+    active: local
+    include: oauth, mail
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: local
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: prod
