@@ -1,5 +1,6 @@
 package com.jinjjaseoul.domain.user.model;
 
+import com.jinjjaseoul.common.enums.Provider;
 import com.jinjjaseoul.common.enums.Role;
 import com.jinjjaseoul.domain.BaseEntity;
 import lombok.AccessLevel;
@@ -36,12 +37,24 @@ public class User extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Role role; // ROLE_ADMIN, ROLE_USER
 
+    @Enumerated(EnumType.STRING)
+    private Provider provider; // GOOGLE, KAKAO, APPLE
+
     @Builder
-    private User(String email, String password, String name, String imageUrl, Role role) {
+    private User(String email, String password, String name, String imageUrl, Role role, Provider provider) {
         this.email = email;
         this.password = password;
         this.name = name;
         this.imageUrl = imageUrl;
         this.role = role;
+        this.provider = provider;
+    }
+
+    public User update(String email, String name, String imageUrl, Provider provider) {
+        this.email = email;
+        this.name = name;
+        this.imageUrl = imageUrl;
+        this.provider = provider;
+        return this;
     }
 }

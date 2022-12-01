@@ -26,6 +26,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                 .name(user.getName())
                 .imageUrl(user.getImageUrl())
                 .role(user.getRole())
+                .provider(null)
+                .attributes(null)
                 .build();
     }
 }
