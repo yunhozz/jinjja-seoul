@@ -1,7 +1,9 @@
 package com.jinjjaseoul.auth.oauth2;
 
 import com.jinjjaseoul.auth.model.UserPrincipal;
+import com.jinjjaseoul.common.converter.UserConverter;
 import com.jinjjaseoul.common.enums.Role;
+import com.jinjjaseoul.domain.user.dto.UserResponseDto;
 import com.jinjjaseoul.domain.user.model.entity.User;
 import com.jinjjaseoul.domain.user.model.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -40,41 +42,35 @@ public class OAuth2UserServiceImpl implements OAuth2UserService<OAuth2UserReques
         }
 
         User user = saveOrUpdate(oAuth2Provider);
-        saveUserInfoInSession(session, user);
+        UserResponseDto userResponseDto = UserConverter.convertToDto(user);
+        saveUserInfoInSession(session, userResponseDto);
 
-        return UserPrincipal.builder()
-                .id(user.getId())
-                .email(user.getEmail())
-                .password(user.getPassword())
-                .name(user.getName())
-                .imageUrl(user.getImageUrl())
-                .role(user.getRole())
-                .provider(user.getProvider())
-                .attributes(attributes)
-                .build();
+        return new UserPrincipal(userResponseDto, attributes);
     }
 
     private User saveOrUpdate(OAuth2Provider oAuth2Provider) {
         Optional<User> findUser = userRepository.findByEmail(oAuth2Provider.getEmail());
         User user;
 
+        // TODO: 2022-12-02 아이콘 랜덤 배정
         if (findUser.isEmpty()) {
             user = User.builder()
                     .email(oAuth2Provider.getEmail())
                     .password(null)
                     .name(oAuth2Provider.getName())
-                    .imageUrl(oAuth2Provider.getImageUrl())
+                    .introduction(null)
+                    .icon(null)
                     .role(Role.USER)
                     .provider(oAuth2Provider.getProvider())
                     .build();
 
-        } else user = findUser.get().updateInfo(oAuth2Provider.getEmail(), oAuth2Provider.getName(), oAuth2Provider.getImageUrl(), oAuth2Provider.getProvider());
+        } else user = findUser.get().updateInfo(oAuth2Provider.getEmail(), oAuth2Provider.getName(), oAuth2Provider.getProvider());
 
         return user;
     }
 
-    private void saveUserInfoInSession(HttpSession session, User user) {
-        SessionUser sessionUser = new SessionUser(user.getEmail(), user.getName(), user.getImageUrl());
+    private void saveUserInfoInSession(HttpSession session, UserResponseDto userResponseDto) {
+        SessionUser sessionUser = new SessionUser(userResponseDto.getEmail(), userResponseDto.getName(), userResponseDto.getIconId());
         session.setAttribute("userInfo", sessionUser);
     }
 }

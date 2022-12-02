@@ -1,6 +1,7 @@
 package com.jinjjaseoul.auth.jwt;
 
 import com.jinjjaseoul.auth.model.UserDetailsServiceImpl;
+import com.jinjjaseoul.common.enums.Role;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Header;
@@ -45,9 +46,9 @@ public class JwtService {
         secretKey = Base64UrlCodec.BASE64URL.encode(secretKey.getBytes(StandardCharsets.UTF_8));
     }
 
-    public TokenResponseDto createTokenDto(String email, String role) {
+    public TokenResponseDto createTokenDto(String email, Role role) {
         Claims claims = Jwts.claims().setSubject(email);
-        claims.put("role", role);
+        claims.put("role", role.getValue());
         Date now = new Date();
 
         String accessToken = createToken(claims, now, accessTokenValidMilliSecond);

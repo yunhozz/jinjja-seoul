@@ -50,7 +50,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
     private String createRedirectUrl(HttpServletRequest request, HttpServletResponse response, Authentication authentication, String targetUrl) {
         UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
-        TokenResponseDto tokenResponseDto = jwtService.createTokenDto(userPrincipal.getUsername(), userPrincipal.getRole().getValue());
+        TokenResponseDto tokenResponseDto = jwtService.createTokenDto(userPrincipal.getUsername(), userPrincipal.getRole());
 
         saveOrUpdateRefreshToken(userPrincipal, tokenResponseDto);
         saveTokenOnResponseAndCookie(request, response, tokenResponseDto);
