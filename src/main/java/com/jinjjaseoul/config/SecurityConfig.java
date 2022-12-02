@@ -4,6 +4,9 @@ import com.jinjjaseoul.auth.jwt.JwtAccessDeniedHandler;
 import com.jinjjaseoul.auth.jwt.JwtAuthenticationEntryPoint;
 import com.jinjjaseoul.auth.jwt.JwtFilter;
 import com.jinjjaseoul.auth.jwt.JwtService;
+import com.jinjjaseoul.auth.oauth2.OAuth2AuthenticationFailureHandler;
+import com.jinjjaseoul.auth.oauth2.OAuth2AuthenticationSuccessHandler;
+import com.jinjjaseoul.auth.oauth2.OAuth2UserServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,6 +27,9 @@ public class SecurityConfig {
     private final JwtService jwtService;
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    private final OAuth2UserServiceImpl oAuth2UserService;
+    private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
+    private final OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
@@ -50,7 +56,25 @@ public class SecurityConfig {
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling()
                 .accessDeniedHandler(jwtAccessDeniedHandler)
-                .authenticationEntryPoint(jwtAuthenticationEntryPoint);
+                .authenticationEntryPoint(jwtAuthenticationEntryPoint)
+
+                .and()
+
+                .oauth2Login()
+                .successHandler(oAuth2AuthenticationSuccessHandler)
+                .failureHandler(oAuth2AuthenticationFailureHandler)
+                .userInfoEndpoint()
+                .userService(oAuth2UserService)
+
+                .and()
+
+                .authorizationEndpoint()
+                .baseUri("/oauth2/authorization")
+
+                .and()
+
+                .redirectionEndpoint()
+                .baseUri("/*/oauth2/code/*");
 
         return httpSecurity.build();
     }
