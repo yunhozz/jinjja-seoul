@@ -1,5 +1,7 @@
 package com.jinjjaseoul.auth.model;
 
+import com.jinjjaseoul.common.converter.UserConverter;
+import com.jinjjaseoul.domain.user.dto.UserResponseDto;
 import com.jinjjaseoul.domain.user.model.entity.User;
 import com.jinjjaseoul.domain.user.model.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,16 +20,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException(email));
+        UserResponseDto userResponseDto = UserConverter.convertToDto(user);
 
-        return UserPrincipal.builder()
-                .id(user.getId())
-                .email(user.getEmail())
-                .password(user.getPassword())
-                .name(user.getName())
-                .imageUrl(user.getImageUrl())
-                .role(user.getRole())
-                .provider(null)
-                .attributes(null)
-                .build();
+        return new UserPrincipal(userResponseDto);
     }
 }

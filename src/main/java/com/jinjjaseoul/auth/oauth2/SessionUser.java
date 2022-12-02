@@ -13,5 +13,5 @@ public class SessionUser implements Serializable {
 
     private String email;
     private String name;
-    private String imageUrl;
+    private Long iconId;
 }
