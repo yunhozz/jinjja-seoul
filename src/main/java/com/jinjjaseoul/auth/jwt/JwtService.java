@@ -53,7 +53,7 @@ public class JwtService {
         String accessToken = createToken(claims, now, accessTokenValidMilliSecond);
         String refreshToken = createToken(claims, now, refreshTokenValidMilliSecond);
 
-        return new TokenResponseDto(grantType + accessToken, grantType + refreshToken);
+        return new TokenResponseDto(grantType + accessToken, grantType + refreshToken, refreshTokenValidMilliSecond);
     }
 
     public Authentication getAuthentication(String token) {
