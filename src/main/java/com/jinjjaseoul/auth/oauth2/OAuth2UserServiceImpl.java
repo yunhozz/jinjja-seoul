@@ -2,8 +2,8 @@ package com.jinjjaseoul.auth.oauth2;
 
 import com.jinjjaseoul.auth.model.UserPrincipal;
 import com.jinjjaseoul.common.enums.Role;
-import com.jinjjaseoul.domain.user.model.User;
-import com.jinjjaseoul.domain.user.model.UserRepository;
+import com.jinjjaseoul.domain.user.model.entity.User;
+import com.jinjjaseoul.domain.user.model.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -68,7 +68,7 @@ public class OAuth2UserServiceImpl implements OAuth2UserService<OAuth2UserReques
                     .provider(oAuth2Provider.getProvider())
                     .build();
 
-        } else user = findUser.get().update(oAuth2Provider.getEmail(), oAuth2Provider.getName(), oAuth2Provider.getImageUrl(), oAuth2Provider.getProvider());
+        } else user = findUser.get().updateInfo(oAuth2Provider.getEmail(), oAuth2Provider.getName(), oAuth2Provider.getImageUrl(), oAuth2Provider.getProvider());
 
         return user;
     }

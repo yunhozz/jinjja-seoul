@@ -1,4 +1,4 @@
-package com.jinjjaseoul.domain.user.model;
+package com.jinjjaseoul.domain.user.model.entity;
 
 import com.jinjjaseoul.common.enums.Provider;
 import com.jinjjaseoul.common.enums.Role;
@@ -50,7 +50,7 @@ public class User extends BaseEntity {
         this.provider = provider;
     }
 
-    public User update(String email, String name, String imageUrl, Provider provider) {
+    public User updateInfo(String email, String name, String imageUrl, Provider provider) {
         this.email = email;
         this.name = name;
         this.imageUrl = imageUrl;

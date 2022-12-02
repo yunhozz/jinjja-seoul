@@ -58,6 +58,10 @@ public class UserPrincipal implements UserDetails, OAuth2User {
         return imageUrl;
     }
 
+    public Role getRole() {
+        return role;
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return new HashSet<>() {{
