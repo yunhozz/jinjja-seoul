@@ -29,16 +29,16 @@ public class JwtService {
 
     private final UserDetailsServiceImpl userDetailsService;
 
-    @Value("{jinjja-seoul.jwt.secret}")
+    @Value("${jinjja-seoul.jwt.secret}")
     private String secretKey;
 
-    @Value("{jinjja-seoul.jwt.grantType}")
+    @Value("${jinjja-seoul.jwt.grantType}")
     private String grantType;
 
-    @Value("{jinjja-seoul.jwt.accessTime}")
+    @Value("${jinjja-seoul.jwt.accessTime}")
     private Long accessTokenValidMilliSecond;
 
-    @Value("{jinjja-seoul.jwt.refreshTime}")
+    @Value("${jinjja-seoul.jwt.refreshTime}")
     private Long refreshTokenValidMilliSecond;
 
     @PostConstruct

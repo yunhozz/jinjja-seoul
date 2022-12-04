@@ -6,6 +6,7 @@ import com.jinjjaseoul.auth.jwt.JwtFilter;
 import com.jinjjaseoul.auth.jwt.JwtService;
 import com.jinjjaseoul.auth.oauth2.OAuth2AuthenticationFailureHandler;
 import com.jinjjaseoul.auth.oauth2.OAuth2AuthenticationSuccessHandler;
+import com.jinjjaseoul.auth.oauth2.OAuth2AuthorizationRequestRepository;
 import com.jinjjaseoul.auth.oauth2.OAuth2UserServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -30,6 +31,7 @@ public class SecurityConfig {
     private final OAuth2UserServiceImpl oAuth2UserService;
     private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
     private final OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
+    private final OAuth2AuthorizationRequestRepository oAuth2AuthorizationRequestRepository;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
@@ -60,6 +62,19 @@ public class SecurityConfig {
 
                 .and()
 
+                .formLogin()
+                .loginProcessingUrl("/login")
+                .defaultSuccessUrl("/")
+
+                .and()
+
+                .logout()
+                .logoutUrl("/logout")
+                .clearAuthentication(true)
+                .logoutSuccessUrl("/")
+
+                .and()
+
                 .oauth2Login()
                 .successHandler(oAuth2AuthenticationSuccessHandler)
                 .failureHandler(oAuth2AuthenticationFailureHandler)
@@ -70,6 +85,7 @@ public class SecurityConfig {
 
                 .authorizationEndpoint()
                 .baseUri("/oauth2/authorization")
+                .authorizationRequestRepository(oAuth2AuthorizationRequestRepository)
 
                 .and()
 
