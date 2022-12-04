@@ -70,7 +70,7 @@ public class OAuth2UserServiceImpl implements OAuth2UserService<OAuth2UserReques
     }
 
     private void saveUserInfoInSession(HttpSession session, UserResponseDto userResponseDto) {
-        SessionUser sessionUser = new SessionUser(userResponseDto.getEmail(), userResponseDto.getName(), userResponseDto.getIconId());
+        SessionUser sessionUser = new SessionUser(userResponseDto.getEmail(), userResponseDto.getName());
         session.setAttribute("userInfo", sessionUser);
     }
 }

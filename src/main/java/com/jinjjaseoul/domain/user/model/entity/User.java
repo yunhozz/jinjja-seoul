@@ -46,6 +46,8 @@ public class User extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Provider provider; // GOOGLE, KAKAO, APPLE
 
+    private boolean isDeleted;
+
     @Builder
     private User(String email, String password, String name, String introduction, Icon icon, Role role, Provider provider) {
         this.email = email;
@@ -68,5 +70,19 @@ public class User extends BaseEntity {
         this.name = name;
         this.introduction = introduction;
         this.icon = icon;
+    }
+
+    public void withdraw() {
+        if (!isDeleted) {
+            isDeleted = true;
+
+        } else throw new IllegalStateException("이미 탈퇴한 회원입니다.");
+    }
+
+    public void reAssign() {
+        if (isDeleted) {
+            isDeleted = false;
+
+        } else throw new IllegalStateException("재가입이 불가능한 상태입니다.");
     }
 }

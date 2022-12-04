@@ -5,6 +5,7 @@ import lombok.Getter;
 @Getter
 public enum Provider {
 
+    LOCAL("로컬"),
     GOOGLE("구글"),
     KAKAO("카카오"),
     APPLE("애플")

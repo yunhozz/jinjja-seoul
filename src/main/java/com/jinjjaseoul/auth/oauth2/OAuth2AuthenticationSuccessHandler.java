@@ -73,8 +73,9 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         response.setContentType("application/json;charset=UTF-8");
         response.addHeader("Authorization", tokenResponseDto.getAccessToken());
         // refresh token
+        String refreshToken = tokenResponseDto.getRefreshToken().split(" ")[1];
         CookieUtils.deleteCookie(request, response, REFRESH_TOKEN);
-        CookieUtils.addCookie(response, REFRESH_TOKEN, tokenResponseDto.getRefreshToken(), tokenResponseDto.getRefreshTokenValidTime().intValue());
+        CookieUtils.addCookie(response, REFRESH_TOKEN, refreshToken, tokenResponseDto.getRefreshTokenValidTime().intValue());
     }
 
     private void clearAuthenticationAttributes(HttpServletRequest request, HttpServletResponse response) {
