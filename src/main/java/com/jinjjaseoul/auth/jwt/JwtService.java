@@ -5,6 +5,7 @@ import com.jinjjaseoul.common.enums.Role;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Header;
+import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -54,40 +55,42 @@ public class JwtService {
         String accessToken = createToken(claims, now, accessTokenValidMilliSecond);
         String refreshToken = createToken(claims, now, refreshTokenValidMilliSecond);
 
-        return new TokenResponseDto(grantType + accessToken, grantType + refreshToken, refreshTokenValidMilliSecond);
+        return new TokenResponseDto(grantType, accessToken, refreshToken, refreshTokenValidMilliSecond);
     }
 
     public Authentication getAuthentication(String token) {
-        Claims claims = Jwts.parser()
-                .setSigningKey(secretKey)
-                .parseClaimsJws(token)
-                .getBody();
-
+        Claims claims = parseToken(token).getBody();
         String email = claims.getSubject();
         UserDetails userDetails = userDetailsService.loadUserByUsername(email);
 
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
 
-    public boolean validateToken(String token) {
+    public boolean isValidatedToken(String token) {
         try {
-            Jwts.parser()
-                    .setSigningKey(secretKey)
-                    .parseClaimsJws(token);
-
+            parseToken(token);
             return true;
 
         } catch (SecurityException | MalformedJwtException e) {
             log.error("잘못된 Jwt 서명입니다.");
-
-        } catch (ExpiredJwtException e) {
-            log.error("만료된 토큰입니다.");
 
         } catch (UnsupportedJwtException e) {
             log.error("지원하지 않는 토큰입니다.");
 
         } catch (IllegalArgumentException e) {
             log.error("잘못된 토큰입니다.");
+        }
+
+        return false;
+    }
+
+    public boolean isExpiredToken(String token) {
+        try {
+            parseToken(token);
+            return true;
+
+        } catch (ExpiredJwtException e) {
+            log.error("만료된 토큰입니다.");
         }
 
         return false;
@@ -101,5 +104,11 @@ public class JwtService {
                 .setExpiration(new Date(date.getTime() + time))
                 .signWith(SignatureAlgorithm.HS256, secretKey)
                 .compact();
+    }
+
+    private Jws<Claims> parseToken(String token) {
+        return Jwts.parser()
+                .setSigningKey(secretKey)
+                .parseClaimsJws(token);
     }
 }

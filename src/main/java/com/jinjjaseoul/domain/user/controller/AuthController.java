@@ -32,15 +32,9 @@ public class AuthController {
         return Response.success(HttpStatus.CREATED, tokenResponseDto);
     }
 
-    @GetMapping("/token")
-    public Response tokenReissue(HttpServletRequest request, HttpServletResponse response) {
-        TokenResponseDto tokenResponseDto = authService.tokenReissue(request, response);
-        return Response.success(HttpStatus.OK, tokenResponseDto);
-    }
-
     @GetMapping("/logout")
-    public Response logout(HttpServletRequest request, HttpServletResponse response) {
-        authService.logout(request, response);
+    public Response logout(@AuthenticationPrincipal UserPrincipal userPrincipal, HttpServletRequest request, HttpServletResponse response) {
+        authService.logout(userPrincipal.getId(),request, response);
         return Response.success(HttpStatus.OK);
     }
 
