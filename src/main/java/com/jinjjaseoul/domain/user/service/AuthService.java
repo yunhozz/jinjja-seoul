@@ -22,7 +22,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import static com.jinjjaseoul.auth.oauth2.OAuth2AuthorizationRequestRepository.REFRESH_TOKEN;
+import static com.jinjjaseoul.common.utils.CookieUtils.COOKIE_MAX_AGE;
+import static com.jinjjaseoul.common.utils.CookieUtils.REFRESH_TOKEN;
 
 @Service
 @RequiredArgsConstructor
@@ -32,7 +33,6 @@ public class AuthService {
     private final UserRefreshTokenRepository userRefreshTokenRepository;
     private final JwtService jwtService;
     private final HttpSession session;
-    private final int COOKIE_MAX_AGE = 60 * 60 * 24 * 14; // 2 weeks
 
     @Value("${jinjja-seoul.jwt.grantType}")
     private String grantType;

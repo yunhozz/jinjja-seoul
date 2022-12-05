@@ -10,6 +10,9 @@ import java.util.Optional;
 
 public class CookieUtils {
 
+    public static final String REFRESH_TOKEN = "refresh_token";
+    public static final int COOKIE_MAX_AGE = 60 * 60 * 24 * 14; // 2 weeks
+
     public static void addCookie(HttpServletResponse response, String name, String value, int maxAge) {
         Cookie cookie = new Cookie(name, value);
         cookie.setPath("/");

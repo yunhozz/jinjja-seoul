@@ -21,7 +21,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Optional;
 
-import static com.jinjjaseoul.auth.oauth2.OAuth2AuthorizationRequestRepository.REFRESH_TOKEN;
+import static com.jinjjaseoul.common.utils.CookieUtils.COOKIE_MAX_AGE;
+import static com.jinjjaseoul.common.utils.CookieUtils.REFRESH_TOKEN;
 
 @Slf4j
 @Component
@@ -30,7 +31,6 @@ public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
     private final UserRefreshTokenRepository userRefreshTokenRepository;
-    private final int COOKIE_MAX_AGE = 60 * 60 * 24 * 14; // 2 weeks
 
     @Override
     @Transactional
