@@ -16,6 +16,7 @@ public enum ErrorCode {
     EMAIL_NOT_FOUND(400, "U-002", "해당 이메일이 존재하지 않습니다."),
     PASSWORD_DIFFERENT(400, "U-003", "비밀번호가 일치하지 않습니다."),
     ALREADY_LOGIN(400, "U-004", "이미 로그인 상태입니다."),
+    NOT_REFRESH_TOKEN(400, "U-005", "재발급 토큰이 아닙니다."),
     USER_NOT_FOUND(404, "U-041", "해당 유저를 찾을 수 없습니다."),
     JWT_TOKEN_NOT_FOUND(404, "U-042", "jwt 토큰이 만료되었거나 찾을 수 없습니다."),
 
