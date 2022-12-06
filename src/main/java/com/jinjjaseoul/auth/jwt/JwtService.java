@@ -2,10 +2,10 @@ package com.jinjjaseoul.auth.jwt;
 
 import com.jinjjaseoul.auth.model.UserDetailsServiceImpl;
 import com.jinjjaseoul.common.enums.Role;
+import com.jinjjaseoul.common.utils.RedisUtils;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Header;
-import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -21,6 +21,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.Date;
 
 @Slf4j
@@ -29,6 +30,7 @@ import java.util.Date;
 public class JwtService {
 
     private final UserDetailsServiceImpl userDetailsService;
+    private final RedisUtils redisUtils;
 
     @Value("${jinjja-seoul.jwt.secret}")
     private String secretKey;
@@ -54,22 +56,38 @@ public class JwtService {
 
         String accessToken = createToken(claims, now, accessTokenValidMilliSecond);
         String refreshToken = createToken(claims, now, refreshTokenValidMilliSecond);
+        redisUtils.setValues(email, refreshToken, Duration.ofMillis(refreshTokenValidMilliSecond));
 
-        return new TokenResponseDto(grantType, accessToken, refreshToken, refreshTokenValidMilliSecond);
+        return TokenResponseDto.builder()
+                .grantType(grantType)
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .refreshTokenValidTime(refreshTokenValidMilliSecond)
+                .build();
     }
 
     public Authentication getAuthentication(String token) {
-        Claims claims = parseToken(token).getBody();
+        Claims claims = parseToken(token);
         String email = claims.getSubject();
         UserDetails userDetails = userDetailsService.loadUserByUsername(email);
 
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
 
+    public Long getExpirationTime(String token) {
+        Long now = new Date().getTime();
+        Long expirationTime = parseToken(token).getExpiration().getTime();
+
+        return expirationTime - now;
+    }
+
     public boolean isValidatedToken(String token) {
         try {
             parseToken(token);
             return true;
+
+        } catch (ExpiredJwtException e) {
+            log.error("만료된 토큰입니다.");
 
         } catch (SecurityException | MalformedJwtException e) {
             log.error("잘못된 Jwt 서명입니다.");
@@ -79,18 +97,6 @@ public class JwtService {
 
         } catch (IllegalArgumentException e) {
             log.error("잘못된 토큰입니다.");
-        }
-
-        return false;
-    }
-
-    public boolean isExpiredToken(String token) {
-        try {
-            parseToken(token);
-            return true;
-
-        } catch (ExpiredJwtException e) {
-            log.error("만료된 토큰입니다.");
         }
 
         return false;
@@ -106,9 +112,10 @@ public class JwtService {
                 .compact();
     }
 
-    private Jws<Claims> parseToken(String token) {
+    private Claims parseToken(String token) {
         return Jwts.parser()
                 .setSigningKey(secretKey)
-                .parseClaimsJws(token);
+                .parseClaimsJws(token)
+                .getBody();
     }
 }
