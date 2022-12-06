@@ -60,12 +60,11 @@ public class AuthService {
         String refreshToken = redisUtils.getValues(email)
                 .orElseThrow(JwtTokenNotFoundException::new);
 
-        if (refreshToken == null) {
-            throw new JwtTokenNotFoundException();
-        }
+        Authentication authentication = jwtService.getAuthentication(refreshToken);
+        UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
 
-        TokenResponseDto tokenResponseDto = jwtService.createTokenDto(sessionUser.getEmail(), sessionUser.getRole());
-        redisUtils.setValues(sessionUser.getEmail(), tokenResponseDto.getRefreshToken(), Duration.ofMillis(tokenResponseDto.getRefreshTokenValidTime()));
+        TokenResponseDto tokenResponseDto = jwtService.createTokenDto(userPrincipal.getUsername(), userPrincipal.getRole());
+        updateRedisData(userPrincipal, userPrincipal.getUsername(), tokenResponseDto.getRefreshToken(), tokenResponseDto.getRefreshTokenValidTime());
         saveTokenOnResponse(response, tokenResponseDto);
 
         return tokenResponseDto;
