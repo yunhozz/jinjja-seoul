@@ -41,6 +41,9 @@ public class JwtService {
     @Value("${jinjja-seoul.jwt.refreshTime}")
     private Long refreshTokenValidMilliSecond;
 
+    private final String ACCESS_TOKEN_SUBJECT = "access_token";
+    private final String REFRESH_TOKEN_SUBJECT = "refresh_token";
+
     @PostConstruct
     protected void init() {
         secretKey = Base64UrlCodec.BASE64URL.encode(secretKey.getBytes(StandardCharsets.UTF_8));
@@ -51,8 +54,8 @@ public class JwtService {
         claims.put("role", role.getValue());
         Date now = new Date();
 
-        String accessToken = createToken(claims, now, accessTokenValidMilliSecond);
-        String refreshToken = createToken(claims, now, refreshTokenValidMilliSecond);
+        String accessToken = createToken(ACCESS_TOKEN_SUBJECT, claims, now, accessTokenValidMilliSecond);
+        String refreshToken = createToken(REFRESH_TOKEN_SUBJECT, claims, now, refreshTokenValidMilliSecond);
 
         return TokenResponseDto.builder()
                 .grantType(grantType)
@@ -98,9 +101,14 @@ public class JwtService {
         return false;
     }
 
-    private String createToken(Claims claims, Date date, Long time) {
+    public boolean isRefreshToken(String token) {
+        return parseToken(token).getSubject().equals(REFRESH_TOKEN_SUBJECT);
+    }
+
+    private String createToken(String subject, Claims claims, Date date, Long time) {
         return Jwts.builder()
                 .setHeaderParam(Header.TYPE, Header.JWT_TYPE)
+                .setSubject(subject)
                 .setClaims(claims)
                 .setIssuedAt(date)
                 .setExpiration(new Date(date.getTime() + time))
