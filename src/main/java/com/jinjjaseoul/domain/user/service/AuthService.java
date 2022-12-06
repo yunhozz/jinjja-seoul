@@ -14,6 +14,7 @@ import com.jinjjaseoul.domain.user.service.exception.EmailNotFoundException;
 import com.jinjjaseoul.domain.user.service.exception.JwtTokenNotFoundException;
 import com.jinjjaseoul.domain.user.service.exception.PasswordDifferentException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -32,7 +33,9 @@ public class AuthService {
     private final RedisUtils redisUtils;
     private final HttpSession session;
 
-    private final String SESSION_KEY = "email";
+    @Value("${jinjja-seoul.session.key}")
+    private String SESSION_KEY;
+
     private final String ACCESS_TOKEN_REDIS_DATA = "logout";
 
     @Transactional(readOnly = true)

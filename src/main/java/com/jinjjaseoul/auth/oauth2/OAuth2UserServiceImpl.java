@@ -8,6 +8,7 @@ import com.jinjjaseoul.domain.user.model.User;
 import com.jinjjaseoul.domain.user.model.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
@@ -27,7 +28,9 @@ public class OAuth2UserServiceImpl implements OAuth2UserService<OAuth2UserReques
     private final UserRepository userRepository;
     private final HttpSession session;
 
-    private final String SESSION_KEY = "email";
+    @Value("${jinjja-seoul.session.key}")
+    private String SESSION_KEY;
+
     private final String ACCESS_TOKEN_REDIS_DATA = "logout";
 
     @Override
