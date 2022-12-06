@@ -5,7 +5,7 @@ import com.jinjjaseoul.common.enums.Role;
 import com.jinjjaseoul.domain.icon.model.Icon;
 import com.jinjjaseoul.domain.user.dto.UserRequestDto;
 import com.jinjjaseoul.domain.user.dto.UserResponseDto;
-import com.jinjjaseoul.domain.user.model.entity.User;
+import com.jinjjaseoul.domain.user.model.User;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 public class UserConverter {

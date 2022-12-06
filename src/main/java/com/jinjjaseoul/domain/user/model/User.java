@@ -1,4 +1,4 @@
-package com.jinjjaseoul.domain.user.model.entity;
+package com.jinjjaseoul.domain.user.model;
 
 import com.jinjjaseoul.common.enums.Provider;
 import com.jinjjaseoul.common.enums.Role;

@@ -2,12 +2,14 @@ package com.jinjjaseoul.domain.user.controller;
 
 import com.jinjjaseoul.auth.model.UserPrincipal;
 import com.jinjjaseoul.common.dto.Response;
+import com.jinjjaseoul.domain.user.dto.ProfileResponseDto;
 import com.jinjjaseoul.domain.user.dto.UpdateRequestDto;
 import com.jinjjaseoul.domain.user.dto.UserRequestDto;
 import com.jinjjaseoul.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -23,6 +25,12 @@ public class UserController {
 
     private final UserService userService;
 
+    @GetMapping("/me")
+    public Response getMyInfo(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+        ProfileResponseDto profileResponseDto = userService.findProfileDto(userPrincipal);
+        return Response.success(HttpStatus.OK, profileResponseDto);
+    }
+
     @PostMapping("/join")
     public Response join(@Valid @RequestBody UserRequestDto userRequestDto) {
         Long userId = userService.join(userRequestDto);
@@ -31,7 +39,7 @@ public class UserController {
 
     @PatchMapping("/update")
     public Response updateProfile(@AuthenticationPrincipal UserPrincipal userPrincipal, @Valid @RequestBody UpdateRequestDto updateRequestDto) {
-        userService.updateProfile(userPrincipal.getId(), updateRequestDto);
-        return Response.success(HttpStatus.CREATED);
+        userService.updateProfile(userPrincipal, updateRequestDto);
+        return Response.success(HttpStatus.CREATED, "프로필 업데이트가 완료되었습니다.");
     }
 }

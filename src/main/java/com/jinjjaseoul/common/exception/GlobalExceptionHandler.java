@@ -57,7 +57,7 @@ public class GlobalExceptionHandler {
     }
 
     private Response failure(Exception e, ErrorCode errorCode) {
-        log.error(String.format("handle%s", e));
+        log.error(String.format("handle%s", e.getClass().getSimpleName()));
         ErrorResponseDto errorResponseDto = new ErrorResponseDto(errorCode);
         return Response.failure(HttpStatus.valueOf(errorCode.getStatus()), errorResponseDto);
     }
