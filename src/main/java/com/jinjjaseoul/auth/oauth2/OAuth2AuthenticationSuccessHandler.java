@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.servlet.FilterChain;
@@ -31,6 +32,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     private final JwtService jwtService;
     private final UserRefreshTokenRepository userRefreshTokenRepository;
     private final OAuth2AuthorizationRequestRepository oAuth2AuthorizationRequestRepository;
+    private final int COOKIE_MAX_AGE = 60 * 60 * 24 * 14; // 2 weeks
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authentication) throws IOException, ServletException {
@@ -52,29 +54,34 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
         TokenResponseDto tokenResponseDto = jwtService.createTokenDto(userPrincipal.getUsername(), userPrincipal.getRole());
 
-        saveOrUpdateRefreshToken(userPrincipal, tokenResponseDto);
-        saveTokenOnResponseAndCookie(request, response, tokenResponseDto);
+        UserRefreshToken userRefreshToken = saveOrUpdateRefreshToken(userPrincipal, tokenResponseDto);
+        saveTokenOnResponseAndCookie(request, response, tokenResponseDto, userRefreshToken);
 
         return UriComponentsBuilder.fromUriString(targetUrl)
                 .queryParam("token", tokenResponseDto.getAccessToken())
                 .build().toString();
     }
 
-    private void saveOrUpdateRefreshToken(UserPrincipal userPrincipal, TokenResponseDto tokenResponseDto) {
-        userRefreshTokenRepository.findByUserId(userPrincipal.getId())
-                .ifPresentOrElse(userRefreshToken -> userRefreshToken.updateRefreshToken(tokenResponseDto.getRefreshToken()), () -> {
-                    UserRefreshToken userRefreshToken = new UserRefreshToken(userPrincipal.getId(), tokenResponseDto.getRefreshToken());
-                    userRefreshTokenRepository.save(userRefreshToken);
-                });
+    @Transactional
+    private UserRefreshToken saveOrUpdateRefreshToken(UserPrincipal userPrincipal, TokenResponseDto tokenResponseDto) {
+        final UserRefreshToken[] userRefreshTokens = {null};
+        userRefreshTokenRepository.findByUserId(userPrincipal.getId()).ifPresentOrElse(userRefreshToken -> {
+            userRefreshToken.updateRefreshToken(tokenResponseDto.getRefreshToken());
+            userRefreshTokens[0] = userRefreshToken;
+
+        }, () -> {
+            UserRefreshToken userRefreshToken = new UserRefreshToken(userPrincipal.getId(), tokenResponseDto.getRefreshToken());
+            userRefreshTokens[0] = userRefreshTokenRepository.save(userRefreshToken);
+        });
+
+        return userRefreshTokens[0];
     }
 
-    private void saveTokenOnResponseAndCookie(HttpServletRequest request, HttpServletResponse response, TokenResponseDto tokenResponseDto) {
-        // access token
+    private void saveTokenOnResponseAndCookie(HttpServletRequest request, HttpServletResponse response, TokenResponseDto tokenResponseDto, UserRefreshToken userRefreshToken) {
         response.setContentType("application/json;charset=UTF-8");
-        response.addHeader("Authorization", tokenResponseDto.getAccessToken());
-        // refresh token
+        response.addHeader("Authorization", tokenResponseDto.getGrantType() + tokenResponseDto.getAccessToken());
         CookieUtils.deleteCookie(request, response, REFRESH_TOKEN);
-        CookieUtils.addCookie(response, REFRESH_TOKEN, tokenResponseDto.getRefreshToken(), tokenResponseDto.getRefreshTokenValidTime().intValue());
+        CookieUtils.addCookie(response, REFRESH_TOKEN, String.valueOf(userRefreshToken.getId()), COOKIE_MAX_AGE);
     }
 
     private void clearAuthenticationAttributes(HttpServletRequest request, HttpServletResponse response) {

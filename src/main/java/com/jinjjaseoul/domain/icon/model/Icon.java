@@ -1,4 +1,4 @@
-package com.jinjjaseoul.domain.user.model.entity;
+package com.jinjjaseoul.domain.icon.model;
 
 import com.jinjjaseoul.domain.BaseEntity;
 import lombok.AccessLevel;
@@ -13,22 +13,18 @@ import javax.persistence.Id;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class UserRefreshToken extends BaseEntity {
+public class Icon extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long userId;
+    private String imageUrl;
 
-    private String refreshToken;
+    private String name;
 
-    public UserRefreshToken(Long userId, String refreshToken) {
-        this.userId = userId;
-        this.refreshToken = refreshToken;
-    }
-
-    public void updateRefreshToken(String refreshToken) {
-        this.refreshToken = refreshToken;
+    public Icon(String imageUrl, String name) {
+        this.imageUrl = imageUrl;
+        this.name = name;
     }
 }

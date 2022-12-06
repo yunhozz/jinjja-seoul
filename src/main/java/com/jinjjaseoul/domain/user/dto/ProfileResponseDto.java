@@ -1,17 +1,15 @@
-package com.jinjjaseoul.auth.oauth2;
+package com.jinjjaseoul.domain.user.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
-
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class SessionUser implements Serializable {
+public class ProfileResponseDto {
 
-    private String email;
     private String name;
+    private String introduction;
     private Long iconId;
 }

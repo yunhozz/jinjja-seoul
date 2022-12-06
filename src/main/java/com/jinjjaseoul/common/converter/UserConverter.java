@@ -1,24 +1,26 @@
 package com.jinjjaseoul.common.converter;
 
+import com.jinjjaseoul.common.enums.Provider;
 import com.jinjjaseoul.common.enums.Role;
+import com.jinjjaseoul.domain.icon.model.Icon;
 import com.jinjjaseoul.domain.user.dto.UserRequestDto;
 import com.jinjjaseoul.domain.user.dto.UserResponseDto;
-import com.jinjjaseoul.domain.user.model.entity.User;
+import com.jinjjaseoul.domain.user.model.User;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 public class UserConverter {
 
     // TODO: 2022-12-02 아이콘 랜덤 배정 -> RandomIdUtils
-    public static User convertToEntity(UserRequestDto userRequestDto) {
+    public static User convertToEntity(UserRequestDto userRequestDto, Icon icon) {
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         return User.builder()
                 .email(userRequestDto.getEmail())
                 .password(encoder.encode(userRequestDto.getPassword()))
                 .name(userRequestDto.getName())
                 .introduction(null)
-                .icon(null)
+                .icon(icon)
                 .role(Role.USER)
-                .provider(null)
+                .provider(Provider.LOCAL)
                 .build();
     }
 

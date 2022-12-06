@@ -2,8 +2,8 @@ package com.jinjjaseoul.auth.model;
 
 import com.jinjjaseoul.common.converter.UserConverter;
 import com.jinjjaseoul.domain.user.dto.UserResponseDto;
-import com.jinjjaseoul.domain.user.model.entity.User;
-import com.jinjjaseoul.domain.user.model.repository.UserRepository;
+import com.jinjjaseoul.domain.user.model.User;
+import com.jinjjaseoul.domain.user.model.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
