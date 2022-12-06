@@ -4,8 +4,8 @@ import com.jinjjaseoul.auth.model.UserPrincipal;
 import com.jinjjaseoul.common.converter.UserConverter;
 import com.jinjjaseoul.common.enums.Role;
 import com.jinjjaseoul.domain.user.dto.UserResponseDto;
-import com.jinjjaseoul.domain.user.model.entity.User;
-import com.jinjjaseoul.domain.user.model.repository.UserRepository;
+import com.jinjjaseoul.domain.user.model.User;
+import com.jinjjaseoul.domain.user.model.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -27,6 +27,9 @@ public class OAuth2UserServiceImpl implements OAuth2UserService<OAuth2UserReques
     private final UserRepository userRepository;
     private final HttpSession session;
 
+    private final String SESSION_KEY = "email";
+    private final String ACCESS_TOKEN_REDIS_DATA = "logout";
+
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
         DefaultOAuth2UserService delegate = new DefaultOAuth2UserService();
@@ -43,7 +46,7 @@ public class OAuth2UserServiceImpl implements OAuth2UserService<OAuth2UserReques
 
         User user = saveOrUpdate(oAuth2Provider);
         UserResponseDto userResponseDto = UserConverter.convertToDto(user);
-        saveUserInfoInSession(session, userResponseDto);
+        session.setAttribute(SESSION_KEY, userResponseDto.getEmail());
 
         return new UserPrincipal(userResponseDto, attributes);
     }
@@ -67,10 +70,5 @@ public class OAuth2UserServiceImpl implements OAuth2UserService<OAuth2UserReques
         } else user = findUser.get().updateInfo(oAuth2Provider.getEmail(), oAuth2Provider.getName(), oAuth2Provider.getProvider());
 
         return user;
-    }
-
-    private void saveUserInfoInSession(HttpSession session, UserResponseDto userResponseDto) {
-        SessionUser sessionUser = new SessionUser(userResponseDto.getEmail(), userResponseDto.getName());
-        session.setAttribute("userInfo", sessionUser);
     }
 }

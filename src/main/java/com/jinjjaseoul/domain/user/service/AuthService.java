@@ -3,7 +3,6 @@ package com.jinjjaseoul.domain.user.service;
 import com.jinjjaseoul.auth.jwt.JwtService;
 import com.jinjjaseoul.auth.jwt.TokenResponseDto;
 import com.jinjjaseoul.auth.model.UserPrincipal;
-import com.jinjjaseoul.common.SessionUser;
 import com.jinjjaseoul.common.converter.UserConverter;
 import com.jinjjaseoul.common.utils.RedisUtils;
 import com.jinjjaseoul.domain.user.dto.LoginRequestDto;
@@ -33,10 +32,7 @@ public class AuthService {
     private final RedisUtils redisUtils;
     private final HttpSession session;
 
-    @Value("${jinjja-seoul.jwt.accessTime}")
-    private Long accessTokenValidMilliSecond;
-
-    private final String SESSION_KEY = "userInfo";
+    private final String SESSION_KEY = "email";
     private final String ACCESS_TOKEN_REDIS_DATA = "logout";
 
     @Transactional(readOnly = true)
@@ -49,7 +45,7 @@ public class AuthService {
 
             redisUtils.setValues(userResponseDto.getEmail(), tokenResponseDto[0].getRefreshToken(), Duration.ofMillis(tokenResponseDto[0].getRefreshTokenValidTime()));
             saveTokenOnResponse(response, tokenResponseDto[0]);
-            session.setAttribute(SESSION_KEY, new SessionUser(userResponseDto.getEmail(), userResponseDto.getRole()));
+            session.setAttribute(SESSION_KEY, userResponseDto.getEmail());
 
         }, () -> {
             throw new EmailNotFoundException();
@@ -60,8 +56,9 @@ public class AuthService {
 
     // access token 만료 -> 세션에 저장된 이메일 정보 요청 -> redis 에 저장된 refresh token 을 이용하여 재발급 요청
     public TokenResponseDto tokenReissue(HttpServletResponse response) {
-        SessionUser sessionUser = (SessionUser) session.getAttribute(SESSION_KEY);
-        String refreshToken = redisUtils.getValues(sessionUser.getEmail());
+        String email = (String) session.getAttribute(SESSION_KEY);
+        String refreshToken = redisUtils.getValues(email)
+                .orElseThrow(JwtTokenNotFoundException::new);
 
         if (refreshToken == null) {
             throw new JwtTokenNotFoundException();
@@ -94,13 +91,13 @@ public class AuthService {
 
     private void validatePasswordAndLoginCondition(LoginRequestDto loginRequestDto, UserResponseDto userResponseDto) {
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-        SessionUser sessionUser = (SessionUser) session.getAttribute("userInfo");
+        String email = (String) session.getAttribute(SESSION_KEY);
 
         if (!encoder.matches(loginRequestDto.getPassword(), userResponseDto.getPassword())) {
             throw new PasswordDifferentException();
         }
 
-        if (sessionUser != null && sessionUser.getEmail().equals(loginRequestDto.getEmail())) {
+        if (email != null && email.equals(loginRequestDto.getEmail())) {
             throw new AlreadyLoginException();
         }
     }
