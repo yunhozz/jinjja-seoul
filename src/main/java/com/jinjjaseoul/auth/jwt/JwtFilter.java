@@ -32,7 +32,8 @@ public class JwtFilter extends OncePerRequestFilter {
 
         resolveToken(request).ifPresent(accessToken -> {
             if (jwtService.isValidatedToken(accessToken)) {
-                String logout = redisUtils.getValues(accessToken);
+                String logout = redisUtils.getValues(accessToken)
+                        .orElse(null);
                 // access token 로그아웃 상태 확인
                 if (!StringUtils.hasText(logout)) {
                     Authentication authentication = jwtService.getAuthentication(accessToken);

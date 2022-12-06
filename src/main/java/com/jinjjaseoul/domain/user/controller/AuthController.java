@@ -32,20 +32,20 @@ public class AuthController {
     }
 
     @PostMapping("/issue")
-    public Response tokenReIssue(HttpServletResponse response) {
-        TokenResponseDto tokenResponseDto = authService.tokenReissue(response);
+    public Response tokenReIssue(@RequestHeader("Authorization") String refreshToken, HttpServletResponse response) {
+        TokenResponseDto tokenResponseDto = authService.reissue(refreshToken, response);
         return Response.success(HttpStatus.CREATED, tokenResponseDto);
     }
 
     @PostMapping("/logout")
-    public Response logout(@RequestHeader("Authorization") String accessToken, @AuthenticationPrincipal UserPrincipal userPrincipal, HttpServletResponse response) {
-        authService.logout(accessToken, userPrincipal, response);
+    public Response logout(@RequestHeader("Authorization") String accessToken, @AuthenticationPrincipal UserPrincipal userPrincipal) {
+        authService.logout(accessToken, userPrincipal);
         return Response.success(HttpStatus.CREATED, "로그아웃이 완료되었습니다.");
     }
 
     @PatchMapping("/withdraw")
-    public Response withdraw(@RequestHeader("Authorization") String accessToken, @AuthenticationPrincipal UserPrincipal userPrincipal, HttpServletResponse response) {
-        authService.withdraw(accessToken, userPrincipal, response);
+    public Response withdraw(@RequestHeader("Authorization") String accessToken, @AuthenticationPrincipal UserPrincipal userPrincipal) {
+        authService.withdraw(accessToken, userPrincipal);
         return Response.success(HttpStatus.CREATED, "회원 탈퇴가 완료되었습니다.");
     }
 }

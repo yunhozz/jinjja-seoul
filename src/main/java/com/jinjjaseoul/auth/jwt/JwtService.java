@@ -2,7 +2,6 @@ package com.jinjjaseoul.auth.jwt;
 
 import com.jinjjaseoul.auth.model.UserDetailsServiceImpl;
 import com.jinjjaseoul.common.enums.Role;
-import com.jinjjaseoul.common.utils.RedisUtils;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Header;
@@ -21,7 +20,6 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.nio.charset.StandardCharsets;
-import java.time.Duration;
 import java.util.Date;
 
 @Slf4j
@@ -30,7 +28,6 @@ import java.util.Date;
 public class JwtService {
 
     private final UserDetailsServiceImpl userDetailsService;
-    private final RedisUtils redisUtils;
 
     @Value("${jinjja-seoul.jwt.secret}")
     private String secretKey;
@@ -44,6 +41,9 @@ public class JwtService {
     @Value("${jinjja-seoul.jwt.refreshTime}")
     private Long refreshTokenValidMilliSecond;
 
+    private final String ACCESS_TOKEN_SUBJECT = "access_token";
+    private final String REFRESH_TOKEN_SUBJECT = "refresh_token";
+
     @PostConstruct
     protected void init() {
         secretKey = Base64UrlCodec.BASE64URL.encode(secretKey.getBytes(StandardCharsets.UTF_8));
@@ -54,9 +54,8 @@ public class JwtService {
         claims.put("role", role.getValue());
         Date now = new Date();
 
-        String accessToken = createToken(claims, now, accessTokenValidMilliSecond);
-        String refreshToken = createToken(claims, now, refreshTokenValidMilliSecond);
-        redisUtils.setValues(email, refreshToken, Duration.ofMillis(refreshTokenValidMilliSecond));
+        String accessToken = createToken(ACCESS_TOKEN_SUBJECT, claims, now, accessTokenValidMilliSecond);
+        String refreshToken = createToken(REFRESH_TOKEN_SUBJECT, claims, now, refreshTokenValidMilliSecond);
 
         return TokenResponseDto.builder()
                 .grantType(grantType)
@@ -102,9 +101,14 @@ public class JwtService {
         return false;
     }
 
-    private String createToken(Claims claims, Date date, Long time) {
+    public boolean isRefreshToken(String token) {
+        return parseToken(token).getSubject().equals(REFRESH_TOKEN_SUBJECT);
+    }
+
+    private String createToken(String subject, Claims claims, Date date, Long time) {
         return Jwts.builder()
                 .setHeaderParam(Header.TYPE, Header.JWT_TYPE)
+                .setSubject(subject)
                 .setClaims(claims)
                 .setIssuedAt(date)
                 .setExpiration(new Date(date.getTime() + time))
