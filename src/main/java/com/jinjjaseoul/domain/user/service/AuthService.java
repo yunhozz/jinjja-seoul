@@ -14,7 +14,7 @@ import com.jinjjaseoul.domain.user.service.exception.EmailNotFoundException;
 import com.jinjjaseoul.domain.user.service.exception.JwtTokenNotFoundException;
 import com.jinjjaseoul.domain.user.service.exception.PasswordDifferentException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -73,18 +73,17 @@ public class AuthService {
 
     // refresh token 삭제, access token 값을 redis 에 key 로 저장
     // 로그아웃된 access token 으로 요청이 들어왔을 때, 해당 토큰의 유효성이 남아있는 동안은 redis 에 블랙리스트로 등록되어 있을 것이기 때문에 로그인 불가
-    public void logout(String accessToken, UserPrincipal userPrincipal, HttpServletResponse response) {
+    public void logout(String accessToken, UserPrincipal userPrincipal) {
         String token = accessToken.split(" ")[1];
         Long expirationTime = jwtService.getExpirationTime(token);
 
-        redisUtils.deleteValues(userPrincipal.getUsername()); // refresh token 삭제
-        redisUtils.setValues(token, ACCESS_TOKEN_REDIS_DATA, Duration.ofMillis(expirationTime));
+        updateRedisData(userPrincipal, token, ACCESS_TOKEN_REDIS_DATA, expirationTime);
         session.removeAttribute(SESSION_KEY);
     }
 
     @Transactional
-    public void withdraw(String accessToken, UserPrincipal userPrincipal, HttpServletResponse response) {
-        logout(accessToken, userPrincipal, response);
+    public void withdraw(String accessToken, UserPrincipal userPrincipal) {
+        logout(accessToken, userPrincipal);
         User user = userRepository.getReferenceById(userPrincipal.getId());
         user.withdraw();
     }
@@ -100,6 +99,11 @@ public class AuthService {
         if (email != null && email.equals(loginRequestDto.getEmail())) {
             throw new AlreadyLoginException();
         }
+    }
+
+    private void updateRedisData(UserPrincipal userPrincipal, String key, String data, Long timeMills) {
+        redisUtils.deleteValues(userPrincipal.getUsername());
+        redisUtils.setValues(key, data, Duration.ofMillis(timeMills));
     }
 
     private void saveTokenOnResponse(HttpServletResponse response, TokenResponseDto tokenResponseDto) {

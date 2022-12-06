@@ -2,7 +2,6 @@ package com.jinjjaseoul.auth.jwt;
 
 import com.jinjjaseoul.auth.model.UserDetailsServiceImpl;
 import com.jinjjaseoul.common.enums.Role;
-import com.jinjjaseoul.common.utils.RedisUtils;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Header;
@@ -21,7 +20,6 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.nio.charset.StandardCharsets;
-import java.time.Duration;
 import java.util.Date;
 
 @Slf4j
@@ -30,7 +28,6 @@ import java.util.Date;
 public class JwtService {
 
     private final UserDetailsServiceImpl userDetailsService;
-    private final RedisUtils redisUtils;
 
     @Value("${jinjja-seoul.jwt.secret}")
     private String secretKey;
@@ -56,7 +53,6 @@ public class JwtService {
 
         String accessToken = createToken(claims, now, accessTokenValidMilliSecond);
         String refreshToken = createToken(claims, now, refreshTokenValidMilliSecond);
-        redisUtils.setValues(email, refreshToken, Duration.ofMillis(refreshTokenValidMilliSecond));
 
         return TokenResponseDto.builder()
                 .grantType(grantType)
