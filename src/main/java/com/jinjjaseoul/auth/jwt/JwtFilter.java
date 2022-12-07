@@ -28,15 +28,20 @@ public class JwtFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         log.info("[Verifying Token]");
-        log.info("uri = " + request.getRequestURI());
+        log.info("url = " + request.getRequestURL());
 
-        resolveToken(request).ifPresent(accessToken -> {
-            if (jwtService.isValidatedToken(accessToken)) {
-                String logout = redisUtils.getValues(accessToken)
-                        .orElse(null);
+        resolveToken(request).ifPresent(token -> {
+            if (jwtService.isValidatedToken(token)) {
+                String logout = redisUtils.getValues(token).orElse(null);
+                String requestURI = request.getRequestURI();
+
+                if (jwtService.isRefreshToken(token) && !requestURI.equals("/api/auth/issue")) {
+                    throw new IllegalStateException("JWT 토큰을 확인해주세요.");
+                }
+
                 // access token 로그아웃 상태 확인
                 if (!StringUtils.hasText(logout)) {
-                    Authentication authentication = jwtService.getAuthentication(accessToken);
+                    Authentication authentication = jwtService.getAuthentication(token);
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                 }
             }
