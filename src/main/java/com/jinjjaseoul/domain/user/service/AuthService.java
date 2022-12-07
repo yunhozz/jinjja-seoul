@@ -14,8 +14,8 @@ import com.jinjjaseoul.domain.user.service.exception.EmailNotFoundException;
 import com.jinjjaseoul.domain.user.service.exception.JwtTokenNotFoundException;
 import com.jinjjaseoul.domain.user.service.exception.NotRefreshTokenException;
 import com.jinjjaseoul.domain.user.service.exception.PasswordDifferentException;
+import com.jinjjaseoul.domain.user.service.exception.RefreshTokenDifferentException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,19 +52,19 @@ public class AuthService {
     }
 
     // access token 만료 -> 재요청 -> Authorization 헤더에 refresh token 검증 -> redis 에 존재하는지 검증 -> 재발급
-    public TokenResponseDto reissue(String refreshToken, HttpServletResponse response) {
+    public TokenResponseDto reissue(String refreshToken, UserPrincipal userPrincipal, HttpServletResponse response) {
         String token = refreshToken.split(" ")[1];
-
         if (!jwtService.isRefreshToken(token)) {
             throw new NotRefreshTokenException();
         }
 
-        Authentication authentication = jwtService.getAuthentication(token);
-        UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
-        String email = redisUtils.getValues(userPrincipal.getUsername())
+        String redisToken = redisUtils.getValues(userPrincipal.getUsername())
                 .orElseThrow(JwtTokenNotFoundException::new);
+        if (!redisToken.equals(token)) {
+            throw new RefreshTokenDifferentException();
+        }
 
-        TokenResponseDto tokenResponseDto = jwtService.createTokenDto(email, userPrincipal.getRole());
+        TokenResponseDto tokenResponseDto = jwtService.createTokenDto(userPrincipal.getUsername(), userPrincipal.getRole());
         updateRedisData(userPrincipal, userPrincipal.getUsername(), tokenResponseDto.getRefreshToken(), tokenResponseDto.getRefreshTokenValidTime());
         saveTokenOnResponse(response, tokenResponseDto);
 

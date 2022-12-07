@@ -32,8 +32,8 @@ public class AuthController {
     }
 
     @PostMapping("/issue")
-    public Response tokenReIssue(@RequestHeader("Authorization") String refreshToken, HttpServletResponse response) {
-        TokenResponseDto tokenResponseDto = authService.reissue(refreshToken, response);
+    public Response tokenReIssue(@RequestHeader("Authorization") String refreshToken, @AuthenticationPrincipal UserPrincipal userPrincipal, HttpServletResponse response) {
+        TokenResponseDto tokenResponseDto = authService.reissue(refreshToken, userPrincipal, response);
         return Response.success(HttpStatus.CREATED, tokenResponseDto);
     }
 
