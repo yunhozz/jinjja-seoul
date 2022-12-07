@@ -9,23 +9,23 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.UnsupportedJwtException;
-import io.jsonwebtoken.impl.Base64UrlCodec;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.Date;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class JwtService {
+public class JwtService implements InitializingBean {
 
     private final UserDetailsServiceImpl userDetailsService;
 
@@ -41,12 +41,12 @@ public class JwtService {
     @Value("${jinjja-seoul.jwt.refreshTime}")
     private Long refreshTokenValidMilliSecond;
 
-    private final String ACCESS_TOKEN_SUBJECT = "access_token";
-    private final String REFRESH_TOKEN_SUBJECT = "refresh_token";
+    private final String ACCESS_TOKEN_TYPE = "atk";
+    private final String REFRESH_TOKEN_TYPE = "rtk";
 
-    @PostConstruct
-    protected void init() {
-        secretKey = Base64UrlCodec.BASE64URL.encode(secretKey.getBytes(StandardCharsets.UTF_8));
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes(StandardCharsets.UTF_8));
     }
 
     public TokenResponseDto createTokenDto(String email, Role role) {
@@ -54,8 +54,8 @@ public class JwtService {
         claims.put("role", role.getValue());
         Date now = new Date();
 
-        String accessToken = createToken(ACCESS_TOKEN_SUBJECT, claims, now, accessTokenValidMilliSecond);
-        String refreshToken = createToken(REFRESH_TOKEN_SUBJECT, claims, now, refreshTokenValidMilliSecond);
+        String accessToken = createToken(claims, ACCESS_TOKEN_TYPE, now, accessTokenValidMilliSecond);
+        String refreshToken = createToken(claims, REFRESH_TOKEN_TYPE, now, refreshTokenValidMilliSecond);
 
         return TokenResponseDto.builder()
                 .grantType(grantType)
@@ -66,8 +66,7 @@ public class JwtService {
     }
 
     public Authentication getAuthentication(String token) {
-        Claims claims = parseToken(token);
-        String email = claims.getSubject();
+        String email = parseToken(token).getSubject();
         UserDetails userDetails = userDetailsService.loadUserByUsername(email);
 
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
@@ -102,13 +101,13 @@ public class JwtService {
     }
 
     public boolean isRefreshToken(String token) {
-        return parseToken(token).getSubject().equals(REFRESH_TOKEN_SUBJECT);
+        return parseToken(token).get("type").equals(REFRESH_TOKEN_TYPE);
     }
 
-    private String createToken(String subject, Claims claims, Date date, Long time) {
+    private String createToken(Claims claims, String tokenType, Date date, Long time) {
+        claims.put("type", tokenType);
         return Jwts.builder()
                 .setHeaderParam(Header.TYPE, Header.JWT_TYPE)
-                .setSubject(subject)
                 .setClaims(claims)
                 .setIssuedAt(date)
                 .setExpiration(new Date(date.getTime() + time))
