@@ -42,8 +42,8 @@ public class JwtService implements InitializingBean {
     @Value("${jinjja-seoul.jwt.refreshTime}")
     private Long refreshTokenValidMilliSecond;
 
-    private final String ACCESS_TOKEN_TYPE = "atk";
-    private final String REFRESH_TOKEN_TYPE = "rtk";
+    public static final String ACCESS_TOKEN_TYPE = "atk";
+    public static final String REFRESH_TOKEN_TYPE = "rtk";
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -73,6 +73,10 @@ public class JwtService implements InitializingBean {
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
 
+    public String getTokenType(String token) {
+        return parseToken(token).get("type").toString();
+    }
+
     public Long getExpirationTime(String token) {
         Long now = new Date().getTime();
         Long expirationTime = parseToken(token).getExpiration().getTime();
@@ -99,10 +103,6 @@ public class JwtService implements InitializingBean {
         }
 
         return false;
-    }
-
-    public boolean isRefreshToken(String token) {
-        return parseToken(token).get("type").equals(REFRESH_TOKEN_TYPE);
     }
 
     private String createToken(Claims claims, String tokenType, Date date, Long time) {

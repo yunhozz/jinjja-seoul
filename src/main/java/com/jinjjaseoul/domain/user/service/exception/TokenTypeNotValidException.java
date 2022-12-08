@@ -3,9 +3,9 @@ package com.jinjjaseoul.domain.user.service.exception;
 import com.jinjjaseoul.common.enums.ErrorCode;
 import com.jinjjaseoul.common.exception.JinjjaSeoulException;
 
-public class NotRefreshTokenException extends JinjjaSeoulException {
+public class TokenTypeNotValidException extends JinjjaSeoulException {
 
-    public NotRefreshTokenException() {
-        super(ErrorCode.NOT_REFRESH_TOKEN);
+    public TokenTypeNotValidException() {
+        super(ErrorCode.TOKEN_TYPE_NOT_VALID);
     }
 }

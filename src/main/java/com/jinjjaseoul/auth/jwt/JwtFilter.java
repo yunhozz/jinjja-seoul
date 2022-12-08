@@ -17,6 +17,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Optional;
 
+import static com.jinjjaseoul.auth.jwt.JwtService.REFRESH_TOKEN_TYPE;
+
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -35,10 +37,9 @@ public class JwtFilter extends OncePerRequestFilter {
                 String logout = redisUtils.getValues(token).orElse(null);
                 String requestURI = request.getRequestURI();
 
-                if (jwtService.isRefreshToken(token) && !requestURI.equals("/api/auth/issue")) {
+                if (jwtService.getTokenType(token).equals(REFRESH_TOKEN_TYPE) && !requestURI.equals("/api/auth/issue")) {
                     throw new IllegalStateException("JWT 토큰을 확인해주세요.");
                 }
-
                 // access token 로그아웃 상태 확인
                 if (!StringUtils.hasText(logout)) {
                     Authentication authentication = jwtService.getAuthentication(token);
