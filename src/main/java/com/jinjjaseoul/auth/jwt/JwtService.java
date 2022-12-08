@@ -1,6 +1,7 @@
 package com.jinjjaseoul.auth.jwt;
 
 import com.jinjjaseoul.auth.model.UserDetailsServiceImpl;
+import com.jinjjaseoul.common.dto.TokenResponseDto;
 import com.jinjjaseoul.common.enums.Role;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;

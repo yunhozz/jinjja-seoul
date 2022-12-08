@@ -1,9 +1,9 @@
 package com.jinjjaseoul.domain.user.service;
 
 import com.jinjjaseoul.auth.jwt.JwtService;
-import com.jinjjaseoul.auth.jwt.TokenResponseDto;
 import com.jinjjaseoul.auth.model.UserPrincipal;
 import com.jinjjaseoul.common.converter.UserConverter;
+import com.jinjjaseoul.common.dto.TokenResponseDto;
 import com.jinjjaseoul.common.utils.RedisUtils;
 import com.jinjjaseoul.domain.user.dto.LoginRequestDto;
 import com.jinjjaseoul.domain.user.dto.UserResponseDto;

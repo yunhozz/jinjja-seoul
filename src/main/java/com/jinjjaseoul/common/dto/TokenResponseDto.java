@@ -1,4 +1,4 @@
-package com.jinjjaseoul.auth.jwt;
+package com.jinjjaseoul.common.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
