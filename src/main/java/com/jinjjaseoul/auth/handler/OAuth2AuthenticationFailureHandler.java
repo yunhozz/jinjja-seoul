@@ -1,4 +1,4 @@
-package com.jinjjaseoul.auth.oauth2;
+package com.jinjjaseoul.auth.handler;
 
 import com.jinjjaseoul.common.utils.CookieUtils;
 import lombok.RequiredArgsConstructor;
@@ -14,27 +14,27 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-import static com.jinjjaseoul.auth.oauth2.OAuth2AuthorizationRequestRepository.OAUTH2_AUTHORIZATION_REQUEST_COOKIE_NAME;
+import static com.jinjjaseoul.auth.handler.OAuth2AuthorizationRequestCookieRepository.OAUTH2_AUTHORIZATION_REQUEST_COOKIE_NAME;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class OAuth2AuthenticationFailureHandler extends SimpleUrlAuthenticationFailureHandler {
 
-    private final OAuth2AuthorizationRequestRepository oAuth2AuthorizationRequestRepository;
+    private final OAuth2AuthorizationRequestCookieRepository oAuth2AuthorizationRequestCookieRepository;
 
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
-        String targetUrl = CookieUtils.getCookie(request, OAUTH2_AUTHORIZATION_REQUEST_COOKIE_NAME)
+        String targetUri = CookieUtils.getCookie(request, OAUTH2_AUTHORIZATION_REQUEST_COOKIE_NAME)
                 .map(Cookie::getValue)
                 .orElse("/");
 
         exception.printStackTrace();
-        targetUrl = UriComponentsBuilder.fromUriString(targetUrl)
+        targetUri = UriComponentsBuilder.fromUriString(targetUri)
                 .queryParam("error", exception.getLocalizedMessage())
                 .build().toUriString();
 
-        oAuth2AuthorizationRequestRepository.removeAuthorizationRequest(request, response);
-        getRedirectStrategy().sendRedirect(request, response, targetUrl);
+        oAuth2AuthorizationRequestCookieRepository.removeAuthorizationRequest(request, response);
+        getRedirectStrategy().sendRedirect(request, response, targetUri);
     }
 }
