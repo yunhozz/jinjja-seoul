@@ -1,4 +1,4 @@
-package com.jinjjaseoul.domain.user.dto;
+package com.jinjjaseoul.domain.user.dto.request;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -8,7 +8,7 @@ import javax.validation.constraints.NotBlank;
 
 @Getter
 @NoArgsConstructor
-public class UserRequestDto {
+public class LoginRequestDto {
 
     @NotBlank
     @Email
@@ -16,7 +16,4 @@ public class UserRequestDto {
 
     @NotBlank
     private String password;
-
-    @NotBlank
-    private String name;
 }

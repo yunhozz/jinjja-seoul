@@ -2,7 +2,7 @@ package com.jinjjaseoul.auth.model;
 
 import com.jinjjaseoul.common.enums.Provider;
 import com.jinjjaseoul.common.enums.Role;
-import com.jinjjaseoul.domain.user.dto.UserResponseDto;
+import com.jinjjaseoul.domain.user.dto.response.UserResponseDto;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

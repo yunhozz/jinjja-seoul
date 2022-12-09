@@ -3,7 +3,7 @@ package com.jinjjaseoul.domain.user.controller;
 import com.jinjjaseoul.auth.model.UserPrincipal;
 import com.jinjjaseoul.common.dto.Response;
 import com.jinjjaseoul.common.dto.TokenResponseDto;
-import com.jinjjaseoul.domain.user.dto.LoginRequestDto;
+import com.jinjjaseoul.domain.user.dto.request.LoginRequestDto;
 import com.jinjjaseoul.domain.user.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

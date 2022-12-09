@@ -1,7 +1,7 @@
 package com.jinjjaseoul.auth.model;
 
 import com.jinjjaseoul.common.converter.UserConverter;
-import com.jinjjaseoul.domain.user.dto.UserResponseDto;
+import com.jinjjaseoul.domain.user.dto.response.UserResponseDto;
 import com.jinjjaseoul.domain.user.model.User;
 import com.jinjjaseoul.domain.user.model.UserRepository;
 import lombok.RequiredArgsConstructor;

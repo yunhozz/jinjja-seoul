@@ -1,4 +1,4 @@
-package com.jinjjaseoul.domain.user.dto;
+package com.jinjjaseoul.domain.user.dto.request;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

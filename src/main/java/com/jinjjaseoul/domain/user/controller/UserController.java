@@ -2,9 +2,9 @@ package com.jinjjaseoul.domain.user.controller;
 
 import com.jinjjaseoul.auth.model.UserPrincipal;
 import com.jinjjaseoul.common.dto.Response;
-import com.jinjjaseoul.domain.user.dto.ProfileResponseDto;
-import com.jinjjaseoul.domain.user.dto.UpdateRequestDto;
-import com.jinjjaseoul.domain.user.dto.UserRequestDto;
+import com.jinjjaseoul.domain.user.dto.request.UpdateRequestDto;
+import com.jinjjaseoul.domain.user.dto.request.UserRequestDto;
+import com.jinjjaseoul.domain.user.dto.response.ProfileResponseDto;
 import com.jinjjaseoul.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

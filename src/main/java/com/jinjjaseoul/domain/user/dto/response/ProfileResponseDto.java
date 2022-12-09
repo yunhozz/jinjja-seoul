@@ -1,4 +1,4 @@
-package com.jinjjaseoul.domain.user.dto;
+package com.jinjjaseoul.domain.user.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -1,4 +1,4 @@
-package com.jinjjaseoul.domain.user.dto;
+package com.jinjjaseoul.domain.user.dto.response;
 
 import com.jinjjaseoul.common.enums.Provider;
 import com.jinjjaseoul.common.enums.Role;

@@ -5,7 +5,7 @@ import com.jinjjaseoul.common.converter.UserConverter;
 import com.jinjjaseoul.common.enums.Role;
 import com.jinjjaseoul.domain.icon.model.Icon;
 import com.jinjjaseoul.domain.icon.model.IconRepository;
-import com.jinjjaseoul.domain.user.dto.UserResponseDto;
+import com.jinjjaseoul.domain.user.dto.response.UserResponseDto;
 import com.jinjjaseoul.domain.user.model.User;
 import com.jinjjaseoul.domain.user.model.UserRepository;
 import lombok.RequiredArgsConstructor;
