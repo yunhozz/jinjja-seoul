@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.Random;
 
 @Slf4j
 @Component
@@ -54,9 +55,8 @@ public class OAuth2UserServiceImpl implements OAuth2UserService<OAuth2UserReques
         Optional<User> findUser = userRepository.findByEmail(oAuth2Provider.getEmail());
         User user;
 
-        // TODO: 2022-12-02 아이콘 랜덤 배정
         if (findUser.isEmpty()) {
-            Icon icon = new Icon("testUrl", "testIcon");
+            Icon icon = randomIcon();
             iconRepository.save(icon);
 
             user = User.builder()
@@ -76,5 +76,12 @@ public class OAuth2UserServiceImpl implements OAuth2UserService<OAuth2UserReques
         }
 
         return user;
+    }
+
+    private Icon randomIcon() {
+        long iconSize = iconRepository.count();
+        Random random = new Random(iconSize);
+
+        return iconRepository.getReferenceById(random.nextLong());
     }
 }
