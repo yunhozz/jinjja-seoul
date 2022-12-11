@@ -24,6 +24,12 @@ public enum ErrorCode {
     // icon
     ICON_NOT_FOUND(404, "I-041", "해당 아이콘을 찾을 수 없습니다."),
 
+    // map
+    THEME_MAP_NOT_FOUND(404, "M-041", "테마 맵을 찾을 수 없습니다."),
+    THEME_LOCATION_NOT_FOUND(404, "M-042", "테마 장소를 찾을 수 없습니다."),
+    CURATION_MAP_NOT_FOUND(404, "M-043", "큐레이션 맵을 찾을 수 없습니다."),
+    CURATION_LOCATION_NOT_FOUND(404, "M-044", "큐레이션 장소를 찾을 수 없습니다."),
+
     ;
 
     private final int status;

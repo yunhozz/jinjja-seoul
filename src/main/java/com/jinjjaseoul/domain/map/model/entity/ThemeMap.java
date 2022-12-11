@@ -43,7 +43,7 @@ public class ThemeMap extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private List<Category> categories = new ArrayList<>();
 
-    private String keyword;
+    private String keyword; // 선택 사항, 쉼표로 구분
 
     @Builder
     private ThemeMap(User user, String name, Icon icon, List<Category> categories, String keyword) {
@@ -52,5 +52,9 @@ public class ThemeMap extends BaseEntity {
         this.icon = icon;
         this.categories = categories;
         this.keyword = keyword;
+    }
+
+    public boolean isMadeByUser(User user) {
+        return this.user == user;
     }
 }

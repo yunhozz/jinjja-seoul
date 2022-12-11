@@ -43,4 +43,9 @@ public class ThemeLocation extends BaseEntity {
         this.location = location;
         this.imageUrl = imageUrl;
     }
+
+    public void update(Location location, String imageUrl) {
+        this.location = location;
+        this.imageUrl = imageUrl;
+    }
 }

@@ -4,6 +4,7 @@ import com.jinjjaseoul.domain.BaseEntity;
 import com.jinjjaseoul.domain.location.model.entity.Location;
 import com.jinjjaseoul.domain.user.model.User;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -33,4 +34,12 @@ public class CurationLocation extends BaseEntity {
     private Location location;
 
     private String imageUrl;
+
+    @Builder
+    private CurationLocation(User user, CurationMap curationMap, Location location, String imageUrl) {
+        this.user = user;
+        this.curationMap = curationMap;
+        this.location = location;
+        this.imageUrl = imageUrl;
+    }
 }
