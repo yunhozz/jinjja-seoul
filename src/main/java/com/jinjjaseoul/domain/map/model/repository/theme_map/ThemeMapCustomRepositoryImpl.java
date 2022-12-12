@@ -84,7 +84,7 @@ public class ThemeMapCustomRepositoryImpl implements ThemeMapCustomRepository {
     }
 
     @Override
-    public Page<ThemeMapQueryDto> searchThemeMapListByKeyword(String keyword, SearchQueryDto searchQueryDto, Long themeMapId, Pageable pageable) {
+    public Page<ThemeMapQueryDto> searchThemeMapListByKeyword(String keyword, SearchQueryDto searchQueryDto, Long lastThemeMapId, Pageable pageable) {
         List<ThemeMapQueryDto> themeMapSearchList = queryFactory
                 .select(new QThemeMapQueryDto(
                         themeMap.id,
@@ -94,7 +94,7 @@ public class ThemeMapCustomRepositoryImpl implements ThemeMapCustomRepository {
                 ))
                 .from(themeMap)
                 .join(themeMap.icon, icon)
-                .where(themeMapIdGt(themeMapId))
+                .where(themeMapIdLt(lastThemeMapId))
                 .where(
                         byKeyword(keyword),
                         byPlace(searchQueryDto.getPlace()),
@@ -144,8 +144,8 @@ public class ThemeMapCustomRepositoryImpl implements ThemeMapCustomRepository {
                 .fetchOne();
     }
 
-    private BooleanExpression themeMapIdGt(Long themeMapId) {
-        return themeMapId != null ? themeMap.id.gt(themeMapId) : null;
+    private BooleanExpression themeMapIdLt(Long lastThemeMapId) {
+        return lastThemeMapId != null ? themeMap.id.lt(lastThemeMapId) : null;
     }
 
     private BooleanExpression byKeyword(String keyword) {
