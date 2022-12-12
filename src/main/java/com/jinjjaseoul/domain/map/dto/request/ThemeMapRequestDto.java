@@ -16,7 +16,7 @@ public class ThemeMapRequestDto {
     private String name;
     @NotEmpty
     private List<Category> categories;
-    private String keyword;
+    private String keywordArr; // 쉼표로 구분
 
     // 생성 후 장소 등록
     private Long locationId;
