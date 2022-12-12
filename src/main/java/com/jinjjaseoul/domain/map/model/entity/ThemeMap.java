@@ -1,6 +1,12 @@
 package com.jinjjaseoul.domain.map.model.entity;
 
+import com.jinjjaseoul.common.enums.Beverage;
 import com.jinjjaseoul.common.enums.Category;
+import com.jinjjaseoul.common.enums.Characteristics;
+import com.jinjjaseoul.common.enums.Food;
+import com.jinjjaseoul.common.enums.Place;
+import com.jinjjaseoul.common.enums.Somebody;
+import com.jinjjaseoul.common.enums.Something;
 import com.jinjjaseoul.domain.BaseEntity;
 import com.jinjjaseoul.domain.icon.model.Icon;
 import com.jinjjaseoul.domain.user.model.User;
@@ -10,6 +16,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.ElementCollection;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -43,18 +50,33 @@ public class ThemeMap extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private List<Category> categories = new ArrayList<>();
 
-    private String keyword; // 선택 사항, 쉼표로 구분
+    @ElementCollection
+    private List<String> keywordList = new ArrayList<>();
+
+    @Embedded
+    private MapSearch mapSearch; // 검색 조건 : 어디로?, 누구와?, 무엇을?, 분위기/특징, 음식, 술/음료
 
     @Builder
-    private ThemeMap(User user, String name, Icon icon, List<Category> categories, String keyword) {
+    private ThemeMap(User user, String name, Icon icon, List<Category> categories, List<String> keywordList) {
         this.user = user;
         this.name = name;
         this.icon = icon;
         this.categories = categories;
-        this.keyword = keyword;
+        this.keywordList = keywordList;
     }
 
     public boolean isMadeByUser(User user) {
         return this.user == user;
+    }
+
+    public void updateSearchCondition(Place place, Somebody somebody, Something something, Characteristics characteristics, Food food, Beverage beverage) {
+        mapSearch = MapSearch.builder()
+                .place(place)
+                .somebody(somebody)
+                .something(something)
+                .characteristics(characteristics)
+                .food(food)
+                .beverage(beverage)
+                .build();
     }
 }

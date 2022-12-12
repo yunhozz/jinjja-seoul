@@ -1,5 +1,12 @@
 package com.jinjjaseoul.domain.map.model.entity;
 
+import com.jinjjaseoul.common.enums.Beverage;
+import com.jinjjaseoul.common.enums.Category;
+import com.jinjjaseoul.common.enums.Characteristics;
+import com.jinjjaseoul.common.enums.Food;
+import com.jinjjaseoul.common.enums.Place;
+import com.jinjjaseoul.common.enums.Somebody;
+import com.jinjjaseoul.common.enums.Something;
 import com.jinjjaseoul.domain.BaseEntity;
 import com.jinjjaseoul.domain.icon.model.Icon;
 import com.jinjjaseoul.domain.user.model.User;
@@ -8,6 +15,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -43,6 +51,9 @@ public class CurationMap extends BaseEntity {
 
     private int numOfLikes;
 
+    @Embedded
+    private MapSearch mapSearch; // 검색 조건 : 어디로?, 누구와?, 무엇을?, 분위기/특징, 음식, 술/음료, 카테고리
+
     @Builder
     private CurationMap(User user, String name, Icon icon, boolean isMakeTogether, boolean isProfileDisplay, boolean isShared, String redirectUrl) {
         this.user = user;
@@ -52,6 +63,18 @@ public class CurationMap extends BaseEntity {
         this.isProfileDisplay = isProfileDisplay;
         this.isShared = isShared;
         this.redirectUrl = redirectUrl;
+    }
+
+    public void updateSearchCondition(Place place, Somebody somebody, Something something, Characteristics characteristics, Food food, Beverage beverage, Category category) {
+        mapSearch = MapSearch.builder()
+                .place(place)
+                .somebody(somebody)
+                .something(something)
+                .characteristics(characteristics)
+                .food(food)
+                .beverage(beverage)
+                .category(category)
+                .build();
     }
 
     public void addLikes() {
