@@ -5,6 +5,7 @@ import com.jinjjaseoul.domain.icon.model.Icon;
 import com.jinjjaseoul.domain.icon.model.IconRepository;
 import com.jinjjaseoul.domain.location.model.entity.Location;
 import com.jinjjaseoul.domain.location.model.repository.LocationRepository;
+import com.jinjjaseoul.domain.map.dto.request.MapSearchRequestDto;
 import com.jinjjaseoul.domain.map.dto.request.ThemeMapRequestDto;
 import com.jinjjaseoul.domain.map.model.entity.ThemeLocation;
 import com.jinjjaseoul.domain.map.model.entity.ThemeMap;
@@ -67,6 +68,20 @@ public class ThemeMapService {
             ThemeLocation themeLocation = createThemeLocation(user, themeMap, location, imageUrl);
             themeLocationRepository.save(themeLocation);
         }
+    }
+
+    // 검색용 테이블 업데이트 (운영자)
+    @Transactional
+    public void updateMapSearchTable(Long themeMapId, MapSearchRequestDto mapSearchRequestDto) {
+        ThemeMap themeMap = findThemeMap(themeMapId);
+        themeMap.updateSearchCondition(
+                mapSearchRequestDto.getPlace(),
+                mapSearchRequestDto.getSomebody(),
+                mapSearchRequestDto.getSomething(),
+                mapSearchRequestDto.getCharacteristics(),
+                mapSearchRequestDto.getFood(),
+                mapSearchRequestDto.getBeverage()
+        );
     }
 
     @Transactional
