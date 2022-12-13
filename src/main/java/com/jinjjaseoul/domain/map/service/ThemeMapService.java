@@ -20,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Random;
 
 @Slf4j
@@ -87,6 +88,12 @@ public class ThemeMapService {
     @Transactional
     public void deleteThemeMap(Long themeMapId) {
         ThemeMap themeMap = findThemeMap(themeMapId);
+        List<ThemeLocation> themeLocationList = themeLocationRepository.findByThemeMap(themeMap);
+
+        for (ThemeLocation themeLocation : themeLocationList) {
+            themeLocationRepository.delete(themeLocation);
+        }
+
         themeMapRepository.delete(themeMap);
     }
 
