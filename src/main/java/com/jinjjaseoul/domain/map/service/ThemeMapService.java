@@ -88,12 +88,9 @@ public class ThemeMapService {
     @Transactional
     public void deleteThemeMap(Long themeMapId) {
         ThemeMap themeMap = findThemeMap(themeMapId);
-        List<ThemeLocation> themeLocationList = themeLocationRepository.findByThemeMap(themeMap);
+        List<Long> themeLocationIds = themeLocationRepository.findIdsByThemeMapId(themeMap.getId());
 
-        for (ThemeLocation themeLocation : themeLocationList) {
-            themeLocationRepository.delete(themeLocation);
-        }
-
+        themeLocationRepository.deleteAllByIds(themeLocationIds);
         themeMapRepository.delete(themeMap);
     }
 
