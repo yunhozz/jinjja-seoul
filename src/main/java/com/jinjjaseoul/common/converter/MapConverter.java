@@ -15,7 +15,7 @@ public class MapConverter {
 
     public static ThemeMap convertToThemeMapEntity(ThemeMapRequestDto themeMapRequestDto, User user, Icon icon) {
         List<String> keywordList = new ArrayList<>() {{
-            String[] keyword = themeMapRequestDto.getKeywordArr().split(",");
+            String[] keyword = themeMapRequestDto.getKeywordStr().split(",");
             this.addAll(Arrays.asList(keyword));
         }};
 
