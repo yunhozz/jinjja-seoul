@@ -44,7 +44,7 @@ public class AuthService {
             validatePasswordAndLoginCondition(loginRequestDto, userResponseDto);
             tokenResponseDto[0] = jwtService.createTokenDto(userResponseDto.getEmail(), userResponseDto.getRole());
 
-            redisUtils.setValues(userResponseDto.getEmail(), tokenResponseDto[0].getRefreshToken(), Duration.ofMillis(tokenResponseDto[0].getRefreshTokenValidTime()));
+            redisUtils.setValue(userResponseDto.getEmail(), tokenResponseDto[0].getRefreshToken(), Duration.ofMillis(tokenResponseDto[0].getRefreshTokenValidTime()));
             saveTokenOnResponse(response, tokenResponseDto[0]);
 
         }, () -> {
@@ -59,7 +59,7 @@ public class AuthService {
         String token = refreshToken.split(" ")[1];
         validateRefreshToken(token);
 
-        String redisToken = redisUtils.getValues(userPrincipal.getUsername())
+        String redisToken = redisUtils.getValue(userPrincipal.getUsername())
                 .orElseThrow(JwtTokenNotFoundException::new);
         validateRedisToken(token, redisToken);
 
@@ -93,7 +93,7 @@ public class AuthService {
             throw new PasswordDifferentException();
         }
 
-        if (redisUtils.getValues(loginRequestDto.getEmail()).isPresent()) {
+        if (redisUtils.getValue(loginRequestDto.getEmail()).isPresent()) {
             throw new AlreadyLoginException();
         }
     }
@@ -117,8 +117,8 @@ public class AuthService {
     }
 
     private void updateRedisData(UserPrincipal userPrincipal, String key, String data, Long timeMills) {
-        redisUtils.deleteValues(userPrincipal.getUsername());
-        redisUtils.setValues(key, data, Duration.ofMillis(timeMills));
+        redisUtils.deleteData(userPrincipal.getUsername());
+        redisUtils.setValue(key, data, Duration.ofMillis(timeMills));
     }
 
     private void saveTokenOnResponse(HttpServletResponse response, TokenResponseDto tokenResponseDto) {

@@ -34,7 +34,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
         resolveToken(request).ifPresent(token -> {
             if (jwtService.isValidatedToken(token)) {
-                String logout = redisUtils.getValues(token).orElse(null);
+                String logout = redisUtils.getValue(token).orElse(null);
                 String requestURI = request.getRequestURI();
 
                 if (jwtService.getTokenType(token).equals(REFRESH_TOKEN_TYPE) && !requestURI.equals("/api/auth/issue")) {

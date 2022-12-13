@@ -38,7 +38,7 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
 
         // access token -> Authorization 헤더에 저장 & refresh token -> redis 에 저장
         saveAccessTokenOnResponse(response, tokenResponseDto);
-        redisUtils.setValues(userPrincipal.getUsername(), tokenResponseDto.getRefreshToken(), Duration.ofMillis(tokenResponseDto.getRefreshTokenValidTime()));
+        redisUtils.setValue(userPrincipal.getUsername(), tokenResponseDto.getRefreshToken(), Duration.ofMillis(tokenResponseDto.getRefreshTokenValidTime()));
 
         resultRedirectStrategy(request, response);
         clearAuthenticationAttributes(request);
