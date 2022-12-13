@@ -8,9 +8,11 @@ import com.jinjjaseoul.common.enums.Place;
 import com.jinjjaseoul.common.enums.Somebody;
 import com.jinjjaseoul.common.enums.Something;
 import com.jinjjaseoul.domain.map.dto.query.QThemeLocationCountQueryDto;
+import com.jinjjaseoul.domain.map.dto.query.QThemeLocationSimpleQueryDto;
 import com.jinjjaseoul.domain.map.dto.query.QThemeMapQueryDto;
 import com.jinjjaseoul.domain.map.dto.query.SearchQueryDto;
 import com.jinjjaseoul.domain.map.dto.query.ThemeLocationCountQueryDto;
+import com.jinjjaseoul.domain.map.dto.query.ThemeLocationSimpleQueryDto;
 import com.jinjjaseoul.domain.map.dto.query.ThemeMapQueryDto;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -27,8 +29,10 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.jinjjaseoul.domain.icon.model.QIcon.icon;
+import static com.jinjjaseoul.domain.location.model.entity.QLocation.location;
 import static com.jinjjaseoul.domain.map.model.entity.QThemeLocation.themeLocation;
 import static com.jinjjaseoul.domain.map.model.entity.QThemeMap.themeMap;
+import static com.jinjjaseoul.domain.user.model.QUser.user;
 
 @Repository
 @RequiredArgsConstructor
@@ -113,6 +117,25 @@ public class ThemeMapCustomRepositoryImpl implements ThemeMapCustomRepository {
         groupQueryAndSetCuratorNum(themeMapSearchList, themeLocationList);
 
         return new PageImpl<>(themeMapSearchList, pageable, totalCount());
+    }
+
+    @Override
+    public List<ThemeLocationSimpleQueryDto> findLocationListById(Long themeMapId) {
+        return queryFactory
+                .select(new QThemeLocationSimpleQueryDto(
+                        themeLocation.id,
+                        location.id,
+                        location.name,
+                        icon.id,
+                        icon.imageUrl
+                ))
+                .from(themeLocation)
+                .join(themeLocation.location, location)
+                .join(themeLocation.user, user)
+                .join(user.icon, icon)
+                .join(themeLocation.themeMap, themeMap)
+                .where(themeMap.id.eq(themeMapId))
+                .fetch();
     }
 
     private List<ThemeLocationCountQueryDto> getThemeLocationListByThemeMapIds(List<ThemeMapQueryDto> themeMapQueryDtoList) {
