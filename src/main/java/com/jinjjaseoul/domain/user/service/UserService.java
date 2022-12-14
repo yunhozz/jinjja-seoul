@@ -17,6 +17,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Random;
+
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -58,10 +60,15 @@ public class UserService {
             } else throw new EmailDuplicateException();
 
         }, () -> {
-            Icon testIcon = iconRepository.getReferenceById(1L); // 테스트를 위한 임시 아이콘 생성 -> 랜덤 id
-            users[0] = UserConverter.convertToEntity(userRequestDto, testIcon);
+            Icon icon = randomIcon();
+            users[0] = UserConverter.convertToEntity(userRequestDto, icon);
         });
 
         return users[0];
+    }
+
+    private Icon randomIcon() {
+        Random random = new Random(iconRepository.count());
+        return iconRepository.getReferenceById(random.nextLong());
     }
 }

@@ -10,7 +10,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 public class UserConverter {
 
-    // TODO: 2022-12-02 아이콘 랜덤 배정 -> RandomIdUtils
     public static User convertToEntity(UserRequestDto userRequestDto, Icon icon) {
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         return User.builder()
