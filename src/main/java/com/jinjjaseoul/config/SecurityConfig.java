@@ -39,7 +39,6 @@ public class SecurityConfig {
                 .cors().disable()
                 .authorizeRequests()
                 .antMatchers("/", "/error", "/favicon.ico").permitAll()
-                .antMatchers("/api/**").permitAll()
                 .antMatchers("/api/users/**", "/api/auth/**").permitAll()
                 .anyRequest().authenticated();
 

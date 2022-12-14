@@ -8,6 +8,7 @@ import com.jinjjaseoul.domain.user.dto.response.ProfileResponseDto;
 import com.jinjjaseoul.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -25,6 +26,7 @@ public class UserController {
 
     private final UserService userService;
 
+    @Secured("{ROLE_ADMIN, ROLE_USER}")
     @GetMapping("/me")
     public Response getMyInfo(@AuthenticationPrincipal UserPrincipal userPrincipal) {
         ProfileResponseDto profileResponseDto = userService.findProfileDto(userPrincipal);
@@ -37,6 +39,7 @@ public class UserController {
         return Response.success(HttpStatus.CREATED, userId);
     }
 
+    @Secured("{ROLE_ADMIN, ROLE_USER}")
     @PatchMapping("/update")
     public Response updateProfile(@AuthenticationPrincipal UserPrincipal userPrincipal, @Valid @RequestBody UpdateRequestDto updateRequestDto) {
         userService.updateProfile(userPrincipal, updateRequestDto);

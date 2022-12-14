@@ -7,6 +7,7 @@ import com.jinjjaseoul.domain.user.dto.request.LoginRequestDto;
 import com.jinjjaseoul.domain.user.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -31,18 +32,21 @@ public class AuthController {
         return Response.success(HttpStatus.CREATED, tokenResponseDto);
     }
 
+    @Secured("{ROLE_ADMIN, ROLE_USER}")
     @PostMapping("/issue")
     public Response tokenReIssue(@RequestHeader("Authorization") String refreshToken, @AuthenticationPrincipal UserPrincipal userPrincipal, HttpServletResponse response) {
         TokenResponseDto tokenResponseDto = authService.reissue(refreshToken, userPrincipal, response);
         return Response.success(HttpStatus.CREATED, tokenResponseDto);
     }
 
+    @Secured("{ROLE_ADMIN, ROLE_USER}")
     @PostMapping("/logout")
     public Response logout(@RequestHeader("Authorization") String accessToken, @AuthenticationPrincipal UserPrincipal userPrincipal) {
         authService.logout(accessToken, userPrincipal);
         return Response.success(HttpStatus.CREATED, "로그아웃이 완료되었습니다.");
     }
 
+    @Secured("{ROLE_ADMIN, ROLE_USER}")
     @PatchMapping("/withdraw")
     public Response withdraw(@RequestHeader("Authorization") String accessToken, @AuthenticationPrincipal UserPrincipal userPrincipal) {
         authService.withdraw(accessToken, userPrincipal);
