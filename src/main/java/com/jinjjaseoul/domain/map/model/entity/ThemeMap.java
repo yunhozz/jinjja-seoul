@@ -79,4 +79,8 @@ public class ThemeMap extends BaseEntity {
                 .beverage(beverage)
                 .build();
     }
+
+    public void subtractNumOfUserRecommend() {
+        user.subtractNumOfRecommend();
+    }
 }

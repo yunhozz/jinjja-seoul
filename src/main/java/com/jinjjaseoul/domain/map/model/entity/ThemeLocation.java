@@ -48,4 +48,8 @@ public class ThemeLocation extends BaseEntity {
         this.location = location;
         this.imageUrl = imageUrl;
     }
+
+    public void subtractNumOfUserRecommend() {
+        user.subtractNumOfRecommend();
+    }
 }

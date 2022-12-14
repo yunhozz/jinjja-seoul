@@ -49,6 +49,7 @@ public class ThemeMapService {
 
         ThemeLocation themeLocation = createThemeLocation(user, themeMap, location, themeMapRequestDto.getImageUrl());
         themeLocationRepository.save(themeLocation);
+        user.addNumOfRecommend(); // 장소 추천수 +1
 
         return themeMapRepository.save(themeMap).getId();
     }
@@ -68,6 +69,7 @@ public class ThemeMapService {
         } else {
             ThemeLocation themeLocation = createThemeLocation(user, themeMap, location, imageUrl);
             themeLocationRepository.save(themeLocation);
+            user.addNumOfRecommend(); // 장소 추천수 +1
         }
     }
 
@@ -87,17 +89,21 @@ public class ThemeMapService {
 
     @Transactional
     public void deleteThemeMap(Long themeMapId) {
-        ThemeMap themeMap = findThemeMap(themeMapId);
+        ThemeMap themeMap = themeMapRepository.findWithUserById(themeMapId)
+                .orElseThrow(ThemeMapNotFoundException::new);
         List<Long> themeLocationIds = themeLocationRepository.findIdsByThemeMapId(themeMap.getId());
 
+        themeMap.subtractNumOfUserRecommend(); // 장소 추천수 -1
         themeLocationRepository.deleteAllByIds(themeLocationIds);
         themeMapRepository.delete(themeMap);
     }
 
     @Transactional
     public void deleteThemeLocation(Long themeLocationId) {
-        ThemeLocation themeLocation = themeLocationRepository.findById(themeLocationId)
+        ThemeLocation themeLocation = themeLocationRepository.findWithUserById(themeLocationId)
                 .orElseThrow(ThemeLocationNotFoundException::new);
+
+        themeLocation.subtractNumOfUserRecommend(); // 장소 추천수 -1
         themeLocationRepository.delete(themeLocation);
     }
 

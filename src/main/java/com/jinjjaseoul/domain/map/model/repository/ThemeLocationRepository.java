@@ -14,6 +14,9 @@ public interface ThemeLocationRepository extends JpaRepository<ThemeLocation, Lo
 
     Optional<ThemeLocation> findByUser(User user);
 
+    @Query("select tl from ThemeLocation tl join fetch tl.user u where tl.id = :id")
+    Optional<ThemeLocation> findWithUserById(@Param("id") Long themeLocationId);
+
     @Query("select tl.id from ThemeLocation tl join tl.themeMap tm where tm.id = :id")
     List<Long> findIdsByThemeMapId(@Param("id") Long themeMapId);
 
