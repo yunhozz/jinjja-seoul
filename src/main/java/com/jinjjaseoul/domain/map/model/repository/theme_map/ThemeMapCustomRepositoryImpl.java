@@ -10,10 +10,10 @@ import com.jinjjaseoul.common.enums.Something;
 import com.jinjjaseoul.domain.map.dto.query.QThemeLocationCountQueryDto;
 import com.jinjjaseoul.domain.map.dto.query.QThemeLocationSimpleQueryDto;
 import com.jinjjaseoul.domain.map.dto.query.QThemeMapQueryDto;
-import com.jinjjaseoul.domain.map.dto.query.SearchQueryDto;
 import com.jinjjaseoul.domain.map.dto.query.ThemeLocationCountQueryDto;
 import com.jinjjaseoul.domain.map.dto.query.ThemeLocationSimpleQueryDto;
 import com.jinjjaseoul.domain.map.dto.query.ThemeMapQueryDto;
+import com.jinjjaseoul.domain.map.dto.request.SearchRequestDto;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -88,7 +88,7 @@ public class ThemeMapCustomRepositoryImpl implements ThemeMapCustomRepository {
     }
 
     @Override
-    public Page<ThemeMapQueryDto> searchThemeMapListByKeyword(String keyword, SearchQueryDto searchQueryDto, Long lastThemeMapId, Pageable pageable) {
+    public Page<ThemeMapQueryDto> searchThemeMapListByKeyword(String keyword, SearchRequestDto searchRequestDto, Long lastThemeMapId, Pageable pageable) {
         List<ThemeMapQueryDto> themeMapSearchList = queryFactory
                 .select(new QThemeMapQueryDto(
                         themeMap.id,
@@ -101,13 +101,13 @@ public class ThemeMapCustomRepositoryImpl implements ThemeMapCustomRepository {
                 .where(themeMapIdLt(lastThemeMapId))
                 .where(
                         byKeyword(keyword),
-                        byPlace(searchQueryDto.getPlace()),
-                        bySomebody(searchQueryDto.getSomebody()),
-                        bySomething(searchQueryDto.getSomething()),
-                        byCharacteristics(searchQueryDto.getCharacteristics()),
-                        byFood(searchQueryDto.getFood()),
-                        byBeverage(searchQueryDto.getBeverage()),
-                        byCategory(searchQueryDto.getCategory())
+                        byPlace(searchRequestDto.getPlace()),
+                        bySomebody(searchRequestDto.getSomebody()),
+                        bySomething(searchRequestDto.getSomething()),
+                        byCharacteristics(searchRequestDto.getCharacteristics()),
+                        byFood(searchRequestDto.getFood()),
+                        byBeverage(searchRequestDto.getBeverage()),
+                        byCategory(searchRequestDto.getCategory())
                 )
                 .orderBy(themeMap.createdDate.desc())
                 .limit(pageable.getPageSize())

@@ -1,4 +1,4 @@
-package com.jinjjaseoul.domain.map.dto.query;
+package com.jinjjaseoul.domain.map.dto.request;
 
 import com.jinjjaseoul.common.enums.Beverage;
 import com.jinjjaseoul.common.enums.Category;
@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class SearchQueryDto {
+public class SearchRequestDto {
 
     private Place place;
     private Somebody somebody;
