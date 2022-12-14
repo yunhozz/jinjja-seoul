@@ -46,6 +46,10 @@ public class User extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Provider provider; // GOOGLE, KAKAO, APPLE
 
+    private int numOfRecommend; // 테마 지도에서의 장소 추천 개수
+
+    private int numOfComment; // 코멘트 개수
+
     private boolean isDeleted;
 
     @Builder
@@ -70,6 +74,28 @@ public class User extends BaseEntity {
         this.name = name;
         this.introduction = introduction;
         this.icon = icon;
+    }
+
+    public void addNumOfRecommend() {
+        this.numOfRecommend ++;
+    }
+
+    public void subtractNumOfRecommend() {
+        if (this.numOfRecommend > 0) {
+            this.numOfRecommend --;
+
+        } else throw new IllegalStateException("기존의 추천 수가 0 이하입니다.");
+    }
+
+    public void addNumOfComment() {
+        this.numOfComment++;
+    }
+
+    public void subtractNumOfComment() {
+        if (this.numOfComment > 0) {
+            this.numOfComment--;
+
+        } else throw new IllegalStateException("기존의 코멘트 수가 0 이하입니다.");
     }
 
     public void withdraw() {
