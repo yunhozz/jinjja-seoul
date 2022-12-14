@@ -1,6 +1,9 @@
 package com.jinjjaseoul.common.enums;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.Getter;
+
+import java.util.Arrays;
 
 @Getter
 public enum Food {
@@ -23,5 +26,13 @@ public enum Food {
 
     Food(String desc) {
         this.desc = desc;
+    }
+
+    @JsonCreator
+    public static Food forValue(String value) {
+        return Arrays.stream(Food.values())
+                .filter(somebody -> somebody.name().equals(value))
+                .findFirst()
+                .orElse(null);
     }
 }

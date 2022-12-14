@@ -1,6 +1,9 @@
 package com.jinjjaseoul.common.enums;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.Getter;
+
+import java.util.Arrays;
 
 @Getter
 public enum Characteristics {
@@ -39,5 +42,13 @@ public enum Characteristics {
 
     Characteristics(String desc) {
         this.desc = desc;
+    }
+
+    @JsonCreator
+    public static Characteristics forValue(String value) {
+        return Arrays.stream(Characteristics.values())
+                .filter(somebody -> somebody.name().equals(value))
+                .findFirst()
+                .orElse(null);
     }
 }

@@ -1,6 +1,9 @@
 package com.jinjjaseoul.common.enums;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.Getter;
+
+import java.util.Arrays;
 
 @Getter
 public enum Place {
@@ -37,5 +40,13 @@ public enum Place {
 
     Place(String desc) {
         this.desc = desc;
+    }
+
+    @JsonCreator
+    public static Place forValue(String value) {
+        return Arrays.stream(Place.values())
+                .filter(place -> place.name().equals(value))
+                .findFirst()
+                .orElse(null);
     }
 }
