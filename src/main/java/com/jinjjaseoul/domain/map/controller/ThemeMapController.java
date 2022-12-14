@@ -5,13 +5,18 @@ import com.jinjjaseoul.common.dto.Response;
 import com.jinjjaseoul.common.enums.Category;
 import com.jinjjaseoul.common.utils.RedisUtils;
 import com.jinjjaseoul.domain.map.dto.query.ThemeLocationSimpleQueryDto;
+import com.jinjjaseoul.domain.map.dto.query.ThemeMapQueryDto;
 import com.jinjjaseoul.domain.map.dto.request.LocationSimpleRequestDto;
 import com.jinjjaseoul.domain.map.dto.request.MapSearchRequestDto;
+import com.jinjjaseoul.domain.map.dto.request.SearchRequestDto;
 import com.jinjjaseoul.domain.map.dto.request.ThemeMapRequestDto;
 import com.jinjjaseoul.domain.map.dto.request.ThemeMapSimpleRequestDto;
 import com.jinjjaseoul.domain.map.model.repository.theme_map.ThemeMapRepository;
 import com.jinjjaseoul.domain.map.service.ThemeMapService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -28,13 +33,31 @@ import javax.validation.Valid;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/theme")
+@RequestMapping("/api/themes")
 @RequiredArgsConstructor
 public class ThemeMapController {
 
     private final ThemeMapService themeMapService;
     private final ThemeMapRepository themeMapRepository;
     private final RedisUtils redisUtils;
+
+    @GetMapping("/recommend")
+    public Response getRecommendList() {
+        List<ThemeMapQueryDto> themeMapQueryDtoList = themeMapRepository.findRecommendList();
+        return Response.success(HttpStatus.OK, themeMapQueryDtoList);
+    }
+
+    @GetMapping("/latest")
+    public Response getLatestList() {
+        List<ThemeMapQueryDto> themeMapQueryDtoList = themeMapRepository.findLatestList();
+        return Response.success(HttpStatus.OK, themeMapQueryDtoList);
+    }
+
+    @GetMapping("/popular")
+    public Response getPopularList() {
+        List<ThemeMapQueryDto> themeMapQueryDtoList = themeMapRepository.findPopularList();
+        return Response.success(HttpStatus.OK, themeMapQueryDtoList);
+    }
 
     /*
      * 임시 데이터 저장 (쿠키 vs 세션 vs 웹 스토리지 vs 캐시)
@@ -45,16 +68,18 @@ public class ThemeMapController {
      * 5. 캐시 메모리에 저장 (redis)
      */
     @PostMapping("/save")
-    public void saveThemeMapInfoOnCache(@AuthenticationPrincipal UserPrincipal userPrincipal, @RequestParam(required = false) Long iconId,
+    public Response saveThemeMapInfoOnCache(@AuthenticationPrincipal UserPrincipal userPrincipal, @RequestParam(required = false) Long iconId,
                                         @Valid @RequestBody ThemeMapSimpleRequestDto themeMapSimpleRequestDto) {
         // 쿠키 or 캐시에 저장 -> redis
         redisUtils.setCollection(
                 String.valueOf(userPrincipal.getId()), // key
                 themeMapSimpleRequestDto.getName(), // 0
-                String.valueOf(iconId), // 1
+                iconId, // 1
                 themeMapSimpleRequestDto.getCategories(), // 2
                 themeMapSimpleRequestDto.getKeywordStr() // 3
         );
+
+        return Response.success(HttpStatus.CREATED);
     }
 
     @PostMapping("/create")
@@ -80,7 +105,7 @@ public class ThemeMapController {
         return Response.success(HttpStatus.OK, locationList);
     }
     
-    @PostMapping("/recommend")
+    @PostMapping("/update")
     public Response recommendThemeLocation(@AuthenticationPrincipal UserPrincipal userPrincipal, @RequestParam("id") Long themeMapId, @RequestParam Long locationId,
                                            @RequestParam(required = false) String imageUrl) {
         themeMapService.updateThemeLocation(userPrincipal.getId(), themeMapId, locationId, imageUrl);
@@ -88,10 +113,17 @@ public class ThemeMapController {
     }
 
     @Secured("ROLE_ADMIN")
-    @PostMapping("/{id}/search")
+    @PostMapping("/{id}/condition")
     public Response updateSearchCondition(@PathVariable("id") Long themeMapId, @RequestBody MapSearchRequestDto mapSearchRequestDto) {
         themeMapService.updateMapSearchTable(themeMapId, mapSearchRequestDto);
         return Response.success(HttpStatus.CREATED, "검색 조건을 업데이트 했습니다.");
+    }
+
+    @PostMapping("/search")
+    public Response searchList(@RequestParam(required = false) String keyword, @RequestBody SearchRequestDto searchRequestDto,
+                               @RequestParam(required = false) Long lastThemeMapId, @PageableDefault(size = 30) Pageable pageable) {
+        Page<ThemeMapQueryDto> themeMapQueryDtoPage = themeMapRepository.searchThemeMapListByKeyword(keyword, searchRequestDto, lastThemeMapId, pageable);
+        return Response.success(HttpStatus.CREATED, themeMapQueryDtoPage);
     }
 
     @DeleteMapping("/{themeMapId}/delete")
