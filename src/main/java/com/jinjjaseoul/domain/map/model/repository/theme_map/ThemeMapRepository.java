@@ -9,6 +9,6 @@ import java.util.Optional;
 
 public interface ThemeMapRepository extends JpaRepository<ThemeMap, Long>, ThemeMapCustomRepository {
 
-    @Query("select tm from ThemeMap join fetch tm.user u where tm.id = :id")
+    @Query("select tm from ThemeMap tm join fetch tm.user u where tm.id = :id")
     Optional<ThemeMap> findWithUserById(@Param("id") Long themeMapId);
 }
