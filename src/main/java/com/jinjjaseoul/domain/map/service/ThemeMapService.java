@@ -121,8 +121,8 @@ public class ThemeMapService {
             icon = iconRepository.getReferenceById(iconId);
 
         } else {
-            Random random = new Random(iconRepository.count());
-            icon = iconRepository.getReferenceById(random.nextLong());
+            Random random = new Random(System.currentTimeMillis());
+            return iconRepository.getReferenceById((long) random.nextInt(8) + 1);
         }
 
         return icon;

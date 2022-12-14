@@ -79,7 +79,7 @@ public class OAuth2UserServiceImpl implements OAuth2UserService<OAuth2UserReques
     }
 
     private Icon randomIcon() {
-        Random random = new Random(iconRepository.count());
-        return iconRepository.getReferenceById(random.nextLong());
+        Random random = new Random(System.currentTimeMillis());
+        return iconRepository.getReferenceById((long) random.nextInt(8) + 1);
     }
 }
