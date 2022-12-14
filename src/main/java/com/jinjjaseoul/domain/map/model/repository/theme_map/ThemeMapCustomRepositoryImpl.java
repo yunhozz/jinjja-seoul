@@ -84,6 +84,10 @@ public class ThemeMapCustomRepositoryImpl implements ThemeMapCustomRepository {
         groupQueryAndSetCuratorNum(themeMapList, themeLocationList);
         themeMapList.sort((o1, o2) -> o2.getCuratorNum() - o1.getCuratorNum()); // 큐레이터 수 내림차순 정렬
 
+        if (themeMapList.size() <= 12) {
+            return themeMapList;
+        }
+
         return new ArrayList<>(themeMapList.subList(0, 12));
     }
 
