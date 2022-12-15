@@ -80,10 +80,9 @@ public class AuthService {
     }
 
     @Transactional
-    public void withdraw(String accessToken, UserPrincipal userPrincipal) {
-        logout(accessToken, userPrincipal);
-        User user = userPrincipal.getUser();
-        user.withdraw();
+    public void withdraw(Long userId) {
+        User user = userRepository.getReferenceById(userId);
+        user.withdraw(); // soft delete
     }
 
     private void validatePasswordAndLoginCondition(LoginRequestDto loginRequestDto, UserResponseDto userResponseDto) {

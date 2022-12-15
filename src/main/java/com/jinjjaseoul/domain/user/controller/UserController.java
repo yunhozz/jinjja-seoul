@@ -42,7 +42,7 @@ public class UserController {
     @Secured({"ROLE_ADMIN", "ROLE_USER"})
     @PatchMapping("/update")
     public Response updateProfile(@AuthenticationPrincipal UserPrincipal userPrincipal, @Valid @RequestBody UpdateRequestDto updateRequestDto) {
-        userService.updateProfile(userPrincipal, updateRequestDto);
+        userService.updateProfile(userPrincipal.getId(), updateRequestDto);
         return Response.success(HttpStatus.CREATED, "프로필 업데이트가 완료되었습니다.");
     }
 }

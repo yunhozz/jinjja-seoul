@@ -11,7 +11,6 @@ import com.jinjjaseoul.domain.user.dto.response.UserResponseDto;
 import com.jinjjaseoul.domain.user.model.User;
 import com.jinjjaseoul.domain.user.model.UserRepository;
 import com.jinjjaseoul.domain.user.service.exception.EmailDuplicateException;
-import com.jinjjaseoul.domain.user.service.exception.IconNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,11 +31,9 @@ public class UserService {
     }
 
     @Transactional
-    public void updateProfile(UserPrincipal userPrincipal, UpdateRequestDto updateRequestDto) {
-        User user = userPrincipal.getUser();
-        Icon icon = iconRepository.findById(updateRequestDto.getIconId())
-                .orElseThrow(IconNotFoundException::new);
-
+    public void updateProfile(Long userId, UpdateRequestDto updateRequestDto) {
+        User user = userRepository.getReferenceById(userId);
+        Icon icon = iconRepository.getReferenceById(updateRequestDto.getIconId());
         user.updateProfile(updateRequestDto.getName(), updateRequestDto.getIntroduction(), icon);
     }
 

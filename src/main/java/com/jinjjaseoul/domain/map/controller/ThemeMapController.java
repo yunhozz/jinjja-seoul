@@ -65,7 +65,7 @@ public class ThemeMapController {
     @Secured("ROLE_USER")
     @PostMapping("/create")
     public Response createThemeMap(@AuthenticationPrincipal UserPrincipal userPrincipal, @RequestBody LocationSimpleRequestDto locationSimpleRequestDto) {
-        Long themeMapId = themeMapService.makeThemeMap(userPrincipal, locationSimpleRequestDto);
+        Long themeMapId = themeMapService.makeThemeMap(userPrincipal.getId(), locationSimpleRequestDto);
         return Response.success(HttpStatus.CREATED, themeMapId);
     }
 
@@ -83,7 +83,7 @@ public class ThemeMapController {
             return Response.failure(HttpStatus.BAD_REQUEST, "장소를 선택해주세요.");
         }
 
-        themeMapService.updateThemeLocation(userPrincipal, themeMapId, locationSimpleRequestDto.getLocationId(), locationSimpleRequestDto.getImageUrl());
+        themeMapService.updateThemeLocation(userPrincipal.getId(), themeMapId, locationSimpleRequestDto.getLocationId(), locationSimpleRequestDto.getImageUrl());
         return Response.success(HttpStatus.CREATED, "테마 지도에 장소가 추가되었습니다.");
     }
 

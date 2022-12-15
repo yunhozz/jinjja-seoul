@@ -100,6 +100,7 @@ public class User extends BaseEntity {
 
     public void withdraw() {
         if (!isDeleted) {
+            email = "[WITHDRAW]" + email;
             isDeleted = true;
 
         } else throw new IllegalStateException("이미 탈퇴한 회원입니다.");

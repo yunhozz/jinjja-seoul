@@ -59,8 +59,8 @@ public class ThemeMapService {
     }
 
     @Transactional
-    public Long makeThemeMap(UserPrincipal userPrincipal, LocationSimpleRequestDto locationSimpleRequestDto) {
-        List<Object> dataList = redisUtils.getDataListFromCollection(String.valueOf(userPrincipal.getId()), 0, 3);
+    public Long makeThemeMap(Long userId, LocationSimpleRequestDto locationSimpleRequestDto) {
+        List<Object> dataList = redisUtils.getDataListFromCollection(String.valueOf(userId), 0, 3);
         ThemeMapRequestDto themeMapRequestDto = ThemeMapRequestDto.builder()
                 .name((String) dataList.get(0))
                 .categories((List<Category>) dataList.get(2))
@@ -71,7 +71,7 @@ public class ThemeMapService {
 
         if (themeMapRequestDto.getLocationId() == null) return null; // 장소 등록 여부 검증
 
-        User user = userPrincipal.getUser();
+        User user = userRepository.getReferenceById(userId);
         Icon icon = determineIcon(locationSimpleRequestDto.getLocationId());
         ThemeMap themeMap = MapConverter.convertToThemeMapEntity(themeMapRequestDto, user, icon);
         Location location = locationRepository.getReferenceById(themeMapRequestDto.getLocationId());
@@ -79,15 +79,15 @@ public class ThemeMapService {
         ThemeLocation themeLocation = createThemeLocation(user, themeMap, location, themeMapRequestDto.getImageUrl());
         themeLocationRepository.save(themeLocation);
         user.addNumOfRecommend(); // 장소 추천수 +1
-        redisUtils.deleteData(String.valueOf(userPrincipal.getId()));
+        redisUtils.deleteData(String.valueOf(userId));
 
         return themeMapRepository.save(themeMap).getId();
     }
 
     // 하나의 테마맵 당 하나의 장소만 추천 가능
     @Transactional
-    public void updateThemeLocation(UserPrincipal userPrincipal, Long themeMapId, Long locationId, String imageUrl) {
-        User user = userPrincipal.getUser();
+    public void updateThemeLocation(Long userId, Long themeMapId, Long locationId, String imageUrl) {
+        User user = userRepository.getReferenceById(userId);
         ThemeMap themeMap = findThemeMap(themeMapId);
         Location location = locationRepository.getReferenceById(locationId);
 

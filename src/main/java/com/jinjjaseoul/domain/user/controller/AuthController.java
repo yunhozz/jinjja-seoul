@@ -48,8 +48,8 @@ public class AuthController {
 
     @Secured({"ROLE_ADMIN", "ROLE_USER"})
     @PatchMapping("/withdraw")
-    public Response withdraw(@RequestHeader("Authorization") String accessToken, @AuthenticationPrincipal UserPrincipal userPrincipal) {
-        authService.withdraw(accessToken, userPrincipal);
+    public Response withdraw(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+        authService.withdraw(userPrincipal.getId());
         return Response.success(HttpStatus.CREATED, "회원 탈퇴가 완료되었습니다.");
     }
 }
