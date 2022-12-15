@@ -67,14 +67,14 @@ public class ThemeMapController {
      * 4. 로컬 스토리지에 저장 : 보안이 중요한 영구 데이터 (ex. 자동 로그인)
      * 5. 캐시 메모리에 저장 (redis)
      */
+    @Secured("ROLE_USER")
     @PostMapping("/save")
-    public Response saveThemeMapInfoOnCache(@AuthenticationPrincipal UserPrincipal userPrincipal, @RequestParam(required = false) Long iconId,
-                                        @Valid @RequestBody ThemeMapSimpleRequestDto themeMapSimpleRequestDto) {
+    public Response saveThemeMapInfoOnCache(@AuthenticationPrincipal UserPrincipal userPrincipal, @Valid @RequestBody ThemeMapSimpleRequestDto themeMapSimpleRequestDto) {
         // 쿠키 or 캐시에 저장 -> redis
         redisUtils.setCollection(
                 String.valueOf(userPrincipal.getId()), // key
                 themeMapSimpleRequestDto.getName(), // 0
-                iconId, // 1
+                themeMapSimpleRequestDto.getIconId(), // 1
                 themeMapSimpleRequestDto.getCategories(), // 2
                 themeMapSimpleRequestDto.getKeywordStr() // 3
         );
@@ -82,6 +82,7 @@ public class ThemeMapController {
         return Response.success(HttpStatus.CREATED);
     }
 
+    @Secured("ROLE_USER")
     @PostMapping("/create")
     public Response createThemeMap(@AuthenticationPrincipal UserPrincipal userPrincipal, @RequestBody LocationSimpleRequestDto locationSimpleRequestDto) {
         List<Object> dataList = redisUtils.getDataListFromCollection(String.valueOf(userPrincipal.getId()), 0, 3);
@@ -93,7 +94,7 @@ public class ThemeMapController {
                 .imageUrl(locationSimpleRequestDto.getImageUrl())
                 .build();
 
-        Long themeMapId = themeMapService.makeThemeMap(userPrincipal.getId(), (Long) dataList.get(1), themeMapRequestDto);
+        Long themeMapId = themeMapService.makeThemeMap(userPrincipal, (Long) dataList.get(1), themeMapRequestDto);
         redisUtils.deleteData(String.valueOf(userPrincipal.getId()));
 
         return Response.success(HttpStatus.CREATED, themeMapId);
@@ -104,11 +105,12 @@ public class ThemeMapController {
         List<ThemeLocationSimpleQueryDto> locationList = themeMapRepository.findLocationListById(themeMapId);
         return Response.success(HttpStatus.OK, locationList);
     }
-    
+
+    @Secured("ROLE_USER")
     @PostMapping("/update")
     public Response recommendThemeLocation(@AuthenticationPrincipal UserPrincipal userPrincipal, @RequestParam("id") Long themeMapId, @RequestParam Long locationId,
                                            @RequestParam(required = false) String imageUrl) {
-        themeMapService.updateThemeLocation(userPrincipal.getId(), themeMapId, locationId, imageUrl);
+        themeMapService.updateThemeLocation(userPrincipal, themeMapId, locationId, imageUrl);
         return Response.success(HttpStatus.CREATED, "테마 지도에 장소가 추가되었습니다.");
     }
 

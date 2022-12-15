@@ -13,16 +13,14 @@ public class ThemeMapQueryDto {
     private String name;
 
     // icon
-    private Long iconId;
     private String imageUrl;
 
     private int curatorNum;
 
     @QueryProjection
-    public ThemeMapQueryDto(Long id, String name, Long iconId, String imageUrl) {
+    public ThemeMapQueryDto(Long id, String name, String imageUrl) {
         this.id = id;
         this.name = name;
-        this.iconId = iconId;
         this.imageUrl = imageUrl;
     }
 

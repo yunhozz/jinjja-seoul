@@ -52,7 +52,6 @@ public class ThemeMapCustomRepositoryImpl implements ThemeMapCustomRepository {
                 .select(new QThemeMapQueryDto(
                         themeMap.id,
                         themeMap.name,
-                        icon.id,
                         icon.imageUrl
                 ))
                 .from(themeMap)
@@ -73,7 +72,6 @@ public class ThemeMapCustomRepositoryImpl implements ThemeMapCustomRepository {
                 .select(new QThemeMapQueryDto(
                         themeMap.id,
                         themeMap.name,
-                        icon.id,
                         icon.imageUrl
                 ))
                 .from(themeMap)
@@ -97,7 +95,6 @@ public class ThemeMapCustomRepositoryImpl implements ThemeMapCustomRepository {
                 .select(new QThemeMapQueryDto(
                         themeMap.id,
                         themeMap.name,
-                        icon.id,
                         icon.imageUrl
                 ))
                 .from(themeMap)
@@ -130,7 +127,6 @@ public class ThemeMapCustomRepositoryImpl implements ThemeMapCustomRepository {
                         themeLocation.id,
                         location.id,
                         location.name,
-                        icon.id,
                         icon.imageUrl
                 ))
                 .from(themeLocation)

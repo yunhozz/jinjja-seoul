@@ -16,15 +16,13 @@ public class ThemeLocationSimpleQueryDto {
     private String name;
 
     // icon
-    private Long iconId;
     private String imageUrl;
 
     @QueryProjection
-    public ThemeLocationSimpleQueryDto(Long id, Long locationId, String name, Long iconId, String imageUrl) {
+    public ThemeLocationSimpleQueryDto(Long id, Long locationId, String name, String imageUrl) {
         this.id = id;
         this.locationId = locationId;
         this.name = name;
-        this.iconId = iconId;
         this.imageUrl = imageUrl;
     }
 }
