@@ -11,4 +11,6 @@ public interface ThemeMapRepository extends JpaRepository<ThemeMap, Long>, Theme
 
     @Query("select tm from ThemeMap tm join fetch tm.user u where tm.id = :id")
     Optional<ThemeMap> findWithUserById(@Param("id") Long themeMapId);
+
+    boolean existsByName(String name);
 }

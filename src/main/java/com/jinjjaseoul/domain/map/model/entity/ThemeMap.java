@@ -66,7 +66,7 @@ public class ThemeMap extends BaseEntity {
     }
 
     public boolean isMadeByUser(User user) {
-        return this.user == user;
+        return this.user.getId().equals(user.getId());
     }
 
     public void updateSearchCondition(Place place, Somebody somebody, Something something, Characteristics characteristics, Food food, Beverage beverage) {

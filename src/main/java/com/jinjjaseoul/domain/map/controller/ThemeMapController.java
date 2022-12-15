@@ -2,14 +2,11 @@ package com.jinjjaseoul.domain.map.controller;
 
 import com.jinjjaseoul.auth.model.UserPrincipal;
 import com.jinjjaseoul.common.dto.Response;
-import com.jinjjaseoul.common.enums.Category;
-import com.jinjjaseoul.common.utils.RedisUtils;
 import com.jinjjaseoul.domain.map.dto.query.ThemeLocationSimpleQueryDto;
 import com.jinjjaseoul.domain.map.dto.query.ThemeMapQueryDto;
 import com.jinjjaseoul.domain.map.dto.request.LocationSimpleRequestDto;
 import com.jinjjaseoul.domain.map.dto.request.MapSearchRequestDto;
 import com.jinjjaseoul.domain.map.dto.request.SearchRequestDto;
-import com.jinjjaseoul.domain.map.dto.request.ThemeMapRequestDto;
 import com.jinjjaseoul.domain.map.dto.request.ThemeMapSimpleRequestDto;
 import com.jinjjaseoul.domain.map.model.repository.theme_map.ThemeMapRepository;
 import com.jinjjaseoul.domain.map.service.ThemeMapService;
@@ -39,7 +36,6 @@ public class ThemeMapController {
 
     private final ThemeMapService themeMapService;
     private final ThemeMapRepository themeMapRepository;
-    private final RedisUtils redisUtils;
 
     @GetMapping("/recommend")
     public Response getRecommendList() {
@@ -59,44 +55,17 @@ public class ThemeMapController {
         return Response.success(HttpStatus.OK, themeMapQueryDtoList);
     }
 
-    /*
-     * 임시 데이터 저장 (쿠키 vs 세션 vs 웹 스토리지 vs 캐시)
-     * 1. 클라이언트에 저장 (쿠키)
-     * 2. 서버에 저장 (세션)
-     * 3. 세션 스토리지에 저장 : 보안이 중요한 임시 데이터 (ex. 일회성 로그인)
-     * 4. 로컬 스토리지에 저장 : 보안이 중요한 영구 데이터 (ex. 자동 로그인)
-     * 5. 캐시 메모리에 저장 (redis)
-     */
     @Secured("ROLE_USER")
     @PostMapping("/save")
     public Response saveThemeMapInfoOnCache(@AuthenticationPrincipal UserPrincipal userPrincipal, @Valid @RequestBody ThemeMapSimpleRequestDto themeMapSimpleRequestDto) {
-        // 쿠키 or 캐시에 저장 -> redis
-        redisUtils.setCollection(
-                String.valueOf(userPrincipal.getId()), // key
-                themeMapSimpleRequestDto.getName(), // 0
-                themeMapSimpleRequestDto.getIconId(), // 1
-                themeMapSimpleRequestDto.getCategories(), // 2
-                themeMapSimpleRequestDto.getKeywordStr() // 3
-        );
-
+        themeMapService.saveThemeMapInfoOnCache(userPrincipal, themeMapSimpleRequestDto);
         return Response.success(HttpStatus.CREATED);
     }
 
     @Secured("ROLE_USER")
     @PostMapping("/create")
     public Response createThemeMap(@AuthenticationPrincipal UserPrincipal userPrincipal, @RequestBody LocationSimpleRequestDto locationSimpleRequestDto) {
-        List<Object> dataList = redisUtils.getDataListFromCollection(String.valueOf(userPrincipal.getId()), 0, 3);
-        ThemeMapRequestDto themeMapRequestDto = ThemeMapRequestDto.builder()
-                .name((String) dataList.get(0))
-                .categories((List<Category>) dataList.get(2))
-                .keywordStr((String) dataList.get(3))
-                .locationId(locationSimpleRequestDto.getLocationId())
-                .imageUrl(locationSimpleRequestDto.getImageUrl())
-                .build();
-
-        Long themeMapId = themeMapService.makeThemeMap(userPrincipal, (Long) dataList.get(1), themeMapRequestDto);
-        redisUtils.deleteData(String.valueOf(userPrincipal.getId()));
-
+        Long themeMapId = themeMapService.makeThemeMap(userPrincipal, locationSimpleRequestDto);
         return Response.success(HttpStatus.CREATED, themeMapId);
     }
 
@@ -108,9 +77,13 @@ public class ThemeMapController {
 
     @Secured("ROLE_USER")
     @PostMapping("/update")
-    public Response recommendThemeLocation(@AuthenticationPrincipal UserPrincipal userPrincipal, @RequestParam("id") Long themeMapId, @RequestParam Long locationId,
-                                           @RequestParam(required = false) String imageUrl) {
-        themeMapService.updateThemeLocation(userPrincipal, themeMapId, locationId, imageUrl);
+    public Response recommendThemeLocation(@AuthenticationPrincipal UserPrincipal userPrincipal, @RequestParam("id") Long themeMapId,
+                                           @RequestBody LocationSimpleRequestDto locationSimpleRequestDto) {
+        if (locationSimpleRequestDto.getLocationId() == null) {
+            return Response.failure(HttpStatus.BAD_REQUEST, "장소를 선택해주세요.");
+        }
+
+        themeMapService.updateThemeLocation(userPrincipal, themeMapId, locationSimpleRequestDto.getLocationId(), locationSimpleRequestDto.getImageUrl());
         return Response.success(HttpStatus.CREATED, "테마 지도에 장소가 추가되었습니다.");
     }
 

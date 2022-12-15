@@ -1,6 +1,7 @@
 package com.jinjjaseoul.domain.map.model.repository;
 
 import com.jinjjaseoul.domain.map.model.entity.ThemeLocation;
+import com.jinjjaseoul.domain.map.model.entity.ThemeMap;
 import com.jinjjaseoul.domain.user.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -12,7 +13,7 @@ import java.util.Optional;
 
 public interface ThemeLocationRepository extends JpaRepository<ThemeLocation, Long> {
 
-    Optional<ThemeLocation> findByUser(User user);
+    Optional<ThemeLocation> findByUserAndThemeMap(User user, ThemeMap themeMap);
 
     @Query("select tl from ThemeLocation tl join fetch tl.user u where tl.id = :id")
     Optional<ThemeLocation> findWithUserById(@Param("id") Long themeLocationId);

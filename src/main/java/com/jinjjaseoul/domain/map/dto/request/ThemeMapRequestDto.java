@@ -6,8 +6,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
 import java.util.List;
 
 @Getter
@@ -16,9 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 public class ThemeMapRequestDto {
 
-    @NotBlank
     private String name;
-    @NotEmpty
     private List<Category> categories;
     private String keywordStr; // 쉼표로 구분
 

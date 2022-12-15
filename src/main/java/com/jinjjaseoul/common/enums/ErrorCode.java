@@ -25,6 +25,7 @@ public enum ErrorCode {
     ICON_NOT_FOUND(404, "I-041", "해당 아이콘을 찾을 수 없습니다."),
 
     // map
+    THEME_MAP_NAME_DUPLICATE(400, "M-001", "중복되는 테마 지도 이름이 존재합니다."),
     THEME_MAP_NOT_FOUND(404, "M-041", "테마 맵을 찾을 수 없습니다."),
     THEME_LOCATION_NOT_FOUND(404, "M-042", "테마 장소를 찾을 수 없습니다."),
     CURATION_MAP_NOT_FOUND(404, "M-043", "큐레이션 맵을 찾을 수 없습니다."),
