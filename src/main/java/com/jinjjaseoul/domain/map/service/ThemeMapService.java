@@ -1,5 +1,6 @@
 package com.jinjjaseoul.domain.map.service;
 
+import com.jinjjaseoul.auth.model.UserPrincipal;
 import com.jinjjaseoul.common.converter.MapConverter;
 import com.jinjjaseoul.domain.icon.model.Icon;
 import com.jinjjaseoul.domain.icon.model.IconRepository;
@@ -35,14 +36,14 @@ public class ThemeMapService {
     private final ThemeLocationRepository themeLocationRepository;
 
     @Transactional
-    public Long makeThemeMap(Long userId, Long iconId, ThemeMapRequestDto themeMapRequestDto) {
+    public Long makeThemeMap(UserPrincipal userPrincipal, Long iconId, ThemeMapRequestDto themeMapRequestDto) {
         // 장소를 등록하지 않은 경우
         if (themeMapRequestDto.getLocationId() == null) {
             log.debug("장소를 등록하지 않았습니다.");
             return null;
         }
 
-        User user = userRepository.getReferenceById(userId);
+        User user = userPrincipal.getUser();
         Icon icon = determineIcon(iconId);
         ThemeMap themeMap = MapConverter.convertToThemeMapEntity(themeMapRequestDto, user, icon);
         Location location = locationRepository.getReferenceById(themeMapRequestDto.getLocationId());
@@ -56,8 +57,8 @@ public class ThemeMapService {
 
     // 하나의 테마맵 당 하나의 장소만 추천 가능
     @Transactional
-    public void updateThemeLocation(Long userId, Long themeMapId, Long locationId, String imageUrl) {
-        User user = userRepository.getReferenceById(userId);
+    public void updateThemeLocation(UserPrincipal userPrincipal, Long themeMapId, Long locationId, String imageUrl) {
+        User user = userPrincipal.getUser();
         ThemeMap themeMap = findThemeMap(themeMapId);
         Location location = locationRepository.getReferenceById(locationId);
 
@@ -102,7 +103,6 @@ public class ThemeMapService {
     public void deleteThemeLocation(Long themeLocationId) {
         ThemeLocation themeLocation = themeLocationRepository.findWithUserById(themeLocationId)
                 .orElseThrow(ThemeLocationNotFoundException::new);
-
         themeLocation.subtractNumOfUserRecommend(); // 장소 추천수 -1
         themeLocationRepository.delete(themeLocation);
     }

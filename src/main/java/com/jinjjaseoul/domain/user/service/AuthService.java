@@ -73,8 +73,8 @@ public class AuthService {
     // refresh token 삭제, access token 값을 redis 에 key 로 저장
     // 로그아웃된 access token 으로 요청이 들어왔을 때, 해당 토큰의 유효성이 남아있는 동안은 redis 에 블랙리스트로 등록되어 있을 것이기 때문에 로그인 불가
     public void logout(String accessToken, UserPrincipal userPrincipal) {
-        validateAccessToken(accessToken);
         String token = accessToken.split(" ")[1];
+        validateAccessToken(token);
         Long expirationTime = jwtService.getExpirationTime(token);
         updateRedisData(userPrincipal, token, ACCESS_TOKEN_REDIS_DATA, expirationTime);
     }
@@ -82,7 +82,7 @@ public class AuthService {
     @Transactional
     public void withdraw(String accessToken, UserPrincipal userPrincipal) {
         logout(accessToken, userPrincipal);
-        User user = userRepository.getReferenceById(userPrincipal.getId());
+        User user = userPrincipal.getUser();
         user.withdraw();
     }
 
