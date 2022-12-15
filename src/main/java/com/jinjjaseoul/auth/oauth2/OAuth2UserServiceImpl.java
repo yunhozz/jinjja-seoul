@@ -1,11 +1,9 @@
 package com.jinjjaseoul.auth.oauth2;
 
 import com.jinjjaseoul.auth.model.UserPrincipal;
-import com.jinjjaseoul.common.converter.UserConverter;
 import com.jinjjaseoul.common.enums.Role;
 import com.jinjjaseoul.domain.icon.model.Icon;
 import com.jinjjaseoul.domain.icon.model.IconRepository;
-import com.jinjjaseoul.domain.user.dto.response.UserResponseDto;
 import com.jinjjaseoul.domain.user.model.User;
 import com.jinjjaseoul.domain.user.model.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -46,9 +44,7 @@ public class OAuth2UserServiceImpl implements OAuth2UserService<OAuth2UserReques
         }
 
         User user = saveOrUpdate(oAuth2Provider);
-        UserResponseDto userResponseDto = UserConverter.convertToDto(user);
-
-        return new UserPrincipal(userResponseDto, attributes);
+        return new UserPrincipal(user, attributes);
     }
 
     private User saveOrUpdate(OAuth2Provider oAuth2Provider) {

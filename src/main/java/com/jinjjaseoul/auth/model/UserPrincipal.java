@@ -2,7 +2,7 @@ package com.jinjjaseoul.auth.model;
 
 import com.jinjjaseoul.common.enums.Provider;
 import com.jinjjaseoul.common.enums.Role;
-import com.jinjjaseoul.domain.user.dto.response.UserResponseDto;
+import com.jinjjaseoul.domain.user.model.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -14,48 +14,29 @@ import java.util.Map;
 
 public class UserPrincipal implements UserDetails, OAuth2User {
 
-    private final Long id;
-    private final String email;
-    private final String password;
-    private final String name;
-    private final String introduction;
-    private final Long iconId;
-    private final Role role;
-    private final Provider provider;
+    private final User user;
     private Map<String, Object> attributes;
 
-    // UserDetailsServiceImpl
-    public UserPrincipal(UserResponseDto userResponseDto) {
-        id = userResponseDto.getId();
-        email = userResponseDto.getEmail();
-        password = userResponseDto.getPassword();
-        name = userResponseDto.getName();
-        introduction = userResponseDto.getIntroduction();
-        iconId = userResponseDto.getIconId();
-        role = userResponseDto.getRole();
-        provider = userResponseDto.getProvider();
+    public UserPrincipal(User user) {
+        this.user = user;
     }
 
-    // OAuth2UserServiceImpl
-    public UserPrincipal(UserResponseDto userResponseDto, Map<String, Object> attributes) {
-        id = userResponseDto.getId();
-        email = userResponseDto.getEmail();
-        password = userResponseDto.getPassword();
-        name = userResponseDto.getName();
-        introduction = userResponseDto.getIntroduction();
-        iconId = userResponseDto.getIconId();
-        role = userResponseDto.getRole();
-        provider = userResponseDto.getProvider();
+    public UserPrincipal(User user, Map<String, Object> attributes) {
+        this.user = user;
         this.attributes = attributes;
     }
 
+    public User getUser() {
+        return user;
+    }
+
     public Long getId() {
-        return id;
+        return user.getId();
     }
 
     @Override
     public String getUsername() {
-        return email;
+        return user.getEmail();
     }
 
     @Override
@@ -65,30 +46,26 @@ public class UserPrincipal implements UserDetails, OAuth2User {
 
     @Override
     public String getName() {
-        return name;
+        return user.getName();
     }
 
     public String getIntroduction() {
-        return introduction;
-    }
-
-    public Long getIconId() {
-        return iconId;
+        return user.getIntroduction();
     }
 
     public Role getRole() {
-        return role;
+        return user.getRole();
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return new HashSet<>() {{
-            add(new SimpleGrantedAuthority(role.getAuthority()));
+            add(new SimpleGrantedAuthority(user.getRole().getAuthority()));
         }};
     }
 
     public Provider getProvider() {
-        return provider;
+        return user.getProvider();
     }
 
     @Override
