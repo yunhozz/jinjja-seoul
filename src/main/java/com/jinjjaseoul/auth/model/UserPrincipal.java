@@ -14,6 +14,10 @@ import java.util.Map;
 
 public class UserPrincipal implements UserDetails, OAuth2User {
 
+    /*
+     * @AuthenticationPrincipal 로 불러온 UserPrincipal 의 user 는 준영속 상태이다.
+     * 따라서, user 의 변경이 필요한 부분은 userPrincipal 에서 user 를 꺼내는 것이 아니라, id 값을 이용하여 직접 user 를 호출한다.
+     */
     private final User user;
     private Map<String, Object> attributes;
 
