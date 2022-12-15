@@ -26,7 +26,7 @@ public class UserController {
 
     private final UserService userService;
 
-    @Secured("{ROLE_ADMIN, ROLE_USER}")
+    @Secured({"ROLE_ADMIN", "ROLE_USER"})
     @GetMapping("/me")
     public Response getMyInfo(@AuthenticationPrincipal UserPrincipal userPrincipal) {
         ProfileResponseDto profileResponseDto = userService.findProfileDto(userPrincipal);
@@ -39,7 +39,7 @@ public class UserController {
         return Response.success(HttpStatus.CREATED, userId);
     }
 
-    @Secured("{ROLE_ADMIN, ROLE_USER}")
+    @Secured({"ROLE_ADMIN", "ROLE_USER"})
     @PatchMapping("/update")
     public Response updateProfile(@AuthenticationPrincipal UserPrincipal userPrincipal, @Valid @RequestBody UpdateRequestDto updateRequestDto) {
         userService.updateProfile(userPrincipal, updateRequestDto);
