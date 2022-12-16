@@ -6,14 +6,10 @@ import com.jinjjaseoul.domain.map.dto.query.ThemeLocationSimpleQueryDto;
 import com.jinjjaseoul.domain.map.dto.query.ThemeMapQueryDto;
 import com.jinjjaseoul.domain.map.dto.request.LocationSimpleRequestDto;
 import com.jinjjaseoul.domain.map.dto.request.MapSearchRequestDto;
-import com.jinjjaseoul.domain.map.dto.request.SearchRequestDto;
 import com.jinjjaseoul.domain.map.dto.request.ThemeMapSimpleRequestDto;
 import com.jinjjaseoul.domain.map.model.repository.theme_map.ThemeMapRepository;
 import com.jinjjaseoul.domain.map.service.ThemeMapService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -55,6 +51,12 @@ public class ThemeMapController {
         return Response.success(HttpStatus.OK, themeMapQueryDtoList);
     }
 
+    @GetMapping("/{id}/locations")
+    public Response getLocationList(@PathVariable("id") Long themeMapId) {
+        List<ThemeLocationSimpleQueryDto> locationList = themeMapRepository.findLocationListById(themeMapId);
+        return Response.success(HttpStatus.OK, locationList);
+    }
+
     @Secured("ROLE_USER")
     @PostMapping("/save")
     public Response saveThemeMapInfoOnCache(@AuthenticationPrincipal UserPrincipal userPrincipal, @Valid @RequestBody ThemeMapSimpleRequestDto themeMapSimpleRequestDto) {
@@ -67,12 +69,6 @@ public class ThemeMapController {
     public Response createThemeMap(@AuthenticationPrincipal UserPrincipal userPrincipal, @RequestBody LocationSimpleRequestDto locationSimpleRequestDto) {
         Long themeMapId = themeMapService.makeThemeMap(userPrincipal.getId(), locationSimpleRequestDto);
         return Response.success(HttpStatus.CREATED, themeMapId);
-    }
-
-    @GetMapping("/{id}/locations")
-    public Response getLocationList(@PathVariable("id") Long themeMapId) {
-        List<ThemeLocationSimpleQueryDto> locationList = themeMapRepository.findLocationListById(themeMapId);
-        return Response.success(HttpStatus.OK, locationList);
     }
 
     @Secured("ROLE_USER")
@@ -94,19 +90,14 @@ public class ThemeMapController {
         return Response.success(HttpStatus.CREATED, "검색 조건을 업데이트 했습니다.");
     }
 
-    @PostMapping("/search")
-    public Response searchList(@RequestParam(required = false) String keyword, @RequestBody SearchRequestDto searchRequestDto,
-                               @RequestParam(required = false) Long lastThemeMapId, @PageableDefault(size = 30) Pageable pageable) {
-        Page<ThemeMapQueryDto> themeMapQueryDtoPage = themeMapRepository.searchThemeMapListByKeyword(keyword, searchRequestDto, lastThemeMapId, pageable);
-        return Response.success(HttpStatus.CREATED, themeMapQueryDtoPage);
-    }
-
+    @Secured({"ROLE_ADMIN", "ROLE_USER"})
     @DeleteMapping("/{themeMapId}/delete")
     public Response deleteThemeMap(@PathVariable Long themeMapId) {
         themeMapService.deleteThemeMap(themeMapId);
         return Response.success(HttpStatus.NO_CONTENT, "테마 지도를 성공적으로 삭제했습니다.");
     }
 
+    @Secured({"ROLE_ADMIN", "ROLE_USER"})
     @DeleteMapping("/{themeLocationId}/delete")
     public Response deleteThemeLocation(@PathVariable Long themeLocationId) {
         themeMapService.deleteThemeLocation(themeLocationId);

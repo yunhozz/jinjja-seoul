@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class SearchRequestDto {
 
+    private String keyword;
     private Place place;
     private Somebody somebody;
     private Something something;

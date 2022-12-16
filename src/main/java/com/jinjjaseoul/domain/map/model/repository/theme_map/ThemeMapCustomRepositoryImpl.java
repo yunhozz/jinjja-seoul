@@ -90,7 +90,7 @@ public class ThemeMapCustomRepositoryImpl implements ThemeMapCustomRepository {
     }
 
     @Override
-    public Page<ThemeMapQueryDto> searchThemeMapListByKeyword(String keyword, SearchRequestDto searchRequestDto, Long lastThemeMapId, Pageable pageable) {
+    public Page<ThemeMapQueryDto> searchThemeMapListByKeyword(SearchRequestDto searchRequestDto, Long lastThemeMapId, Pageable pageable) {
         List<ThemeMapQueryDto> themeMapSearchList = queryFactory
                 .select(new QThemeMapQueryDto(
                         themeMap.id,
@@ -101,7 +101,7 @@ public class ThemeMapCustomRepositoryImpl implements ThemeMapCustomRepository {
                 .join(themeMap.icon, icon)
                 .where(themeMapIdLt(lastThemeMapId))
                 .where(
-                        byKeyword(keyword),
+                        byKeyword(searchRequestDto.getKeyword()),
                         byPlace(searchRequestDto.getPlace()),
                         bySomebody(searchRequestDto.getSomebody()),
                         bySomething(searchRequestDto.getSomething()),
