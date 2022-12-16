@@ -12,6 +12,7 @@ public class CurationMapRequestDto {
 
     @NotBlank
     private String name;
+    private Long iconId;
     @NotNull
     private Boolean isMakeTogether;
     @NotNull
