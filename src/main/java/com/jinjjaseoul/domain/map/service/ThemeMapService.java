@@ -72,7 +72,7 @@ public class ThemeMapService {
         if (themeMapRequestDto.getLocationId() == null) return null; // 장소 등록 여부 검증
 
         User user = userRepository.getReferenceById(userId);
-        Icon icon = determineIcon(locationSimpleRequestDto.getLocationId());
+        Icon icon = determineIcon((Long) dataList.get(1));
         ThemeMap themeMap = MapConverter.convertToThemeMapEntity(themeMapRequestDto, user, icon);
         Location location = locationRepository.getReferenceById(themeMapRequestDto.getLocationId());
 
@@ -123,7 +123,7 @@ public class ThemeMapService {
     public void deleteThemeMap(Long themeMapId) {
         ThemeMap themeMap = themeMapRepository.findWithUserById(themeMapId)
                 .orElseThrow(ThemeMapNotFoundException::new);
-        List<Long> themeLocationIds = themeLocationRepository.findIdsByThemeMapId(themeMap.getId());
+        List<Long> themeLocationIds = themeLocationRepository.findIdsByThemeMapId(themeMapId);
 
         themeMap.subtractNumOfUserRecommend(); // 장소 추천수 -1
         themeLocationRepository.deleteAllByIds(themeLocationIds);
