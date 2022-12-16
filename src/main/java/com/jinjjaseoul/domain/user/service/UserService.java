@@ -5,6 +5,7 @@ import com.jinjjaseoul.domain.icon.model.Icon;
 import com.jinjjaseoul.domain.icon.model.IconRepository;
 import com.jinjjaseoul.domain.user.dto.request.UpdateRequestDto;
 import com.jinjjaseoul.domain.user.dto.request.UserRequestDto;
+import com.jinjjaseoul.domain.user.dto.response.UserResponseDto;
 import com.jinjjaseoul.domain.user.model.User;
 import com.jinjjaseoul.domain.user.model.UserRepository;
 import com.jinjjaseoul.domain.user.service.exception.EmailDuplicateException;
@@ -32,6 +33,12 @@ public class UserService {
         User user = userRepository.getReferenceById(userId);
         Icon icon = iconRepository.getReferenceById(updateRequestDto.getIconId());
         user.updateProfile(updateRequestDto.getName(), updateRequestDto.getIntroduction(), icon);
+    }
+
+    @Transactional(readOnly = true)
+    public UserResponseDto findUserDtoById(Long userId) {
+        User user = userRepository.getReferenceById(userId);
+        return UserConverter.convertToDto(user);
     }
 
     private User validateAndSaveUser(UserRequestDto userRequestDto) {

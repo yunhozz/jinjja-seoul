@@ -6,6 +6,7 @@ import com.jinjjaseoul.domain.user.dto.query.ProfileQueryDto;
 import com.jinjjaseoul.domain.user.dto.query.UserCardQueryDto;
 import com.jinjjaseoul.domain.user.dto.request.UpdateRequestDto;
 import com.jinjjaseoul.domain.user.dto.request.UserRequestDto;
+import com.jinjjaseoul.domain.user.dto.response.UserResponseDto;
 import com.jinjjaseoul.domain.user.model.UserRepository;
 import com.jinjjaseoul.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +15,7 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -41,6 +43,13 @@ public class UserController {
     public Response getMyInfo(@AuthenticationPrincipal UserPrincipal userPrincipal) {
         ProfileQueryDto profileQueryDto = userRepository.findProfileById(userPrincipal.getId());
         return Response.success(HttpStatus.OK, profileQueryDto);
+    }
+
+    @Secured("ROLE_ADMIN")
+    @GetMapping("/{id}")
+    public Response getUserInfo(@PathVariable("id") Long userId) {
+        UserResponseDto userResponseDto = userService.findUserDtoById(userId);
+        return Response.success(HttpStatus.OK, userResponseDto);
     }
 
     @PostMapping("/join")
