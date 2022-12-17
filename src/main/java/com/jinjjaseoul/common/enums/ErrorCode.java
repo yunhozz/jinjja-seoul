@@ -32,6 +32,10 @@ public enum ErrorCode {
     CURATION_MAP_NOT_FOUND(404, "M-043", "큐레이션 맵을 찾을 수 없습니다."),
     CURATION_LOCATION_NOT_FOUND(404, "M-044", "큐레이션 장소를 찾을 수 없습니다."),
 
+    // bookmark
+    CURATION_LIKES_NOT_FOUND(404, "B-041", "큐레이션 좋아요에 대한 기록을 찾을 수 없습니다."),
+    LOCATION_BOOKMARK_NOT_FOUND(404, "B-042", "장소 북마크에 대한 기록을 찾을 수 없습니다."),
+
     ;
 
     private final int status;

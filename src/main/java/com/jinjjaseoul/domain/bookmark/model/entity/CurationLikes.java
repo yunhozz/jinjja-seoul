@@ -33,4 +33,8 @@ public class CurationLikes extends BaseEntity {
         this.user = user;
         this.curationMap = curationMap;
     }
+
+    public void cancelLikesOfCurationMap() {
+        curationMap.subtractLikes();
+    }
 }
