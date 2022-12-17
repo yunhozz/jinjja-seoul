@@ -55,13 +55,16 @@ public class CurationMap extends BaseEntity {
     private MapSearch mapSearch; // 검색 조건 : 어디로?, 누구와?, 무엇을?, 분위기/특징, 음식, 술/음료, 카테고리
 
     @Builder
-    private CurationMap(User user, String name, Icon icon, boolean isMakeTogether, boolean isProfileDisplay, boolean isShared, String redirectUrl) {
+    private CurationMap(User user, String name, Icon icon, boolean isMakeTogether, boolean isProfileDisplay, boolean isShared) {
         this.user = user;
         this.name = name;
         this.icon = icon;
         this.isMakeTogether = isMakeTogether;
         this.isProfileDisplay = isProfileDisplay;
         this.isShared = isShared;
+    }
+
+    public void updateRedirectUrl(String redirectUrl) {
         this.redirectUrl = redirectUrl;
     }
 

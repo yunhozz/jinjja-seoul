@@ -36,7 +36,6 @@ public class MapConverter {
                 .isMakeTogether(curationMapRequestDto.getIsMakeTogether())
                 .isProfileDisplay(curationMapRequestDto.getIsProfileDisplay())
                 .isShared(curationMapRequestDto.getIsShared())
-                .redirectUrl("localhost:8080/curation/curator/" + user.getId())
                 .build();
     }
 }

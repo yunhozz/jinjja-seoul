@@ -43,7 +43,10 @@ public class CurationMapService {
         Icon icon = determineIcon(curationMapRequestDto.getIconId());
         CurationMap curationMap = MapConverter.convertToCurationMapEntity(curationMapRequestDto, user, icon);
 
-        return curationMapRepository.save(curationMap).getId();
+        curationMapRepository.save(curationMap);
+        curationMap.updateRedirectUrl("localhost:8080/curation/" + curationMap.getId());
+
+        return curationMap.getId();
     }
 
     // 하나의 큐레이션맵 당 여러 장소 추천 가능, 공개 여부에 따라 다른 유저도 추천 가능
@@ -108,8 +111,8 @@ public class CurationMapService {
             icon = iconRepository.getReferenceById(iconId);
 
         } else {
-            Random random = new Random(iconRepository.count());
-            icon = iconRepository.getReferenceById(random.nextLong());
+            Random random = new Random(System.currentTimeMillis());
+            return iconRepository.getReferenceById((long) random.nextInt(8) + 1);
         }
 
         return icon;
