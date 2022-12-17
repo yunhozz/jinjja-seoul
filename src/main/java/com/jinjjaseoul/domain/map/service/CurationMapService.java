@@ -14,6 +14,7 @@ import com.jinjjaseoul.domain.map.model.entity.CurationMap;
 import com.jinjjaseoul.domain.map.model.repository.CurationLocationRepository;
 import com.jinjjaseoul.domain.map.model.repository.curation_map.CurationMapRepository;
 import com.jinjjaseoul.domain.map.service.exception.CurationLocationNotFoundException;
+import com.jinjjaseoul.domain.map.service.exception.CurationMapNameDuplicateException;
 import com.jinjjaseoul.domain.map.service.exception.CurationMapNotFoundException;
 import com.jinjjaseoul.domain.user.model.User;
 import com.jinjjaseoul.domain.user.model.repository.UserRepository;
@@ -36,6 +37,8 @@ public class CurationMapService {
 
     @Transactional
     public Long makeCurationMap(UserPrincipal userPrincipal, CurationMapRequestDto curationMapRequestDto) {
+        validateCurationMapNameDuplicate(curationMapRequestDto); // 중복되는 이름 검증
+
         User user = userPrincipal.getUser();
         Icon icon = determineIcon(curationMapRequestDto.getIconId());
         CurationMap curationMap = MapConverter.convertToCurationMapEntity(curationMapRequestDto, user, icon);
@@ -110,5 +113,11 @@ public class CurationMapService {
         }
 
         return icon;
+    }
+
+    private void validateCurationMapNameDuplicate(CurationMapRequestDto curationMapRequestDto) {
+        if (curationMapRepository.existsByName(curationMapRequestDto.getName())) {
+            throw new CurationMapNameDuplicateException();
+        }
     }
 }
