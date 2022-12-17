@@ -8,7 +8,7 @@ import com.jinjjaseoul.common.utils.RedisUtils;
 import com.jinjjaseoul.domain.user.dto.request.LoginRequestDto;
 import com.jinjjaseoul.domain.user.dto.response.UserResponseDto;
 import com.jinjjaseoul.domain.user.model.User;
-import com.jinjjaseoul.domain.user.model.UserRepository;
+import com.jinjjaseoul.domain.user.model.repository.UserRepository;
 import com.jinjjaseoul.domain.user.service.exception.AlreadyLoginException;
 import com.jinjjaseoul.domain.user.service.exception.EmailNotFoundException;
 import com.jinjjaseoul.domain.user.service.exception.JwtTokenNotFoundException;

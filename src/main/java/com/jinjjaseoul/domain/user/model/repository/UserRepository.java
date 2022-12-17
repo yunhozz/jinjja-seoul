@@ -1,5 +1,6 @@
-package com.jinjjaseoul.domain.user.model;
+package com.jinjjaseoul.domain.user.model.repository;
 
+import com.jinjjaseoul.domain.user.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

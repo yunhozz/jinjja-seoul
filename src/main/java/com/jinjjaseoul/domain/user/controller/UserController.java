@@ -7,7 +7,7 @@ import com.jinjjaseoul.domain.user.dto.query.UserCardQueryDto;
 import com.jinjjaseoul.domain.user.dto.request.UpdateRequestDto;
 import com.jinjjaseoul.domain.user.dto.request.UserRequestDto;
 import com.jinjjaseoul.domain.user.dto.response.UserResponseDto;
-import com.jinjjaseoul.domain.user.model.UserRepository;
+import com.jinjjaseoul.domain.user.model.repository.UserRepository;
 import com.jinjjaseoul.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

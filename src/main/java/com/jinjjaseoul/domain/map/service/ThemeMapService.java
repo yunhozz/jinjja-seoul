@@ -20,7 +20,7 @@ import com.jinjjaseoul.domain.map.service.exception.ThemeLocationNotFoundExcepti
 import com.jinjjaseoul.domain.map.service.exception.ThemeMapNameDuplicateException;
 import com.jinjjaseoul.domain.map.service.exception.ThemeMapNotFoundException;
 import com.jinjjaseoul.domain.user.model.User;
-import com.jinjjaseoul.domain.user.model.UserRepository;
+import com.jinjjaseoul.domain.user.model.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

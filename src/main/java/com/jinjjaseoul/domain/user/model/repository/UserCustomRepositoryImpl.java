@@ -1,4 +1,4 @@
-package com.jinjjaseoul.domain.user.model;
+package com.jinjjaseoul.domain.user.model.repository;
 
 import com.jinjjaseoul.domain.user.dto.query.ProfileQueryDto;
 import com.jinjjaseoul.domain.user.dto.query.QProfileQueryDto;
