@@ -196,8 +196,12 @@ public class CurationMapCustomRepositoryImpl implements CurationMapCustomReposit
 
         locationList.forEach(locationSimpleQueryDto -> {
             Long locationId = locationSimpleQueryDto.getId();
-            String largestComment = commentListMap.get(locationId).get(0).getContent();
-            locationSimpleQueryDto.setLargestComment(largestComment);
+            List<CommentSimpleQueryDto> comments = commentListMap.get(locationId);
+
+            if (comments != null) {
+                String largestComment = comments.get(0).getContent();
+                locationSimpleQueryDto.setLargestComment(largestComment);
+            }
         });
     }
 
