@@ -38,7 +38,7 @@ public class CurationMapController {
         return Response.success(HttpStatus.OK, curationMapQueryDtoList);
     }
 
-    @GetMapping("/{id}/locations")
+    @GetMapping("/{id}")
     public Response getLocationList(@PathVariable("id") Long curationMapId) {
         List<LocationSimpleQueryDto> locationSimpleQueryDtoList = curationMapRepository.findLocationListById(curationMapId);
         return Response.success(HttpStatus.OK, locationSimpleQueryDtoList);
@@ -55,6 +55,10 @@ public class CurationMapController {
     @PostMapping("/{id}/update")
     public Response recommendCurationLocation(@AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable("id") Long curationMapId,
                                               @RequestBody LocationSimpleRequestDto locationSimpleRequestDto) {
+        if (locationSimpleRequestDto.getLocationId() == null) {
+            return Response.failure(HttpStatus.BAD_REQUEST, "장소를 선택해주세요.");
+        }
+
         curationMapService.addCurationLocation(userPrincipal, curationMapId, locationSimpleRequestDto);
         return Response.success(HttpStatus.CREATED, "큐레이션 장소가 추가되었습니다.");
     }

@@ -51,7 +51,7 @@ public class ThemeMapController {
         return Response.success(HttpStatus.OK, themeMapQueryDtoList);
     }
 
-    @GetMapping("/{id}/locations")
+    @GetMapping("/{id}")
     public Response getLocationList(@PathVariable("id") Long themeMapId) {
         List<ThemeLocationSimpleQueryDto> locationList = themeMapRepository.findLocationListById(themeMapId);
         return Response.success(HttpStatus.OK, locationList);
