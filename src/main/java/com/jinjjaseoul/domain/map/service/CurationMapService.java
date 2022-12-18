@@ -5,7 +5,7 @@ import com.jinjjaseoul.common.converter.MapConverter;
 import com.jinjjaseoul.domain.icon.model.Icon;
 import com.jinjjaseoul.domain.icon.model.IconRepository;
 import com.jinjjaseoul.domain.location.model.entity.Location;
-import com.jinjjaseoul.domain.location.model.repository.LocationRepository;
+import com.jinjjaseoul.domain.location.model.repository.location.LocationRepository;
 import com.jinjjaseoul.domain.map.dto.request.CurationMapRequestDto;
 import com.jinjjaseoul.domain.map.dto.request.LocationSimpleRequestDto;
 import com.jinjjaseoul.domain.map.dto.request.MapSearchRequestDto;

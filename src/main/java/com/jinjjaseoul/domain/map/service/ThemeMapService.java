@@ -7,7 +7,7 @@ import com.jinjjaseoul.common.utils.RedisUtils;
 import com.jinjjaseoul.domain.icon.model.Icon;
 import com.jinjjaseoul.domain.icon.model.IconRepository;
 import com.jinjjaseoul.domain.location.model.entity.Location;
-import com.jinjjaseoul.domain.location.model.repository.LocationRepository;
+import com.jinjjaseoul.domain.location.model.repository.location.LocationRepository;
 import com.jinjjaseoul.domain.map.dto.request.LocationSimpleRequestDto;
 import com.jinjjaseoul.domain.map.dto.request.MapSearchRequestDto;
 import com.jinjjaseoul.domain.map.dto.request.ThemeMapRequestDto;
@@ -86,19 +86,19 @@ public class ThemeMapService {
 
     // 하나의 테마맵 당 하나의 장소만 추천 가능
     @Transactional
-    public void updateThemeLocation(Long userId, Long themeMapId, Long locationId, String imageUrl) {
+    public void updateThemeLocation(Long userId, Long themeMapId, LocationSimpleRequestDto locationSimpleRequestDto) {
         User user = userRepository.getReferenceById(userId);
         ThemeMap themeMap = findThemeMap(themeMapId);
-        Location location = locationRepository.getReferenceById(locationId);
+        Location location = locationRepository.getReferenceById(locationSimpleRequestDto.getLocationId());
 
         if (themeMap.isMadeByUser(user)) {
             ThemeLocation themeLocation = themeLocationRepository.findByUserAndThemeMap(user, themeMap)
                     .orElseThrow(ThemeLocationNotFoundException::new);
-            themeLocation.update(location, imageUrl);
+            themeLocation.update(location, locationSimpleRequestDto.getImageUrl());
 
         } else {
-            themeLocationRepository.findByUserAndThemeMap(user, themeMap).ifPresentOrElse(themeLocation -> themeLocation.update(location, imageUrl), () -> {
-                ThemeLocation themeLocation = createThemeLocation(user, themeMap, location, imageUrl);
+            themeLocationRepository.findByUserAndThemeMap(user, themeMap).ifPresentOrElse(themeLocation -> themeLocation.update(location, locationSimpleRequestDto.getImageUrl()), () -> {
+                ThemeLocation themeLocation = createThemeLocation(user, themeMap, location, locationSimpleRequestDto.getImageUrl());
                 themeLocationRepository.save(themeLocation);
                 user.addNumOfRecommend(); // 장소 추천수 +1
             });

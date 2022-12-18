@@ -75,12 +75,13 @@ public class ThemeMapController {
     @PostMapping("/update")
     public Response recommendThemeLocation(@AuthenticationPrincipal UserPrincipal userPrincipal, @RequestParam("id") Long themeMapId,
                                            @RequestBody LocationSimpleRequestDto locationSimpleRequestDto) {
-        if (locationSimpleRequestDto.getLocationId() == null) {
+        Long locationId = locationSimpleRequestDto.getLocationId();
+        if (locationId == null) {
             return Response.failure(HttpStatus.BAD_REQUEST, "장소를 선택해주세요.");
         }
 
-        themeMapService.updateThemeLocation(userPrincipal.getId(), themeMapId, locationSimpleRequestDto.getLocationId(), locationSimpleRequestDto.getImageUrl());
-        return Response.success(HttpStatus.CREATED, "테마 지도에 장소가 추가되었습니다.");
+        themeMapService.updateThemeLocation(userPrincipal.getId(), themeMapId, locationSimpleRequestDto);
+        return Response.success(HttpStatus.CREATED, locationId);
     }
 
     @Secured("ROLE_ADMIN")
@@ -91,14 +92,14 @@ public class ThemeMapController {
     }
 
     @Secured({"ROLE_ADMIN", "ROLE_USER"})
-    @DeleteMapping("/{themeMapId}/delete")
+    @DeleteMapping("/{themeMapId}")
     public Response deleteThemeMap(@PathVariable Long themeMapId) {
         themeMapService.deleteThemeMap(themeMapId);
         return Response.success(HttpStatus.NO_CONTENT, "테마 지도를 성공적으로 삭제했습니다.");
     }
 
     @Secured({"ROLE_ADMIN", "ROLE_USER"})
-    @DeleteMapping("/{themeLocationId}/delete")
+    @DeleteMapping("/{themeLocationId}")
     public Response deleteThemeLocation(@PathVariable Long themeLocationId) {
         themeMapService.deleteThemeLocation(themeLocationId);
         return Response.success(HttpStatus.NO_CONTENT, "테마 장소를 성공적으로 삭제했습니다.");
