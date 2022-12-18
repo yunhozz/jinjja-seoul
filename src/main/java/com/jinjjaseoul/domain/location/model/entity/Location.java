@@ -31,9 +31,9 @@ public class Location extends BaseEntity {
     private String ny;
 
     @Builder
-    private Location(String name, String si, String gu, String dong, String etc, String nx, String ny) {
+    private Location(String name, Address address, String nx, String ny) {
         this.name = name;
-        this.address = new Address(si, gu, dong, etc);
+        this.address = address;
         this.nx = nx;
         this.ny = ny;
     }
