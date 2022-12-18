@@ -70,11 +70,7 @@ public class CurationMapCustomRepositoryImpl implements CurationMapCustomReposit
         groupQueryAndSetLocationNum(curationMapList, curationLocationList);
         Collections.shuffle(curationMapList); // 최신 50 개의 큐레이션 지도 랜덤 정렬
 
-        if (curationMapList.size() <= 12) {
-            return curationMapList;
-        }
-
-        return new ArrayList<>(curationMapList.subList(0, 12));
+        return curationMapList.size() > 12 ? new ArrayList<>(curationMapList.subList(0, 12)) : curationMapList;
     }
 
     @Override
