@@ -156,8 +156,12 @@ public class ThemeMapCustomRepositoryImpl implements ThemeMapCustomRepository {
 
         themeMapList.forEach(themeMapQueryDto -> {
             Long themeMapId = themeMapQueryDto.getId();
-            int curatorNum = themeLocationListMap.get(themeMapId).size();
-            themeMapQueryDto.setCuratorNum(curatorNum);
+            List<ThemeLocationCountQueryDto> themeLocationDtoList = themeLocationListMap.get(themeMapId);
+
+            if (themeLocationDtoList != null) {
+                int curatorNum = themeLocationDtoList.size();
+                themeMapQueryDto.setCuratorNum(curatorNum);
+            }
         });
     }
 

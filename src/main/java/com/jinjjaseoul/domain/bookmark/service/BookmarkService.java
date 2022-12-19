@@ -8,7 +8,7 @@ import com.jinjjaseoul.domain.bookmark.model.repository.LocationBookmarkReposito
 import com.jinjjaseoul.domain.bookmark.service.exception.CurationLikesNotFoundException;
 import com.jinjjaseoul.domain.bookmark.service.exception.LocationBookmarkNotFoundException;
 import com.jinjjaseoul.domain.location.model.entity.Location;
-import com.jinjjaseoul.domain.location.model.repository.LocationRepository;
+import com.jinjjaseoul.domain.location.model.repository.location.LocationRepository;
 import com.jinjjaseoul.domain.map.model.entity.CurationMap;
 import com.jinjjaseoul.domain.map.model.repository.curation_map.CurationMapRepository;
 import com.jinjjaseoul.domain.map.service.exception.CurationMapNotFoundException;

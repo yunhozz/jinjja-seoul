@@ -163,8 +163,12 @@ public class CurationMapCustomRepositoryImpl implements CurationMapCustomReposit
 
         curationMapList.forEach(curationMapQueryDto -> {
             Long curationId = curationMapQueryDto.getId();
-            int locationNum = curationLocationListMap.get(curationId).size();
-            curationMapQueryDto.setLocationNum(locationNum);
+            List<CurationLocationCountQueryDto> curationLocationDtoList = curationLocationListMap.get(curationId);
+
+            if (curationLocationDtoList != null) {
+                int locationNum = curationLocationDtoList.size();
+                curationMapQueryDto.setLocationNum(locationNum);
+            }
         });
     }
 
