@@ -52,11 +52,6 @@ public class UserCustomRepositoryImpl implements UserCustomRepository {
                 .fetch();
 
         Collections.shuffle(users); // 상위 20 명의 유저를 랜덤 배치
-
-        if (users.size() <= 6) {
-            return users;
-        }
-
-        return new ArrayList<>(users.subList(0, 6));
+        return users.size() > 6 ? new ArrayList<>(users.subList(0, 6)) : users;
     }
 }

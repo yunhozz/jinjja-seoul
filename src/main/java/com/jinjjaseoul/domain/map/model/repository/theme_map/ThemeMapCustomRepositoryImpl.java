@@ -80,7 +80,8 @@ public class ThemeMapCustomRepositoryImpl implements ThemeMapCustomRepository {
 
         List<ThemeLocationCountQueryDto> themeLocationList = getThemeLocationListByThemeMapIds(themeMapList);
         groupQueryAndSetCuratorNum(themeMapList, themeLocationList);
-        themeMapList.sort((o1, o2) -> o2.getCuratorNum() - o1.getCuratorNum()); // 큐레이터 수 내림차순 정렬
+        // 큐레이터 수 내림차순 정렬, 같을 시 id 값 내림차순 정렬
+        themeMapList.sort((o1, o2) -> o1.getCuratorNum() != o2.getCuratorNum() ? o2.getCuratorNum() - o1.getCuratorNum() : Math.toIntExact(o2.getId() - o1.getId()));
 
         return themeMapList.size() > 12 ? new ArrayList<>(themeMapList.subList(0, 12)) : themeMapList;
     }
