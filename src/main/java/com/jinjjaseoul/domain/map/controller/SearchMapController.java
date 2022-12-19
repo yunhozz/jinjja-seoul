@@ -1,10 +1,9 @@
 package com.jinjjaseoul.domain.map.controller;
 
 import com.jinjjaseoul.common.dto.Response;
-import com.jinjjaseoul.common.enums.MapKind;
 import com.jinjjaseoul.domain.map.dto.query.CurationMapQueryDto;
-import com.jinjjaseoul.domain.map.dto.query.WholeMapQueryDto;
 import com.jinjjaseoul.domain.map.dto.query.ThemeMapQueryDto;
+import com.jinjjaseoul.domain.map.dto.query.WholeMapQueryDto;
 import com.jinjjaseoul.domain.map.dto.request.SearchRequestDto;
 import com.jinjjaseoul.domain.map.model.repository.WholeMapRepository;
 import com.jinjjaseoul.domain.map.model.repository.curation_map.CurationMapRepository;
@@ -30,14 +29,14 @@ public class SearchMapController {
     private final CurationMapRepository curationMapRepository;
 
     @PostMapping
-    public Response searchList(@RequestBody SearchRequestDto searchRequestDto, @RequestParam(defaultValue = "") MapKind mapKind, @RequestParam(required = false) Long lastMapId,
+    public Response searchList(@RequestBody SearchRequestDto searchRequestDto, @RequestParam(required = false, defaultValue = "전체") String mapKind, @RequestParam(required = false) Long lastMapId,
                                @PageableDefault(size = 30) Pageable pageable) {
         switch (mapKind) {
-            case THEME:
+            case "테마지도":
                 Page<ThemeMapQueryDto> themeMapQueryDtoPage = themeMapRepository.searchThemeMapListByKeyword(searchRequestDto, lastMapId, pageable);
                 return Response.success(HttpStatus.CREATED, themeMapQueryDtoPage);
 
-            case CURATION:
+            case "큐레이션지도":
                 Page<CurationMapQueryDto> curationMapQueryDtoPage = curationMapRepository.searchCurationMapListByKeyword(searchRequestDto, lastMapId, pageable);
                 return Response.success(HttpStatus.CREATED, curationMapQueryDtoPage);
 

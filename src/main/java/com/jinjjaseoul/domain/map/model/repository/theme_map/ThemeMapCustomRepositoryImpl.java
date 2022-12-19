@@ -105,7 +105,7 @@ public class ThemeMapCustomRepositoryImpl implements ThemeMapCustomRepository {
                         byCharacteristics(searchRequestDto.getCharacteristics()),
                         byFood(searchRequestDto.getFood()),
                         byBeverage(searchRequestDto.getBeverage()),
-                        byCategory(searchRequestDto.getCategory())
+                        byCategories(searchRequestDto.getCategories())
                 )
                 .orderBy(themeMap.createdDate.desc())
                 .limit(pageable.getPageSize())
@@ -205,7 +205,7 @@ public class ThemeMapCustomRepositoryImpl implements ThemeMapCustomRepository {
         return beverage != null ? themeMap.mapSearch.beverage.eq(beverage) : null;
     }
 
-    private BooleanExpression byCategory(Category category) {
-        return category != null ? themeMap.categories.any().eq(category) : null;
+    private BooleanExpression byCategories(List<Category> categories) {
+        return categories != null ? themeMap.categories.any().in(categories) : null;
     }
 }

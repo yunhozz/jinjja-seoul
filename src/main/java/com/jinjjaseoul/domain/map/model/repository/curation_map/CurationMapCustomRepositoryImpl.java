@@ -99,7 +99,7 @@ public class CurationMapCustomRepositoryImpl implements CurationMapCustomReposit
                         byCharacteristics(searchRequestDto.getCharacteristics()),
                         byFood(searchRequestDto.getFood()),
                         byBeverage(searchRequestDto.getBeverage()),
-                        byCategory(searchRequestDto.getCategory())
+                        byCategories(searchRequestDto.getCategories())
                 )
                 .orderBy(curationMap.createdDate.desc())
                 .limit(pageable.getPageSize())
@@ -244,7 +244,7 @@ public class CurationMapCustomRepositoryImpl implements CurationMapCustomReposit
         return beverage != null ? curationMap.mapSearch.beverage.eq(beverage) : null;
     }
 
-    private BooleanExpression byCategory(Category category) {
-        return category != null ? curationMap.mapSearch.category.eq(category) : null;
+    private BooleanExpression byCategories(List<Category> categories) {
+        return categories != null ? curationMap.mapSearch.category.in(categories) : null;
     }
 }

@@ -10,6 +10,8 @@ import com.jinjjaseoul.common.enums.Something;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Getter
 @NoArgsConstructor
 public class SearchRequestDto {
@@ -21,5 +23,5 @@ public class SearchRequestDto {
     private Characteristics characteristics;
     private Food food;
     private Beverage beverage;
-    private Category category;
+    private List<Category> categories;
 }
