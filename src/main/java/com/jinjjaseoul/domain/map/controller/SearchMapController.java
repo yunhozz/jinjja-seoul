@@ -25,8 +25,8 @@ public class SearchMapController {
     private final MapRepository<?> mapRepository;
 
     @PostMapping
-    public Response searchList(@RequestBody SearchRequestDto searchRequestDto, @RequestParam(required = false, defaultValue = "전체") String mapKind, @RequestParam(required = false) Long lastMapId,
-                               @PageableDefault(size = 30) Pageable pageable) {
+    public Response searchList(@RequestBody SearchRequestDto searchRequestDto, @RequestParam(required = false, defaultValue = "전체") String mapKind,
+                               @RequestParam(required = false) Long lastMapId, @PageableDefault(size = 30) Pageable pageable) {
         switch (mapKind) {
             case "테마지도":
                 Page<ThemeMapQueryDto> themeMapQueryDtoPage = mapRepository.searchThemeMapListByKeyword(searchRequestDto, lastMapId, pageable);
@@ -36,9 +36,12 @@ public class SearchMapController {
                 Page<CurationMapQueryDto> curationMapQueryDtoPage = mapRepository.searchCurationMapListByKeyword(searchRequestDto, lastMapId, pageable);
                 return Response.success(HttpStatus.CREATED, curationMapQueryDtoPage);
 
-            default:
+            case "전체":
                 Page<WholeMapQueryDto> wholeMapQueryDtoPage = mapRepository.searchWholeMapListByKeyword(searchRequestDto, lastMapId, pageable);
                 return Response.success(HttpStatus.CREATED, wholeMapQueryDtoPage);
+
+            default:
+                return Response.failure(HttpStatus.BAD_REQUEST, "요청한 지도 종류를 확인해주세요.");
         }
     }
 }
