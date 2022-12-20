@@ -10,10 +10,9 @@ import com.jinjjaseoul.domain.bookmark.service.exception.LocationBookmarkNotFoun
 import com.jinjjaseoul.domain.location.model.entity.Location;
 import com.jinjjaseoul.domain.location.model.repository.location.LocationRepository;
 import com.jinjjaseoul.domain.map.model.entity.CurationMap;
-import com.jinjjaseoul.domain.map.model.repository.curation_map.CurationMapRepository;
+import com.jinjjaseoul.domain.map.model.repository.map.MapRepository;
 import com.jinjjaseoul.domain.map.service.exception.CurationMapNotFoundException;
 import com.jinjjaseoul.domain.user.model.User;
-import com.jinjjaseoul.domain.user.model.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,8 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class BookmarkService {
 
-    private final UserRepository userRepository;
-    private final CurationMapRepository curationMapRepository;
+    private final MapRepository<CurationMap> curationMapRepository;
     private final CurationLikesRepository curationLikesRepository;
     private final LocationRepository locationRepository;
     private final LocationBookmarkRepository locationBookmarkRepository;

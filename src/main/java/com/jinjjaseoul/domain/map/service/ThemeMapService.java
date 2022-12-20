@@ -15,7 +15,7 @@ import com.jinjjaseoul.domain.map.dto.request.ThemeMapSimpleRequestDto;
 import com.jinjjaseoul.domain.map.model.entity.ThemeLocation;
 import com.jinjjaseoul.domain.map.model.entity.ThemeMap;
 import com.jinjjaseoul.domain.map.model.repository.ThemeLocationRepository;
-import com.jinjjaseoul.domain.map.model.repository.theme_map.ThemeMapRepository;
+import com.jinjjaseoul.domain.map.model.repository.map.MapRepository;
 import com.jinjjaseoul.domain.map.service.exception.ThemeLocationNotFoundException;
 import com.jinjjaseoul.domain.map.service.exception.ThemeMapNameDuplicateException;
 import com.jinjjaseoul.domain.map.service.exception.ThemeMapNotFoundException;
@@ -35,7 +35,7 @@ public class ThemeMapService {
     private final UserRepository userRepository;
     private final IconRepository iconRepository;
     private final LocationRepository locationRepository;
-    private final ThemeMapRepository themeMapRepository;
+    private final MapRepository<ThemeMap> themeMapRepository;
     private final ThemeLocationRepository themeLocationRepository;
     private final RedisUtils redisUtils;
 

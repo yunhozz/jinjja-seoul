@@ -12,12 +12,11 @@ import com.jinjjaseoul.domain.map.dto.request.MapSearchRequestDto;
 import com.jinjjaseoul.domain.map.model.entity.CurationLocation;
 import com.jinjjaseoul.domain.map.model.entity.CurationMap;
 import com.jinjjaseoul.domain.map.model.repository.CurationLocationRepository;
-import com.jinjjaseoul.domain.map.model.repository.curation_map.CurationMapRepository;
+import com.jinjjaseoul.domain.map.model.repository.map.MapRepository;
 import com.jinjjaseoul.domain.map.service.exception.CurationLocationNotFoundException;
 import com.jinjjaseoul.domain.map.service.exception.CurationMapNameDuplicateException;
 import com.jinjjaseoul.domain.map.service.exception.CurationMapNotFoundException;
 import com.jinjjaseoul.domain.user.model.User;
-import com.jinjjaseoul.domain.user.model.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,10 +28,9 @@ import java.util.Random;
 @RequiredArgsConstructor
 public class CurationMapService {
 
-    private final UserRepository userRepository;
     private final IconRepository iconRepository;
     private final LocationRepository locationRepository;
-    private final CurationMapRepository curationMapRepository;
+    private final MapRepository<CurationMap> curationMapRepository;
     private final CurationLocationRepository curationLocationRepository;
 
     @Transactional

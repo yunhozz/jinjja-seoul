@@ -2,12 +2,12 @@ package com.jinjjaseoul.domain.map.controller;
 
 import com.jinjjaseoul.auth.model.UserPrincipal;
 import com.jinjjaseoul.common.dto.Response;
-import com.jinjjaseoul.domain.map.dto.query.LocationSimpleQueryDto;
 import com.jinjjaseoul.domain.map.dto.query.CurationMapQueryDto;
+import com.jinjjaseoul.domain.map.dto.query.LocationSimpleQueryDto;
 import com.jinjjaseoul.domain.map.dto.request.CurationMapRequestDto;
 import com.jinjjaseoul.domain.map.dto.request.LocationSimpleRequestDto;
 import com.jinjjaseoul.domain.map.dto.request.MapSearchRequestDto;
-import com.jinjjaseoul.domain.map.model.repository.curation_map.CurationMapRepository;
+import com.jinjjaseoul.domain.map.model.repository.map.MapRepository;
 import com.jinjjaseoul.domain.map.service.CurationMapService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -30,7 +30,7 @@ import java.util.List;
 public class CurationMapController {
 
     private final CurationMapService curationMapService;
-    private final CurationMapRepository curationMapRepository;
+    private final MapRepository<?> curationMapRepository;
 
     @GetMapping
     public Response getCurationMapList() {
@@ -40,7 +40,7 @@ public class CurationMapController {
 
     @GetMapping("/{id}")
     public Response getLocationList(@PathVariable("id") Long curationMapId) {
-        List<LocationSimpleQueryDto> locationSimpleQueryDtoList = curationMapRepository.findLocationListById(curationMapId);
+        List<LocationSimpleQueryDto> locationSimpleQueryDtoList = curationMapRepository.findLocationListByCurationMapId(curationMapId);
         return Response.success(HttpStatus.OK, locationSimpleQueryDtoList);
     }
 

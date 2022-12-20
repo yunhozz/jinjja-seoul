@@ -7,7 +7,6 @@ import com.jinjjaseoul.common.enums.Food;
 import com.jinjjaseoul.common.enums.Place;
 import com.jinjjaseoul.common.enums.Somebody;
 import com.jinjjaseoul.common.enums.Something;
-import com.jinjjaseoul.domain.BaseEntity;
 import com.jinjjaseoul.domain.icon.model.Icon;
 import com.jinjjaseoul.domain.user.model.User;
 import lombok.AccessLevel;
@@ -15,31 +14,14 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Embedded;
+import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
 
 @Entity
 @Getter
+@DiscriminatorValue("CM")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class CurationMap extends BaseEntity {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    private User user;
-
-    private String name;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    private Icon icon;
+public class CurationMap extends Map {
 
     private boolean isMakeTogether;
 
@@ -51,14 +33,9 @@ public class CurationMap extends BaseEntity {
 
     private int numOfLikes;
 
-    @Embedded
-    private MapSearch mapSearch; // 검색 조건 : 어디로?, 누구와?, 무엇을?, 분위기/특징, 음식, 술/음료, 카테고리
-
     @Builder
     private CurationMap(User user, String name, Icon icon, boolean isMakeTogether, boolean isProfileDisplay, boolean isShared) {
-        this.user = user;
-        this.name = name;
-        this.icon = icon;
+        super(user, name, icon);
         this.isMakeTogether = isMakeTogether;
         this.isProfileDisplay = isProfileDisplay;
         this.isShared = isShared;
@@ -69,7 +46,7 @@ public class CurationMap extends BaseEntity {
     }
 
     public void updateSearchCondition(Place place, Somebody somebody, Something something, Characteristics characteristics, Food food, Beverage beverage, Category category) {
-        mapSearch = MapSearch.builder()
+        MapSearch mapSearch = MapSearch.builder()
                 .place(place)
                 .somebody(somebody)
                 .something(something)
@@ -78,6 +55,7 @@ public class CurationMap extends BaseEntity {
                 .beverage(beverage)
                 .category(category)
                 .build();
+        super.updateMapSearch(mapSearch);
     }
 
     public void addLikes() {

@@ -7,7 +7,7 @@ import com.jinjjaseoul.domain.map.dto.query.ThemeMapQueryDto;
 import com.jinjjaseoul.domain.map.dto.request.LocationSimpleRequestDto;
 import com.jinjjaseoul.domain.map.dto.request.MapSearchRequestDto;
 import com.jinjjaseoul.domain.map.dto.request.ThemeMapSimpleRequestDto;
-import com.jinjjaseoul.domain.map.model.repository.theme_map.ThemeMapRepository;
+import com.jinjjaseoul.domain.map.model.repository.map.MapRepository;
 import com.jinjjaseoul.domain.map.service.ThemeMapService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -31,7 +31,7 @@ import java.util.List;
 public class ThemeMapController {
 
     private final ThemeMapService themeMapService;
-    private final ThemeMapRepository themeMapRepository;
+    private final MapRepository<?> themeMapRepository;
 
     @GetMapping("/recommend")
     public Response getRecommendList() {
@@ -53,7 +53,7 @@ public class ThemeMapController {
 
     @GetMapping("/{id}")
     public Response getLocationList(@PathVariable("id") Long themeMapId) {
-        List<ThemeLocationSimpleQueryDto> locationList = themeMapRepository.findLocationListById(themeMapId);
+        List<ThemeLocationSimpleQueryDto> locationList = themeMapRepository.findLocationListByThemeMapId(themeMapId);
         return Response.success(HttpStatus.OK, locationList);
     }
 
