@@ -192,7 +192,7 @@ public class MapCustomRepositoryImpl implements MapCustomRepository {
                 ))
                 .from(themeMap)
                 .join(themeMap.icon, icon)
-                .where(mapIdLt(lastThemeMapId))
+                .where(themeMapIdLt(lastThemeMapId))
                 .where(
                         byThemeMapKeyword(searchRequestDto.getKeyword()),
                         byPlace(searchRequestDto.getPlace()),
@@ -231,7 +231,7 @@ public class MapCustomRepositoryImpl implements MapCustomRepository {
                 .join(curationMap.icon, curationMapIcon)
                 .join(curationMap.user, user)
                 .join(user.icon, userIcon)
-                .where(mapIdLt(lastCurationMapId))
+                .where(curationMapIdLt(lastCurationMapId))
                 .where(
                         byCurationMapKeyword(searchRequestDto.getKeyword()),
                         byPlace(searchRequestDto.getPlace()),
@@ -401,7 +401,8 @@ public class MapCustomRepositoryImpl implements MapCustomRepository {
         });
     }
 
-    private void groupQueryAndSetExtraColumns(List<WholeMapQueryDto> mapList, List<ThemeLocationCountQueryDto> themeLocationList, List<CurationLocationCountQueryDto> curationLocationList) {
+    private void groupQueryAndSetExtraColumns(List<WholeMapQueryDto> mapList, List<ThemeLocationCountQueryDto> themeLocationList,
+                                              List<CurationLocationCountQueryDto> curationLocationList) {
         Map<Long, List<ThemeLocationCountQueryDto>> themeLocationListMap = groupThemeLocationById(themeLocationList);
         Map<Long, List<CurationLocationCountQueryDto>> curationLocationListMap = groupCurationLocationById(curationLocationList);
 
@@ -455,6 +456,14 @@ public class MapCustomRepositoryImpl implements MapCustomRepository {
 
     private BooleanExpression mapIdLt(Long lastMapId) {
         return lastMapId != null ? map.id.lt(lastMapId) : null;
+    }
+
+    private BooleanExpression themeMapIdLt(Long lastThemeMapId) {
+        return lastThemeMapId != null ? themeMap.id.lt(lastThemeMapId) : null;
+    }
+
+    private BooleanExpression curationMapIdLt(Long lastCurationMapId) {
+        return lastCurationMapId != null ? curationMap.id.lt(lastCurationMapId) : null;
     }
 
     private BooleanExpression byPlace(Place place) {
