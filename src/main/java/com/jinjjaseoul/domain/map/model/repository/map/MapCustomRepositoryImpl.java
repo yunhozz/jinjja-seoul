@@ -176,7 +176,7 @@ public class MapCustomRepositoryImpl implements MapCustomRepository {
                 .orderBy(curationLocation.createdDate.desc())
                 .fetch();
 
-        List<CommentSimpleQueryDto> commentList = getCommentListByLocationIds(locationList);
+        List<CommentSimpleQueryDto> commentList = getCommentListByLocationIdsOrderByCommentLength(locationList);
         groupQueryAndSetLargestComment(locationList, commentList);
 
         return locationList;
@@ -344,7 +344,7 @@ public class MapCustomRepositoryImpl implements MapCustomRepository {
                 .fetch();
     }
 
-    private List<CommentSimpleQueryDto> getCommentListByLocationIds(List<LocationSimpleQueryDto> locationList) {
+    private List<CommentSimpleQueryDto> getCommentListByLocationIdsOrderByCommentLength(List<LocationSimpleQueryDto> locationList) {
         List<Long> locationIds = locationList.stream()
                 .map(LocationSimpleQueryDto::getId)
                 .collect(Collectors.toList());
