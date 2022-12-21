@@ -192,7 +192,8 @@ public class MapCustomRepositoryImpl implements MapCustomRepository {
                 ))
                 .from(themeMap)
                 .join(themeMap.icon, icon)
-                .where(themeMapIdLt(lastThemeMapId))
+                .join(map).on(themeMap.eq(map))
+                .where(mapIdLt(lastThemeMapId))
                 .where(
                         byThemeMapKeyword(searchRequestDto.getKeyword()),
                         byPlace(searchRequestDto.getPlace()),
@@ -231,7 +232,8 @@ public class MapCustomRepositoryImpl implements MapCustomRepository {
                 .join(curationMap.icon, curationMapIcon)
                 .join(curationMap.user, user)
                 .join(user.icon, userIcon)
-                .where(curationMapIdLt(lastCurationMapId))
+                .join(map).on(curationMap.eq(map))
+                .where(mapIdLt(lastCurationMapId))
                 .where(
                         byCurationMapKeyword(searchRequestDto.getKeyword()),
                         byPlace(searchRequestDto.getPlace()),
@@ -456,14 +458,6 @@ public class MapCustomRepositoryImpl implements MapCustomRepository {
 
     private BooleanExpression mapIdLt(Long lastMapId) {
         return lastMapId != null ? map.id.lt(lastMapId) : null;
-    }
-
-    private BooleanExpression themeMapIdLt(Long lastThemeMapId) {
-        return lastThemeMapId != null ? themeMap.id.lt(lastThemeMapId) : null;
-    }
-
-    private BooleanExpression curationMapIdLt(Long lastCurationMapId) {
-        return lastCurationMapId != null ? curationMap.id.lt(lastCurationMapId) : null;
     }
 
     private BooleanExpression byPlace(Place place) {
