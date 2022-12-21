@@ -1,5 +1,6 @@
 package com.jinjjaseoul.domain.map.dto.query;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.Getter;
@@ -14,6 +15,7 @@ public class WholeMapQueryDto {
     private Long id;
     private String name;
     private String mapIconImgUrl;
+    @JsonIgnore
     private String dtype; // TM, CM
 
     // theme map

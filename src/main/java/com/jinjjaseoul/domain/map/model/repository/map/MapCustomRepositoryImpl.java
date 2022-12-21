@@ -25,6 +25,7 @@ import com.jinjjaseoul.domain.map.dto.query.ThemeLocationSimpleQueryDto;
 import com.jinjjaseoul.domain.map.dto.query.ThemeMapQueryDto;
 import com.jinjjaseoul.domain.map.dto.query.WholeMapQueryDto;
 import com.jinjjaseoul.domain.map.dto.request.SearchRequestDto;
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -232,14 +233,14 @@ public class MapCustomRepositoryImpl implements MapCustomRepository {
                 .join(user.icon, userIcon)
                 .where(mapIdLt(lastCurationMapId))
                 .where(
-                        byKeyword(searchRequestDto.getKeyword()),
+                        byCurationMapKeyword(searchRequestDto.getKeyword()),
                         byPlace(searchRequestDto.getPlace()),
                         bySomebody(searchRequestDto.getSomebody()),
                         bySomething(searchRequestDto.getSomething()),
                         byCharacteristics(searchRequestDto.getCharacteristics()),
                         byFood(searchRequestDto.getFood()),
                         byBeverage(searchRequestDto.getBeverage()),
-                        byCategories(searchRequestDto.getCategories())
+                        byCurationMapCategories(searchRequestDto.getCategories())
                 )
                 .orderBy(curationMap.createdDate.desc())
                 .limit(pageable.getPageSize())
@@ -270,19 +271,18 @@ public class MapCustomRepositoryImpl implements MapCustomRepository {
                 .join(map.icon, mapIcon)
                 .join(map.user, user)
                 .join(user.icon, userIcon)
-                .leftJoin(themeMap).on(themeMap.id.eq(map.id)) // TODO: 2022-12-20 ThemeMap 에 대한 키워드, 카테고리 검색
+                .join(themeMap).on(themeMap.eq(map))
+                .join(curationMap).on(curationMap.eq(map))
                 .where(mapIdLt(lastMapId))
                 .where(
-                        byKeyword(searchRequestDto.getKeyword()),
+                        byKeywordAccordingToType(searchRequestDto.getKeyword()),
+                        byCategoriesAccordingToType(searchRequestDto.getCategories()),
                         byPlace(searchRequestDto.getPlace()),
                         bySomebody(searchRequestDto.getSomebody()),
                         bySomething(searchRequestDto.getSomething()),
                         byCharacteristics(searchRequestDto.getCharacteristics()),
                         byFood(searchRequestDto.getFood()),
-                        byBeverage(searchRequestDto.getBeverage()),
-                        byCategories(searchRequestDto.getCategories()),
-                        byThemeMapKeyword(searchRequestDto.getKeyword()),
-                        byThemeMapCategories(searchRequestDto.getCategories())
+                        byBeverage(searchRequestDto.getBeverage())
                 )
                 .orderBy(map.createdDate.desc())
                 .limit(pageable.getPageSize())
@@ -457,10 +457,6 @@ public class MapCustomRepositoryImpl implements MapCustomRepository {
         return lastMapId != null ? map.id.lt(lastMapId) : null;
     }
 
-    private BooleanExpression byKeyword(String keyword) {
-        return StringUtils.hasText(keyword) ? map.name.contains(keyword) : null;
-    }
-
     private BooleanExpression byPlace(Place place) {
         return place != null ? map.mapSearch.place.eq(place) : null;
     }
@@ -485,15 +481,35 @@ public class MapCustomRepositoryImpl implements MapCustomRepository {
         return beverage != null ? map.mapSearch.beverage.eq(beverage) : null;
     }
 
-    private BooleanExpression byCategories(List<Category> categories) {
-        return categories != null ? map.mapSearch.category.in(categories) : null;
-    }
-
     private BooleanExpression byThemeMapKeyword(String keyword) {
         return StringUtils.hasText(keyword) ? themeMap.keywordList.any().like(keyword) : null;
     }
 
+    private BooleanExpression byCurationMapKeyword(String keyword) {
+        return StringUtils.hasText(keyword) ? curationMap.dtype.eq("CM").and(curationMap.name.contains(keyword)) : null;
+    }
+
     private BooleanExpression byThemeMapCategories(List<Category> categories) {
         return categories != null ? themeMap.categories.any().in(categories) : null;
+    }
+
+    private BooleanExpression byCurationMapCategories(List<Category> categories) {
+        return categories != null ? curationMap.dtype.eq("CM").and(curationMap.mapSearch.category.in(categories)) : null;
+    }
+
+    private BooleanBuilder byKeywordAccordingToType(String keyword) {
+        BooleanBuilder builder = new BooleanBuilder();
+        builder.or(byThemeMapKeyword(keyword));
+        builder.or(byCurationMapKeyword(keyword));
+
+        return builder;
+    }
+
+    private BooleanBuilder byCategoriesAccordingToType(List<Category> categories) {
+        BooleanBuilder builder = new BooleanBuilder();
+        builder.or(byThemeMapCategories(categories));
+        builder.or(byCurationMapCategories(categories));
+
+        return builder;
     }
 }
