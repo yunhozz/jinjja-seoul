@@ -59,10 +59,35 @@ public class MapCustomRepositoryImpl implements MapCustomRepository {
 
     private final JPAQueryFactory queryFactory;
 
-    // TODO: 2022-12-12 추천 리스트
     @Override
     public List<ThemeMapQueryDto> findRecommendList() {
-        return null;
+        // 추천 기준 : 카테고리 1개 이상 3개 이하, 키워드 최소 3개 이상인 리스트 중 큐레이터의 수가 5명 이상
+        List<ThemeMapQueryDto> themeMapList = queryFactory
+                .select(new QThemeMapQueryDto(
+                        themeMap.id,
+                        themeMap.name,
+                        icon.imageUrl
+                ))
+                .from(themeMap)
+                .join(themeMap.icon, icon)
+                .where(
+                        themeMap.categories.size().between(1, 3),
+                        themeMap.keywordList.size().goe(3)
+                )
+                .orderBy(themeMap.categories.size().add(themeMap.keywordList.size()).desc())
+                .limit(50)
+                .fetch();
+
+        List<Long> themeMapIds = getThemeMapIds(themeMapList);
+        List<ThemeLocationCountQueryDto> themeLocationList = getThemeLocationCountDtoListByThemeMapIds(themeMapIds);
+        groupQueryAndSetCuratorNum(themeMapList, themeLocationList);
+
+        List<ThemeMapQueryDto> filteredThemeMapList = themeMapList.stream()
+                .filter(themeMapQueryDto -> themeMapQueryDto.getCuratorNum() >= 5)
+                .collect(Collectors.toList());
+        Collections.shuffle(filteredThemeMapList);
+
+        return filteredThemeMapList.size() > 12 ? new ArrayList<>(filteredThemeMapList.subList(0, 12)) : filteredThemeMapList;
     }
 
     @Override
