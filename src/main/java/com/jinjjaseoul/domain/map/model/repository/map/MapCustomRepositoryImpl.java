@@ -10,10 +10,12 @@ import com.jinjjaseoul.common.enums.Something;
 import com.jinjjaseoul.domain.icon.model.QIcon;
 import com.jinjjaseoul.domain.map.dto.query.CommentSimpleQueryDto;
 import com.jinjjaseoul.domain.map.dto.query.CurationLocationCountQueryDto;
+import com.jinjjaseoul.domain.map.dto.query.CurationMapExtraQueryDto;
 import com.jinjjaseoul.domain.map.dto.query.CurationMapQueryDto;
 import com.jinjjaseoul.domain.map.dto.query.LocationSimpleQueryDto;
 import com.jinjjaseoul.domain.map.dto.query.QCommentSimpleQueryDto;
 import com.jinjjaseoul.domain.map.dto.query.QCurationLocationCountQueryDto;
+import com.jinjjaseoul.domain.map.dto.query.QCurationMapExtraQueryDto;
 import com.jinjjaseoul.domain.map.dto.query.QCurationMapQueryDto;
 import com.jinjjaseoul.domain.map.dto.query.QLocationSimpleQueryDto;
 import com.jinjjaseoul.domain.map.dto.query.QThemeLocationCountQueryDto;
@@ -78,7 +80,7 @@ public class MapCustomRepositoryImpl implements MapCustomRepository {
                 .fetch();
 
         List<Long> themeMapIds = getThemeMapIds(themeMapList);
-        List<ThemeLocationCountQueryDto> themeLocationList = getThemeLocationDtoListByThemeMapIds(themeMapIds);
+        List<ThemeLocationCountQueryDto> themeLocationList = getThemeLocationCountDtoListByThemeMapIds(themeMapIds);
         groupQueryAndSetCuratorNum(themeMapList, themeLocationList);
 
         return themeMapList;
@@ -97,7 +99,7 @@ public class MapCustomRepositoryImpl implements MapCustomRepository {
                 .fetch();
 
         List<Long> themeMapIds = getThemeMapIds(themeMapList);
-        List<ThemeLocationCountQueryDto> themeLocationList = getThemeLocationDtoListByThemeMapIds(themeMapIds);
+        List<ThemeLocationCountQueryDto> themeLocationList = getThemeLocationCountDtoListByThemeMapIds(themeMapIds);
         groupQueryAndSetCuratorNum(themeMapList, themeLocationList);
         // 큐레이터 수 내림차순 정렬, 같을 시 id 값 내림차순 정렬
         themeMapList.sort((o1, o2) -> o1.getCuratorNum() != o2.getCuratorNum() ? o2.getCuratorNum() - o1.getCuratorNum() : Math.toIntExact(o2.getId() - o1.getId()));
@@ -145,7 +147,7 @@ public class MapCustomRepositoryImpl implements MapCustomRepository {
                 .fetch();
 
         List<Long> curationMapIds = getCurationMapIds(curationMapList);
-        List<CurationLocationCountQueryDto> curationLocationList = getCurationLocationDtoListByCurationMapIds(curationMapIds);
+        List<CurationLocationCountQueryDto> curationLocationList = getCurationLocationCountDtoListByCurationMapIds(curationMapIds);
         groupQueryAndSetLocationNum(curationMapList, curationLocationList);
         Collections.shuffle(curationMapList); // 최신 50 개의 큐레이션 지도 랜덤 정렬
 
@@ -209,7 +211,7 @@ public class MapCustomRepositoryImpl implements MapCustomRepository {
                 .fetch();
 
         List<Long> themeMapIds = getThemeMapIds(themeMapSearchList);
-        List<ThemeLocationCountQueryDto> themeLocationList = getThemeLocationDtoListByThemeMapIds(themeMapIds);
+        List<ThemeLocationCountQueryDto> themeLocationList = getThemeLocationCountDtoListByThemeMapIds(themeMapIds);
         groupQueryAndSetCuratorNum(themeMapSearchList, themeLocationList);
 
         return new PageImpl<>(themeMapSearchList, pageable, themeMapTotalCount());
@@ -249,7 +251,7 @@ public class MapCustomRepositoryImpl implements MapCustomRepository {
                 .fetch();
 
         List<Long> curationMapIds = getCurationMapIds(curationMapSearchList);
-        List<CurationLocationCountQueryDto> curationLocationList = getCurationLocationDtoListByCurationMapIds(curationMapIds);
+        List<CurationLocationCountQueryDto> curationLocationList = getCurationLocationCountDtoListByCurationMapIds(curationMapIds);
         groupQueryAndSetLocationNum(curationMapSearchList, curationLocationList);
 
         return new PageImpl<>(curationMapSearchList, pageable, curationMapTotalCount());
@@ -258,21 +260,15 @@ public class MapCustomRepositoryImpl implements MapCustomRepository {
     @Override
     public Page<WholeMapQueryDto> searchWholeMapListByKeyword(SearchRequestDto searchRequestDto, Long lastMapId, Pageable pageable) {
         QIcon mapIcon = new QIcon("mapIcon");
-        QIcon userIcon = new QIcon("userIcon");
-
         List<WholeMapQueryDto> mapList = queryFactory
                 .select(new QWholeMapQueryDto(
                         map.id,
                         map.name,
                         mapIcon.imageUrl,
-                        map.dtype,
-                        user.name,
-                        userIcon.imageUrl
+                        map.dtype
                 ))
                 .from(map)
                 .join(map.icon, mapIcon)
-                .join(map.user, user)
-                .join(user.icon, userIcon)
                 .join(themeMap).on(themeMap.eq(map))
                 .join(curationMap).on(curationMap.eq(map))
                 .where(mapIdLt(lastMapId))
@@ -292,18 +288,12 @@ public class MapCustomRepositoryImpl implements MapCustomRepository {
 
         List<Long> themeMapIds = new ArrayList<>();
         List<Long> curationMapIds = new ArrayList<>();
+        sortIds(mapList, themeMapIds, curationMapIds);
 
-        for (WholeMapQueryDto wholeMapQueryDto : mapList) {
-            Long mapId = wholeMapQueryDto.getId();
-            if (wholeMapQueryDto.getDtype().equals("TM")) {
-                themeMapIds.add(mapId);
-
-            } else curationMapIds.add(mapId);
-        }
-
-        List<ThemeLocationCountQueryDto> themeLocationList = getThemeLocationDtoListByThemeMapIds(themeMapIds);
-        List<CurationLocationCountQueryDto> curationLocationList = getCurationLocationDtoListByCurationMapIds(curationMapIds);
-        groupQueryAndSetExtraColumns(mapList, themeLocationList, curationLocationList);
+        List<ThemeLocationCountQueryDto> themeLocationCountList = getThemeLocationCountDtoListByThemeMapIds(themeMapIds);
+        List<CurationLocationCountQueryDto> curationLocationCountList = getCurationLocationCountDtoListByCurationMapIds(curationMapIds);
+        List<CurationMapExtraQueryDto> curationMapExtraList = getCurationMapExtraDtoListByCurationMapIds(curationMapIds);
+        groupQueryAndSetExtraColumns(mapList, themeLocationCountList, curationLocationCountList, curationMapExtraList);
 
         return new PageImpl<>(mapList, pageable, wholeMapTotalCount());
     }
@@ -320,7 +310,7 @@ public class MapCustomRepositoryImpl implements MapCustomRepository {
                 .collect(Collectors.toList());
     }
 
-    private List<ThemeLocationCountQueryDto> getThemeLocationDtoListByThemeMapIds(List<Long> themeMapIds) {
+    private List<ThemeLocationCountQueryDto> getThemeLocationCountDtoListByThemeMapIds(List<Long> themeMapIds) {
         return queryFactory
                 .select(new QThemeLocationCountQueryDto(
                         themeLocation.id,
@@ -332,7 +322,7 @@ public class MapCustomRepositoryImpl implements MapCustomRepository {
                 .fetch();
     }
 
-    private List<CurationLocationCountQueryDto> getCurationLocationDtoListByCurationMapIds(List<Long> curationMapIds) {
+    private List<CurationLocationCountQueryDto> getCurationLocationCountDtoListByCurationMapIds(List<Long> curationMapIds) {
         return queryFactory
                 .select(new QCurationLocationCountQueryDto(
                         curationLocation.id,
@@ -340,6 +330,21 @@ public class MapCustomRepositoryImpl implements MapCustomRepository {
                 ))
                 .from(curationLocation)
                 .join(curationLocation.curationMap, curationMap)
+                .where(curationMap.id.in(curationMapIds))
+                .fetch();
+    }
+
+    private List<CurationMapExtraQueryDto> getCurationMapExtraDtoListByCurationMapIds(List<Long> curationMapIds) {
+        QIcon userIcon = new QIcon("userIcon");
+        return queryFactory
+                .select(new QCurationMapExtraQueryDto(
+                        curationMap.id,
+                        user.name,
+                        userIcon.imageUrl
+                ))
+                .from(curationMap)
+                .join(curationMap.user, user)
+                .join(user.icon, userIcon)
                 .where(curationMap.id.in(curationMapIds))
                 .fetch();
     }
@@ -362,27 +367,27 @@ public class MapCustomRepositoryImpl implements MapCustomRepository {
                 .fetch();
     }
 
-    private void groupQueryAndSetCuratorNum(List<ThemeMapQueryDto> themeMapList, List<ThemeLocationCountQueryDto> themeLocationList) {
-        Map<Long, List<ThemeLocationCountQueryDto>> themeLocationListMap = groupThemeLocationById(themeLocationList);
+    private void groupQueryAndSetCuratorNum(List<ThemeMapQueryDto> themeMapList, List<ThemeLocationCountQueryDto> themeLocationCountList) {
+        Map<Long, List<ThemeLocationCountQueryDto>> themeLocationCountListMap = groupThemeLocationCountListById(themeLocationCountList);
         themeMapList.forEach(themeMapQueryDto -> {
             Long themeMapId = themeMapQueryDto.getId();
-            List<ThemeLocationCountQueryDto> themeLocationDtoList = themeLocationListMap.get(themeMapId);
+            List<ThemeLocationCountQueryDto> themeLocationCountDtoList = themeLocationCountListMap.get(themeMapId);
 
-            if (themeLocationDtoList != null) {
-                int curatorNum = themeLocationDtoList.size();
+            if (themeLocationCountDtoList != null) {
+                int curatorNum = themeLocationCountDtoList.size();
                 themeMapQueryDto.setCuratorNum(curatorNum);
             }
         });
     }
 
-    private void groupQueryAndSetLocationNum(List<CurationMapQueryDto> curationMapList, List<CurationLocationCountQueryDto> curationLocationList) {
-        Map<Long, List<CurationLocationCountQueryDto>> curationLocationListMap = groupCurationLocationById(curationLocationList);
+    private void groupQueryAndSetLocationNum(List<CurationMapQueryDto> curationMapList, List<CurationLocationCountQueryDto> curationLocationCountList) {
+        Map<Long, List<CurationLocationCountQueryDto>> curationLocationCountListMap = groupCurationLocationCountListById(curationLocationCountList);
         curationMapList.forEach(curationMapQueryDto -> {
             Long curationId = curationMapQueryDto.getId();
-            List<CurationLocationCountQueryDto> curationLocationDtoList = curationLocationListMap.get(curationId);
+            List<CurationLocationCountQueryDto> curationLocationCountDtoList = curationLocationCountListMap.get(curationId);
 
-            if (curationLocationDtoList != null) {
-                int locationNum = curationLocationDtoList.size();
+            if (curationLocationCountDtoList != null) {
+                int locationNum = curationLocationCountDtoList.size();
                 curationMapQueryDto.setLocationNum(locationNum);
             }
         });
@@ -403,36 +408,55 @@ public class MapCustomRepositoryImpl implements MapCustomRepository {
         });
     }
 
-    private void groupQueryAndSetExtraColumns(List<WholeMapQueryDto> mapList, List<ThemeLocationCountQueryDto> themeLocationList,
-                                              List<CurationLocationCountQueryDto> curationLocationList) {
-        Map<Long, List<ThemeLocationCountQueryDto>> themeLocationListMap = groupThemeLocationById(themeLocationList);
-        Map<Long, List<CurationLocationCountQueryDto>> curationLocationListMap = groupCurationLocationById(curationLocationList);
+    private void groupQueryAndSetExtraColumns(List<WholeMapQueryDto> mapList, List<ThemeLocationCountQueryDto> themeLocationCountList,
+                                              List<CurationLocationCountQueryDto> curationLocationCountList, List<CurationMapExtraQueryDto> curationMapExtraList) {
+        Map<Long, List<ThemeLocationCountQueryDto>> themeLocationCountListMap = groupThemeLocationCountListById(themeLocationCountList);
+        Map<Long, List<CurationLocationCountQueryDto>> curationLocationCountListMap = groupCurationLocationCountListById(curationLocationCountList);
+        Map<Long, List<CurationMapExtraQueryDto>> curationMapExtraListMap = groupCurationMapExtraListById(curationMapExtraList);
 
         mapList.forEach(wholeMapQueryDto -> {
             Long mapId = wholeMapQueryDto.getId();
-            List<ThemeLocationCountQueryDto> themeLocationDtoList = themeLocationListMap.get(mapId);
-            List<CurationLocationCountQueryDto> curationLocationDtoList = curationLocationListMap.get(mapId);
+            List<ThemeLocationCountQueryDto> themeLocationCountDtoList = themeLocationCountListMap.get(mapId);
+            List<CurationLocationCountQueryDto> curationLocationCountDtoList = curationLocationCountListMap.get(mapId);
+            List<CurationMapExtraQueryDto> curationMapExtraDtoList = curationMapExtraListMap.get(mapId);
 
-            if (themeLocationDtoList != null) {
-                int curatorNum = themeLocationDtoList.size();
+            if (themeLocationCountDtoList != null) {
+                int curatorNum = themeLocationCountDtoList.size();
                 wholeMapQueryDto.setCuratorNum(curatorNum);
             }
 
-            if (curationLocationDtoList != null) {
-                int locationNum = curationLocationDtoList.size();
+            if (curationLocationCountDtoList != null) {
+                int locationNum = curationLocationCountDtoList.size();
                 wholeMapQueryDto.setLocationNum(locationNum);
             }
+
+            wholeMapQueryDto.setUserInfo(curationMapExtraDtoList);
         });
     }
 
-    private Map<Long, List<ThemeLocationCountQueryDto>> groupThemeLocationById(List<ThemeLocationCountQueryDto> themeLocationList) {
-        return themeLocationList.stream()
+    private Map<Long, List<ThemeLocationCountQueryDto>> groupThemeLocationCountListById(List<ThemeLocationCountQueryDto> themeLocationCountList) {
+        return themeLocationCountList.stream()
                 .collect(Collectors.groupingBy(ThemeLocationCountQueryDto::getThemeMapId));
     }
 
-    private Map<Long, List<CurationLocationCountQueryDto>> groupCurationLocationById(List<CurationLocationCountQueryDto> curationLocationList) {
-        return curationLocationList.stream()
+    private Map<Long, List<CurationLocationCountQueryDto>> groupCurationLocationCountListById(List<CurationLocationCountQueryDto> curationLocationCountList) {
+        return curationLocationCountList.stream()
                 .collect(Collectors.groupingBy(CurationLocationCountQueryDto::getCurationMapId));
+    }
+
+    private Map<Long, List<CurationMapExtraQueryDto>> groupCurationMapExtraListById(List<CurationMapExtraQueryDto> curationMapExtraList) {
+        return curationMapExtraList.stream()
+                .collect(Collectors.groupingBy(CurationMapExtraQueryDto::getId));
+    }
+
+    private void sortIds(List<WholeMapQueryDto> mapList, List<Long> themeMapIds, List<Long> curationMapIds) {
+        for (WholeMapQueryDto wholeMapQueryDto : mapList) {
+            Long mapId = wholeMapQueryDto.getId();
+            if (wholeMapQueryDto.getDtype().equals("TM")) {
+                themeMapIds.add(mapId);
+
+            } else curationMapIds.add(mapId);
+        }
     }
 
     private Long themeMapTotalCount() {
