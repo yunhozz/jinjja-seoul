@@ -222,14 +222,14 @@ public class MapCustomRepositoryImpl implements MapCustomRepository {
                 .join(map).on(themeMap.eq(map))
                 .where(mapIdLt(lastThemeMapId))
                 .where(
-                        byThemeMapKeyword(searchRequestDto.getKeyword()),
-                        byPlace(searchRequestDto.getPlace()),
-                        bySomebody(searchRequestDto.getSomebody()),
-                        bySomething(searchRequestDto.getSomething()),
-                        byCharacteristics(searchRequestDto.getCharacteristics()),
-                        byFood(searchRequestDto.getFood()),
-                        byBeverage(searchRequestDto.getBeverage()),
-                        byThemeMapCategories(searchRequestDto.getCategories())
+                        themeMapKeywordEq(searchRequestDto.getKeyword()),
+                        placeEq(searchRequestDto.getPlace()),
+                        somebodyEq(searchRequestDto.getSomebody()),
+                        somethingEq(searchRequestDto.getSomething()),
+                        characteristicsEq(searchRequestDto.getCharacteristics()),
+                        foodEq(searchRequestDto.getFood()),
+                        beverageEq(searchRequestDto.getBeverage()),
+                        themeMapCategoriesEq(searchRequestDto.getCategories())
                 )
                 .orderBy(themeMap.createdDate.desc())
                 .limit(pageable.getPageSize())
@@ -262,14 +262,14 @@ public class MapCustomRepositoryImpl implements MapCustomRepository {
                 .join(map).on(curationMap.eq(map))
                 .where(mapIdLt(lastCurationMapId))
                 .where(
-                        byCurationMapKeyword(searchRequestDto.getKeyword()),
-                        byPlace(searchRequestDto.getPlace()),
-                        bySomebody(searchRequestDto.getSomebody()),
-                        bySomething(searchRequestDto.getSomething()),
-                        byCharacteristics(searchRequestDto.getCharacteristics()),
-                        byFood(searchRequestDto.getFood()),
-                        byBeverage(searchRequestDto.getBeverage()),
-                        byCurationMapCategories(searchRequestDto.getCategories())
+                        curationMapKeywordEq(searchRequestDto.getKeyword()),
+                        placeEq(searchRequestDto.getPlace()),
+                        somebodyEq(searchRequestDto.getSomebody()),
+                        somethingEq(searchRequestDto.getSomething()),
+                        characteristicsEq(searchRequestDto.getCharacteristics()),
+                        foodEq(searchRequestDto.getFood()),
+                        beverageEq(searchRequestDto.getBeverage()),
+                        curationMapCategoriesEq(searchRequestDto.getCategories())
                 )
                 .orderBy(curationMap.createdDate.desc())
                 .limit(pageable.getPageSize())
@@ -298,14 +298,14 @@ public class MapCustomRepositoryImpl implements MapCustomRepository {
                 .join(curationMap).on(curationMap.eq(map))
                 .where(mapIdLt(lastMapId))
                 .where(
-                        byKeywordAccordingToType(searchRequestDto.getKeyword()),
-                        byCategoriesAccordingToType(searchRequestDto.getCategories()),
-                        byPlace(searchRequestDto.getPlace()),
-                        bySomebody(searchRequestDto.getSomebody()),
-                        bySomething(searchRequestDto.getSomething()),
-                        byCharacteristics(searchRequestDto.getCharacteristics()),
-                        byFood(searchRequestDto.getFood()),
-                        byBeverage(searchRequestDto.getBeverage())
+                        keywordEqAccordingToType(searchRequestDto.getKeyword()),
+                        categoriesEqAccordingToType(searchRequestDto.getCategories()),
+                        placeEq(searchRequestDto.getPlace()),
+                        somebodyEq(searchRequestDto.getSomebody()),
+                        somethingEq(searchRequestDto.getSomething()),
+                        characteristicsEq(searchRequestDto.getCharacteristics()),
+                        foodEq(searchRequestDto.getFood()),
+                        beverageEq(searchRequestDto.getBeverage())
                 )
                 .orderBy(map.createdDate.desc())
                 .limit(pageable.getPageSize())
@@ -509,58 +509,58 @@ public class MapCustomRepositoryImpl implements MapCustomRepository {
         return lastMapId != null ? map.id.lt(lastMapId) : null;
     }
 
-    private BooleanExpression byPlace(Place place) {
+    private BooleanExpression placeEq(Place place) {
         return place != null ? map.mapSearch.place.eq(place) : null;
     }
 
-    private BooleanExpression bySomebody(Somebody somebody) {
+    private BooleanExpression somebodyEq(Somebody somebody) {
         return somebody != null ? map.mapSearch.somebody.eq(somebody) : null;
     }
 
-    private BooleanExpression bySomething(Something something) {
+    private BooleanExpression somethingEq(Something something) {
         return something != null ? map.mapSearch.something.eq(something) : null;
     }
 
-    private BooleanExpression byCharacteristics(Characteristics characteristics) {
+    private BooleanExpression characteristicsEq(Characteristics characteristics) {
         return characteristics != null ? map.mapSearch.characteristics.eq(characteristics) : null;
     }
 
-    private BooleanExpression byFood(Food food) {
+    private BooleanExpression foodEq(Food food) {
         return food != null ? map.mapSearch.food.eq(food) : null;
     }
 
-    private BooleanExpression byBeverage(Beverage beverage) {
+    private BooleanExpression beverageEq(Beverage beverage) {
         return beverage != null ? map.mapSearch.beverage.eq(beverage) : null;
     }
 
-    private BooleanExpression byThemeMapKeyword(String keyword) {
+    private BooleanExpression themeMapKeywordEq(String keyword) {
         return StringUtils.hasText(keyword) ? themeMap.keywordList.any().like(keyword) : null;
     }
 
-    private BooleanExpression byCurationMapKeyword(String keyword) {
+    private BooleanExpression curationMapKeywordEq(String keyword) {
         return StringUtils.hasText(keyword) ? curationMap.dtype.eq("CM").and(curationMap.name.contains(keyword)) : null;
     }
 
-    private BooleanExpression byThemeMapCategories(List<Category> categories) {
+    private BooleanExpression themeMapCategoriesEq(List<Category> categories) {
         return categories != null ? themeMap.categories.any().in(categories) : null;
     }
 
-    private BooleanExpression byCurationMapCategories(List<Category> categories) {
+    private BooleanExpression curationMapCategoriesEq(List<Category> categories) {
         return categories != null ? curationMap.dtype.eq("CM").and(curationMap.mapSearch.category.in(categories)) : null;
     }
 
-    private BooleanBuilder byKeywordAccordingToType(String keyword) {
+    private BooleanBuilder keywordEqAccordingToType(String keyword) {
         BooleanBuilder builder = new BooleanBuilder();
-        builder.or(byThemeMapKeyword(keyword));
-        builder.or(byCurationMapKeyword(keyword));
+        builder.or(themeMapKeywordEq(keyword));
+        builder.or(curationMapKeywordEq(keyword));
 
         return builder;
     }
 
-    private BooleanBuilder byCategoriesAccordingToType(List<Category> categories) {
+    private BooleanBuilder categoriesEqAccordingToType(List<Category> categories) {
         BooleanBuilder builder = new BooleanBuilder();
-        builder.or(byThemeMapCategories(categories));
-        builder.or(byCurationMapCategories(categories));
+        builder.or(themeMapCategoriesEq(categories));
+        builder.or(curationMapCategoriesEq(categories));
 
         return builder;
     }
