@@ -32,7 +32,7 @@ public class UserController {
     private final UserService userService;
     private final UserRepository userRepository;
 
-    @GetMapping("/diligent")
+    @GetMapping
     public Response getDiligentCurators() {
         List<UserCardQueryDto> userCardQueryDtoList = userRepository.findDiligentCurators();
         return Response.success(HttpStatus.OK, userCardQueryDtoList);
