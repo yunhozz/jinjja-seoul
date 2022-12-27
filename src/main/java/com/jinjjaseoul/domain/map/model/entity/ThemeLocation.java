@@ -34,19 +34,15 @@ public class ThemeLocation extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private Location location;
 
-    private String imageUrl;
-
     @Builder
-    private ThemeLocation(User user, ThemeMap themeMap, Location location, String imageUrl) {
+    private ThemeLocation(User user, ThemeMap themeMap, Location location) {
         this.user = user;
         this.themeMap = themeMap;
         this.location = location;
-        this.imageUrl = imageUrl;
     }
 
-    public void update(Location location, String imageUrl) {
+    public void updateLocation(Location location) {
         this.location = location;
-        this.imageUrl = imageUrl;
     }
 
     public void subtractNumOfUserRecommend() {

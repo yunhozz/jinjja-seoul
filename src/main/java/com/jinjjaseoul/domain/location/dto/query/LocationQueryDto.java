@@ -20,9 +20,6 @@ public class LocationQueryDto {
     private String nx;
     private String ny;
 
-    // image list
-    private List<String> imageUrlList;
-
     // theme map name list
     private List<ThemeMapNameQueryDto> themeMapNameList;
 
@@ -39,10 +36,6 @@ public class LocationQueryDto {
         this.etc = etc;
         this.nx = nx;
         this.ny = ny;
-    }
-
-    public void setImageUrlList(List<String> imageUrlList) {
-        this.imageUrlList = imageUrlList;
     }
 
     public void setThemeMapNameList(List<ThemeMapNameQueryDto> themeMapNameList) {

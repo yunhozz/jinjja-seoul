@@ -33,13 +33,10 @@ public class CurationLocation extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private Location location;
 
-    private String imageUrl;
-
     @Builder
-    private CurationLocation(User user, CurationMap curationMap, Location location, String imageUrl) {
+    private CurationLocation(User user, CurationMap curationMap, Location location) {
         this.user = user;
         this.curationMap = curationMap;
         this.location = location;
-        this.imageUrl = imageUrl;
     }
 }

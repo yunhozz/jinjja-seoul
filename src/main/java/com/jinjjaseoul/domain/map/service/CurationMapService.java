@@ -54,7 +54,7 @@ public class CurationMapService {
         CurationMap curationMap = findCurationMap(curationMapId);
         Location location = locationRepository.getReferenceById(locationSimpleRequestDto.getLocationId());
 
-        CurationLocation curationLocation = createCurationLocation(user, curationMap, location, locationSimpleRequestDto.getImageUrl());
+        CurationLocation curationLocation = createCurationLocation(user, curationMap, location);
         curationLocationRepository.save(curationLocation);
     }
 
@@ -89,12 +89,11 @@ public class CurationMapService {
         curationLocationRepository.delete(curationLocation);
     }
 
-    private CurationLocation createCurationLocation(User user, CurationMap curationMap, Location location, String imageUrl) {
+    private CurationLocation createCurationLocation(User user, CurationMap curationMap, Location location) {
         return CurationLocation.builder()
                 .user(user)
                 .curationMap(curationMap)
                 .location(location)
-                .imageUrl(imageUrl)
                 .build();
     }
 

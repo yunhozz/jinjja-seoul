@@ -61,13 +61,7 @@ public class ThemeMapService {
     @Transactional
     public Long makeThemeMap(Long userId, LocationSimpleRequestDto locationSimpleRequestDto) {
         List<Object> dataList = redisUtils.getDataListFromCollection(String.valueOf(userId), 0, 3);
-        ThemeMapRequestDto themeMapRequestDto = ThemeMapRequestDto.builder()
-                .name((String) dataList.get(0))
-                .categories((List<Category>) dataList.get(2))
-                .keywordStr((String) dataList.get(3))
-                .locationId(locationSimpleRequestDto.getLocationId())
-                .imageUrl(locationSimpleRequestDto.getImageUrl())
-                .build();
+        ThemeMapRequestDto themeMapRequestDto = createThemeMapDto(locationSimpleRequestDto, dataList);
 
         if (themeMapRequestDto.getLocationId() == null) return null; // 장소 등록 여부 검증
 
@@ -76,7 +70,7 @@ public class ThemeMapService {
         ThemeMap themeMap = MapConverter.convertToThemeMapEntity(themeMapRequestDto, user, icon);
         Location location = locationRepository.getReferenceById(themeMapRequestDto.getLocationId());
 
-        ThemeLocation themeLocation = createThemeLocation(user, themeMap, location, themeMapRequestDto.getImageUrl());
+        ThemeLocation themeLocation = createThemeLocation(user, themeMap, location);
         themeLocationRepository.save(themeLocation);
         user.addNumOfRecommend(); // 장소 추천수 +1
         redisUtils.deleteData(String.valueOf(userId));
@@ -94,11 +88,11 @@ public class ThemeMapService {
         if (themeMap.isMadeByUser(user)) {
             ThemeLocation themeLocation = themeLocationRepository.findByUserAndThemeMap(user, themeMap)
                     .orElseThrow(ThemeLocationNotFoundException::new);
-            themeLocation.update(location, locationSimpleRequestDto.getImageUrl());
+            themeLocation.updateLocation(location);
 
         } else {
-            themeLocationRepository.findByUserAndThemeMap(user, themeMap).ifPresentOrElse(themeLocation -> themeLocation.update(location, locationSimpleRequestDto.getImageUrl()), () -> {
-                ThemeLocation themeLocation = createThemeLocation(user, themeMap, location, locationSimpleRequestDto.getImageUrl());
+            themeLocationRepository.findByUserAndThemeMap(user, themeMap).ifPresentOrElse(themeLocation -> themeLocation.updateLocation(location), () -> {
+                ThemeLocation themeLocation = createThemeLocation(user, themeMap, location);
                 themeLocationRepository.save(themeLocation);
                 user.addNumOfRecommend(); // 장소 추천수 +1
             });
@@ -138,12 +132,20 @@ public class ThemeMapService {
         themeLocationRepository.delete(themeLocation);
     }
 
-    private ThemeLocation createThemeLocation(User user, ThemeMap themeMap, Location location, String imageUrl) {
+    private ThemeLocation createThemeLocation(User user, ThemeMap themeMap, Location location) {
         return ThemeLocation.builder()
                 .user(user)
                 .themeMap(themeMap)
                 .location(location)
-                .imageUrl(imageUrl)
+                .build();
+    }
+
+    private ThemeMapRequestDto createThemeMapDto(LocationSimpleRequestDto locationSimpleRequestDto, List<Object> dataList) {
+        return ThemeMapRequestDto.builder()
+                .name((String) dataList.get(0))
+                .categories((List<Category>) dataList.get(2))
+                .keywordStr((String) dataList.get(3))
+                .locationId(locationSimpleRequestDto.getLocationId())
                 .build();
     }
 

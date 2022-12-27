@@ -20,5 +20,4 @@ public class ThemeMapRequestDto {
 
     // 생성 후 장소 등록
     private Long locationId;
-    private String imageUrl;
 }
