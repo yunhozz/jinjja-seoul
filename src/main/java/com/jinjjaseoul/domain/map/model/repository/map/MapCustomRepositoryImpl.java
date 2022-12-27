@@ -284,16 +284,15 @@ public class MapCustomRepositoryImpl implements MapCustomRepository {
 
     @Override
     public Page<WholeMapQueryDto> searchWholeMapListByKeyword(SearchRequestDto searchRequestDto, Long lastMapId, Pageable pageable) {
-        QIcon mapIcon = new QIcon("mapIcon");
         List<WholeMapQueryDto> mapList = queryFactory
                 .select(new QWholeMapQueryDto(
                         map.id,
                         map.name,
-                        mapIcon.imageUrl,
+                        icon.imageUrl,
                         map.dtype
                 ))
                 .from(map)
-                .join(map.icon, mapIcon)
+                .join(map.icon, icon)
                 .join(themeMap).on(themeMap.eq(map))
                 .join(curationMap).on(curationMap.eq(map))
                 .where(mapIdLt(lastMapId))
@@ -360,16 +359,15 @@ public class MapCustomRepositoryImpl implements MapCustomRepository {
     }
 
     private List<CurationMapExtraQueryDto> getCurationMapExtraDtoListByCurationMapIds(List<Long> curationMapIds) {
-        QIcon userIcon = new QIcon("userIcon");
         return queryFactory
                 .select(new QCurationMapExtraQueryDto(
                         curationMap.id,
                         user.name,
-                        userIcon.imageUrl
+                        icon.imageUrl
                 ))
                 .from(curationMap)
                 .join(curationMap.user, user)
-                .join(user.icon, userIcon)
+                .join(user.icon, icon)
                 .where(curationMap.id.in(curationMapIds))
                 .fetch();
     }
