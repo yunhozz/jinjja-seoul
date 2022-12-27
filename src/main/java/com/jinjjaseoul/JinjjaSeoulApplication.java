@@ -3,9 +3,11 @@ package com.jinjjaseoul;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
-@SpringBootApplication
 @EnableJpaAuditing
+@EnableScheduling
+@SpringBootApplication
 public class JinjjaSeoulApplication {
 
 	public static void main(String[] args) {
