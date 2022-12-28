@@ -1,6 +1,7 @@
 package com.jinjjaseoul.domain.user.service;
 
-import com.jinjjaseoul.common.converter.UserConverter;
+import com.jinjjaseoul.common.enums.Provider;
+import com.jinjjaseoul.common.enums.Role;
 import com.jinjjaseoul.domain.icon.model.Icon;
 import com.jinjjaseoul.domain.icon.model.IconRepository;
 import com.jinjjaseoul.domain.user.dto.request.UpdateRequestDto;
@@ -9,7 +10,9 @@ import com.jinjjaseoul.domain.user.dto.response.UserResponseDto;
 import com.jinjjaseoul.domain.user.model.User;
 import com.jinjjaseoul.domain.user.model.repository.UserRepository;
 import com.jinjjaseoul.domain.user.service.exception.EmailDuplicateException;
+import com.jinjjaseoul.domain.user.service.exception.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,8 +40,9 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public UserResponseDto findUserDtoById(Long userId) {
-        User user = userRepository.getReferenceById(userId);
-        return UserConverter.convertToDto(user);
+        User user = userRepository.findById(userId)
+                .orElseThrow(UserNotFoundException::new);
+        return new UserResponseDto(user);
     }
 
     private User validateAndSaveUser(UserRequestDto userRequestDto) {
@@ -52,10 +56,23 @@ public class UserService {
 
         }, () -> {
             Icon icon = randomIcon();
-            users[0] = UserConverter.convertToEntity(userRequestDto, icon);
+            users[0] = createUser(userRequestDto, icon);
         });
 
         return users[0];
+    }
+
+    private User createUser(UserRequestDto userRequestDto, Icon icon) {
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        return User.builder()
+                .email(userRequestDto.getEmail())
+                .password(encoder.encode(userRequestDto.getPassword()))
+                .name(userRequestDto.getName())
+                .introduction(null)
+                .icon(icon)
+                .role(Role.USER)
+                .provider(Provider.LOCAL)
+                .build();
     }
 
     private Icon randomIcon() {

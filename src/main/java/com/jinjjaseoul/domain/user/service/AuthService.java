@@ -2,7 +2,6 @@ package com.jinjjaseoul.domain.user.service;
 
 import com.jinjjaseoul.auth.jwt.JwtService;
 import com.jinjjaseoul.auth.model.UserPrincipal;
-import com.jinjjaseoul.common.converter.UserConverter;
 import com.jinjjaseoul.common.dto.TokenResponseDto;
 import com.jinjjaseoul.common.utils.RedisUtils;
 import com.jinjjaseoul.domain.user.dto.request.LoginRequestDto;
@@ -40,7 +39,7 @@ public class AuthService {
     public TokenResponseDto login(LoginRequestDto loginRequestDto, HttpServletResponse response) {
         final TokenResponseDto[] tokenResponseDto = {null};
         userRepository.findByEmail(loginRequestDto.getEmail()).ifPresentOrElse(user -> {
-            UserResponseDto userResponseDto = UserConverter.convertToDto(user);
+            UserResponseDto userResponseDto = new UserResponseDto(user);
             validatePasswordAndLoginCondition(loginRequestDto, userResponseDto);
             tokenResponseDto[0] = jwtService.createTokenDto(userResponseDto.getEmail(), userResponseDto.getRole());
 
