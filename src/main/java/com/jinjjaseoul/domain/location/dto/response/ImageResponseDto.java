@@ -11,18 +11,14 @@ import java.time.LocalDateTime;
 public class ImageResponseDto {
 
     private Long id;
-    private String originalName;
     private String savedName;
     private String savedPath;
     private LocalDateTime createdDate;
-    private LocalDateTime lastModifiedDate;
 
     public ImageResponseDto(Image image) {
         id = image.getId();
-        originalName = image.getOriginalName();
         savedName = image.getSavedName();
         savedPath = image.getSavedPath();
         createdDate = image.getCreatedDate();
-        lastModifiedDate = image.getLastModifiedDate();
     }
 }
