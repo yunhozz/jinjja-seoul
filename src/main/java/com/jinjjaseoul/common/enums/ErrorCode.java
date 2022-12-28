@@ -36,6 +36,10 @@ public enum ErrorCode {
     CURATION_LIKES_NOT_FOUND(404, "B-041", "큐레이션 좋아요에 대한 기록을 찾을 수 없습니다."),
     LOCATION_BOOKMARK_NOT_FOUND(404, "B-042", "장소 북마크에 대한 기록을 찾을 수 없습니다."),
 
+    // location
+    IMAGE_CANNOT_ATTACH(400, "L-001", "이미지 등록에 실패하였습니다."),
+    IMAGE_NOT_FOUND(404, "L-041", "이미지를 찾을 수 없습니다."),
+
     ;
 
     private final int status;
