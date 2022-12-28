@@ -72,12 +72,12 @@ public class ImageService {
 
     @Transactional(readOnly = true)
     public byte[] getImage(Long imageId) {
-        Image image = imageRepository.findById(imageId)
+        String savedPath = imageRepository.findPathById(imageId)
                 .orElseThrow(ImageNotFoundException::new);
         byte[] imageArr;
 
         try {
-            FileInputStream inputStream = new FileInputStream(image.getSavedPath());
+            FileInputStream inputStream = new FileInputStream(savedPath);
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             byte[] buffer = new byte[1024];
             int readCount;
