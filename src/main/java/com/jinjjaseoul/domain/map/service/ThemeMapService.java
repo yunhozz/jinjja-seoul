@@ -115,12 +115,16 @@ public class ThemeMapService {
 
     @Transactional
     public void deleteThemeMap(Long themeMapId) {
-        List<Long> themeLocationIds = themeLocationRepository.findIdsByThemeMapId(themeMapId);
-        List<Long> userIds = userRepository.findIdsByThemeLocationIds(themeLocationIds);
+        try {
+            ThemeMap themeMap = themeMapRepository.findById(themeMapId)
+                    .orElseThrow(ThemeMapNotFoundException::new);
+            themeMap.delete();
 
-        themeMapRepository.deleteById(themeMapId);
-        themeLocationRepository.deleteAllByIds(themeLocationIds);
-        userRepository.subtractNumOfRecommendInIds(userIds); // 해당 테마 지도의 유저들의 추천수 -1
+        } catch (ClassCastException e) {
+            throw new ThemeMapNotFoundException();
+        }
+
+        updateTablesByDeletingThemeMap(themeMapId);
     }
 
     @Transactional
@@ -129,6 +133,15 @@ public class ThemeMapService {
                 .orElseThrow(ThemeLocationNotFoundException::new);
         themeLocation.subtractNumOfUserRecommend(); // 장소 추천수 -1
         themeLocationRepository.delete(themeLocation);
+    }
+
+    @Transactional
+    private void updateTablesByDeletingThemeMap(Long themeMapId) {
+        List<Long> themeLocationIds = themeLocationRepository.findIdsByThemeMapId(themeMapId);
+        List<Long> userIds = userRepository.findIdsByThemeLocationIds(themeLocationIds);
+
+        themeLocationRepository.deleteAllByIds(themeLocationIds); // 해당 테마 지도의 테마 장소 전체 삭제
+        userRepository.subtractNumOfRecommendInIds(userIds); // 해당 테마 지도의 유저들의 추천수 -1
     }
 
     private ThemeLocation createThemeLocation(User user, ThemeMap themeMap, Location location) {

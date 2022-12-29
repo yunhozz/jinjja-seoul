@@ -75,9 +75,16 @@ public class CurationMapService {
 
     @Transactional
     public void deleteCurationMap(Long curationMapId) {
-        List<Long> curationLocationIds = curationLocationRepository.findIdsByCurationMapId(curationMapId);
-        curationMapRepository.deleteById(curationMapId);
-        curationLocationRepository.deleteAllByIds(curationLocationIds);
+        try {
+            CurationMap curationMap = curationMapRepository.findById(curationMapId)
+                    .orElseThrow(CurationMapNotFoundException::new);
+            curationMap.delete();
+
+        } catch (ClassCastException e) {
+            throw new CurationMapNotFoundException();
+        }
+
+        updateTableByDeletingCurationMap(curationMapId);
     }
 
     @Transactional
@@ -85,6 +92,12 @@ public class CurationMapService {
         CurationLocation curationLocation = curationLocationRepository.findById(curationLocationId)
                 .orElseThrow(CurationLocationNotFoundException::new);
         curationLocationRepository.delete(curationLocation);
+    }
+
+    @Transactional
+    private void updateTableByDeletingCurationMap(Long curationMapId) {
+        List<Long> curationLocationIds = curationLocationRepository.findIdsByCurationMapId(curationMapId);
+        curationLocationRepository.deleteAllByIds(curationLocationIds); // 해당 큐레이션 지도의 큐레이션 장소 전체 삭제
     }
 
     private CurationLocation createCurationLocation(User user, CurationMap curationMap, Location location) {
