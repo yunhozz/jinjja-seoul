@@ -76,8 +76,7 @@ public class CurationMapService {
     @Transactional
     public void deleteCurationMap(Long curationMapId) {
         try {
-            CurationMap curationMap = curationMapRepository.findById(curationMapId)
-                    .orElseThrow(CurationMapNotFoundException::new);
+            CurationMap curationMap = findCurationMap(curationMapId);
             curationMap.delete();
 
         } catch (ClassCastException e) {

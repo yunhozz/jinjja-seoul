@@ -116,8 +116,7 @@ public class ThemeMapService {
     @Transactional
     public void deleteThemeMap(Long themeMapId) {
         try {
-            ThemeMap themeMap = themeMapRepository.findById(themeMapId)
-                    .orElseThrow(ThemeMapNotFoundException::new);
+            ThemeMap themeMap = findThemeMap(themeMapId);
             themeMap.delete();
 
         } catch (ClassCastException e) {
