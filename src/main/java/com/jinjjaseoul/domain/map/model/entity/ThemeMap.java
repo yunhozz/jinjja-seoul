@@ -47,7 +47,12 @@ public class ThemeMap extends Map {
     }
 
     public void updateSearchCondition(Place place, Somebody somebody, Something something, Characteristics characteristics, Food food, Beverage beverage) {
-        MapSearch mapSearch = MapSearch.builder()
+        MapSearch mapSearch = createMapSearch(place, somebody, something, characteristics, food, beverage);
+        super.updateMapSearch(mapSearch);
+    }
+
+    private MapSearch createMapSearch(Place place, Somebody somebody, Something something, Characteristics characteristics, Food food, Beverage beverage) {
+        return MapSearch.builder()
                 .place(place)
                 .somebody(somebody)
                 .something(something)
@@ -55,6 +60,5 @@ public class ThemeMap extends Map {
                 .food(food)
                 .beverage(beverage)
                 .build();
-        super.updateMapSearch(mapSearch);
     }
 }

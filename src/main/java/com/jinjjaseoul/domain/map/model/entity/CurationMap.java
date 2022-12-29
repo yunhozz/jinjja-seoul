@@ -46,15 +46,7 @@ public class CurationMap extends Map {
     }
 
     public void updateSearchCondition(Place place, Somebody somebody, Something something, Characteristics characteristics, Food food, Beverage beverage, Category category) {
-        MapSearch mapSearch = MapSearch.builder()
-                .place(place)
-                .somebody(somebody)
-                .something(something)
-                .characteristics(characteristics)
-                .food(food)
-                .beverage(beverage)
-                .category(category)
-                .build();
+        MapSearch mapSearch = createMapSearch(place, somebody, something, characteristics, food, beverage, category);
         super.updateMapSearch(mapSearch);
     }
 
@@ -67,5 +59,17 @@ public class CurationMap extends Map {
             numOfLikes--;
 
         } else throw new IllegalStateException("좋아요 수를 더 이상 뺄 수 없습니다.");
+    }
+
+    private MapSearch createMapSearch(Place place, Somebody somebody, Something something, Characteristics characteristics, Food food, Beverage beverage, Category category) {
+        return MapSearch.builder()
+                .place(place)
+                .somebody(somebody)
+                .something(something)
+                .characteristics(characteristics)
+                .food(food)
+                .beverage(beverage)
+                .category(category)
+                .build();
     }
 }
