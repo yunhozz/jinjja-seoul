@@ -55,11 +55,4 @@ public abstract class Map extends BaseEntity {
     public void updateMapSearch(MapSearch mapSearch) {
         this.mapSearch = mapSearch;
     }
-
-    public void delete() {
-        if (!isDeleted) {
-            isDeleted = true;
-
-        } else throw new IllegalStateException("이미 삭제된 지도입니다.");
-    }
 }

@@ -115,14 +115,12 @@ public class ThemeMapService {
 
     @Transactional
     public void deleteThemeMap(Long themeMapId) {
-        ThemeMap themeMap = themeMapRepository.findById(themeMapId)
-                .orElseThrow(ThemeMapNotFoundException::new);
         List<Long> themeLocationIds = themeLocationRepository.findIdsByThemeMapId(themeMapId);
         List<Long> userIds = userRepository.findIdsByThemeLocationIds(themeLocationIds);
 
+        themeMapRepository.deleteById(themeMapId);
         themeLocationRepository.deleteAllByIds(themeLocationIds);
         userRepository.subtractNumOfRecommendInIds(userIds); // 해당 테마 지도의 유저들의 추천수 -1
-        themeMap.delete();
     }
 
     @Transactional

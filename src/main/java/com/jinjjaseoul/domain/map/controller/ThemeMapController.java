@@ -15,6 +15,7 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -92,15 +93,15 @@ public class ThemeMapController {
     }
 
     @Secured({"ROLE_ADMIN", "ROLE_USER"})
-    @DeleteMapping("/{themeMapId}")
-    public Response deleteThemeMap(@PathVariable Long themeMapId) {
+    @PatchMapping("/{id}/delete")
+    public Response deleteThemeMap(@PathVariable("id") Long themeMapId) {
         themeMapService.deleteThemeMap(themeMapId);
-        return Response.success(HttpStatus.NO_CONTENT, "테마 지도를 성공적으로 삭제했습니다.");
+        return Response.success(HttpStatus.CREATED, "테마 지도를 성공적으로 삭제했습니다.");
     }
 
     @Secured({"ROLE_ADMIN", "ROLE_USER"})
-    @DeleteMapping("/{themeLocationId}")
-    public Response deleteThemeLocation(@PathVariable Long themeLocationId) {
+    @DeleteMapping("/{id}/delete")
+    public Response deleteThemeLocation(@PathVariable("id") Long themeLocationId) {
         themeMapService.deleteThemeLocation(themeLocationId);
         return Response.success(HttpStatus.NO_CONTENT, "테마 장소를 성공적으로 삭제했습니다.");
     }

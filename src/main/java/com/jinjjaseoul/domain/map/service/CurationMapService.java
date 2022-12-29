@@ -75,11 +75,9 @@ public class CurationMapService {
 
     @Transactional
     public void deleteCurationMap(Long curationMapId) {
-        CurationMap curationMap = findCurationMap(curationMapId);
         List<Long> curationLocationIds = curationLocationRepository.findIdsByCurationMapId(curationMapId);
-
+        curationMapRepository.deleteById(curationMapId);
         curationLocationRepository.deleteAllByIds(curationLocationIds);
-        curationMap.delete();
     }
 
     @Transactional

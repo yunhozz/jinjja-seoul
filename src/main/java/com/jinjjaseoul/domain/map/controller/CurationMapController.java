@@ -15,6 +15,7 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -72,15 +73,15 @@ public class CurationMapController {
     }
 
     @Secured({"ROLE_ADMIN", "ROLE_USER"})
-    @DeleteMapping("/{curationMapId}")
-    public Response deleteCurationMap(@PathVariable Long curationMapId) {
+    @PatchMapping("/{id}/delete")
+    public Response deleteCurationMap(@PathVariable("id") Long curationMapId) {
         curationMapService.deleteCurationMap(curationMapId);
         return Response.success(HttpStatus.NO_CONTENT, "큐레이션 지도를 성공적으로 삭제했습니다.");
     }
 
     @Secured({"ROLE_ADMIN", "ROLE_USER"})
-    @DeleteMapping("/{curationLocationId}")
-    public Response deleteThemeLocation(@PathVariable Long curationLocationId) {
+    @DeleteMapping("/{id}/delete")
+    public Response deleteThemeLocation(@PathVariable("id") Long curationLocationId) {
         curationMapService.deleteCurationLocation(curationLocationId);
         return Response.success(HttpStatus.NO_CONTENT, "큐레이션 장소를 성공적으로 삭제했습니다.");
     }
