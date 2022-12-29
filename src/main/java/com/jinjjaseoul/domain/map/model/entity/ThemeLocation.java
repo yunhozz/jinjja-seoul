@@ -45,6 +45,10 @@ public class ThemeLocation extends BaseEntity {
         this.location = location;
     }
 
+    public void addNumOfUserRecommend() {
+        user.addNumOfRecommend();
+    }
+
     public void subtractNumOfUserRecommend() {
         user.subtractNumOfRecommend();
     }

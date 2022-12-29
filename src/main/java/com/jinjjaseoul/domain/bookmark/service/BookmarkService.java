@@ -33,7 +33,7 @@ public class BookmarkService {
                 .orElseThrow(CurationMapNotFoundException::new);
 
         CurationLikes curationLikes = new CurationLikes(user, curationMap);
-        curationMap.addLikes(); // 큐레이션 지도 좋아요 +1
+        curationLikes.addLikesOfCurationMap(); // 큐레이션 지도 좋아요 +1
 
         return curationLikesRepository.save(curationLikes).getId();
     }

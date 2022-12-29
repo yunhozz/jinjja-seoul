@@ -72,7 +72,7 @@ public class ThemeMapService {
 
         ThemeLocation themeLocation = createThemeLocation(user, themeMap, location);
         themeLocationRepository.save(themeLocation);
-        user.addNumOfRecommend(); // 장소 추천수 +1
+        themeLocation.addNumOfUserRecommend(); // 장소 추천수 +1
         redisUtils.deleteData(String.valueOf(userId));
 
         return themeMapRepository.save(themeMap).getId();
@@ -94,7 +94,7 @@ public class ThemeMapService {
             themeLocationRepository.findByUserAndThemeMap(user, themeMap).ifPresentOrElse(themeLocation -> themeLocation.updateLocation(location), () -> {
                 ThemeLocation themeLocation = createThemeLocation(user, themeMap, location);
                 themeLocationRepository.save(themeLocation);
-                user.addNumOfRecommend(); // 장소 추천수 +1
+                themeLocation.addNumOfUserRecommend(); // 장소 추천수 +1
             });
         }
     }

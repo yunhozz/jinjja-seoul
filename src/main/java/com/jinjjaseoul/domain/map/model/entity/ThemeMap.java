@@ -57,8 +57,4 @@ public class ThemeMap extends Map {
                 .build();
         super.updateMapSearch(mapSearch);
     }
-
-    public void subtractNumOfUserRecommend() {
-        super.getUser().subtractNumOfRecommend();
-    }
 }
