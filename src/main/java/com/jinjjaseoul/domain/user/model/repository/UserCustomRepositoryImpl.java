@@ -47,6 +47,7 @@ public class UserCustomRepositoryImpl implements UserCustomRepository {
                 ))
                 .from(user)
                 .join(user.icon, icon)
+                .where(user.isDeleted.isFalse())
                 .orderBy(user.numOfRecommend.add(user.numOfComment).desc())
                 .limit(20)
                 .fetch();

@@ -118,9 +118,10 @@ public class ThemeMapService {
         ThemeMap themeMap = themeMapRepository.findWithUserById(themeMapId)
                 .orElseThrow(ThemeMapNotFoundException::new);
         List<Long> themeLocationIds = themeLocationRepository.findIdsByThemeMapId(themeMapId);
+        List<Long> userIds = userRepository.findIdsByThemeLocationIds(themeLocationIds);
 
-        themeMap.subtractNumOfUserRecommend(); // 장소 추천수 -1
         themeLocationRepository.deleteAllByIds(themeLocationIds);
+        userRepository.subtractNumOfRecommendInIds(userIds); // 해당 테마 지도의 유저들의 추천수 -1
         themeMap.delete();
     }
 
