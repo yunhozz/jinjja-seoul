@@ -41,6 +41,8 @@ public abstract class Map extends BaseEntity {
     @Embedded
     private MapSearch mapSearch; // 검색 조건 : 어디로?, 누구와?, 무엇을?, 분위기/특징, 음식, 술/음료, 카테고리 (큐레이션 지도)
 
+    private boolean isDeleted;
+
     @Column(insertable = false, updatable = false)
     private String dtype; // querydsl 을 위해 @DiscriminatorColumn 대신 직접 명시
 
@@ -52,5 +54,12 @@ public abstract class Map extends BaseEntity {
 
     public void updateMapSearch(MapSearch mapSearch) {
         this.mapSearch = mapSearch;
+    }
+
+    public void delete() {
+        if (!isDeleted) {
+            isDeleted = true;
+
+        } else throw new IllegalStateException("이미 삭제된 지도입니다.");
     }
 }

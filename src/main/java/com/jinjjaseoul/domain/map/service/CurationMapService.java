@@ -79,7 +79,7 @@ public class CurationMapService {
         List<Long> curationLocationIds = curationLocationRepository.findIdsByCurationMapId(curationMapId);
 
         curationLocationRepository.deleteAllByIds(curationLocationIds);
-        curationMapRepository.delete(curationMap);
+        curationMap.delete();
     }
 
     @Transactional

@@ -60,7 +60,10 @@ public class LocationCustomRepositoryImpl implements LocationCustomRepository {
                 .join(themeLocation.themeMap, themeMap)
                 .join(themeLocation.location, location)
                 .join(themeMap.icon, icon)
-                .where(location.id.eq(locationId))
+                .where(
+                        location.id.eq(locationId),
+                        themeMap.isDeleted.isFalse()
+                )
                 .orderBy(themeMap.createdDate.desc())
                 .fetch();
     }
@@ -74,7 +77,10 @@ public class LocationCustomRepositoryImpl implements LocationCustomRepository {
                 .from(comment)
                 .join(comment.icon, icon)
                 .join(comment.location, location)
-                .where(location.id.eq(locationId))
+                .where(
+                        location.id.eq(locationId),
+                        comment.isDeleted.isFalse()
+                )
                 .orderBy(comment.createdDate.desc())
                 .fetch();
     }

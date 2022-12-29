@@ -121,7 +121,7 @@ public class ThemeMapService {
 
         themeMap.subtractNumOfUserRecommend(); // 장소 추천수 -1
         themeLocationRepository.deleteAllByIds(themeLocationIds);
-        themeMapRepository.delete(themeMap);
+        themeMap.delete();
     }
 
     @Transactional

@@ -72,7 +72,8 @@ public class MapCustomRepositoryImpl implements MapCustomRepository {
                 .join(themeMap.icon, icon)
                 .where(
                         themeMap.categories.size().between(1, 3),
-                        themeMap.keywordList.size().goe(3)
+                        themeMap.keywordList.size().goe(3),
+                        themeMap.isDeleted.isFalse()
                 )
                 .orderBy(themeMap.categories.size().add(themeMap.keywordList.size()).desc())
                 .limit(50)
@@ -100,6 +101,7 @@ public class MapCustomRepositoryImpl implements MapCustomRepository {
                 ))
                 .from(themeMap)
                 .join(themeMap.icon, icon)
+                .where(themeMap.isDeleted.isFalse())
                 .orderBy(themeMap.createdDate.desc())
                 .limit(9)
                 .fetch();
@@ -121,6 +123,7 @@ public class MapCustomRepositoryImpl implements MapCustomRepository {
                 ))
                 .from(themeMap)
                 .join(themeMap.icon, icon)
+                .where(themeMap.isDeleted.isFalse())
                 .fetch();
 
         List<Long> themeMapIds = getThemeMapIds(themeMapList);
@@ -167,6 +170,7 @@ public class MapCustomRepositoryImpl implements MapCustomRepository {
                 .join(curationMap.icon, curationMapIcon)
                 .join(curationMap.user, user)
                 .join(user.icon, userIcon)
+                .where(curationMap.isDeleted.isFalse())
                 .orderBy(curationMap.createdDate.desc())
                 .limit(50)
                 .fetch();
@@ -220,7 +224,10 @@ public class MapCustomRepositoryImpl implements MapCustomRepository {
                 .from(themeMap)
                 .join(themeMap.icon, icon)
                 .join(map).on(themeMap.eq(map))
-                .where(mapIdLt(lastThemeMapId))
+                .where(
+                        mapIdLt(lastThemeMapId),
+                        themeMap.isDeleted.isFalse()
+                )
                 .where(
                         themeMapKeywordEq(searchRequestDto.getKeyword()),
                         placeEq(searchRequestDto.getPlace()),
@@ -260,7 +267,10 @@ public class MapCustomRepositoryImpl implements MapCustomRepository {
                 .join(curationMap.user, user)
                 .join(user.icon, userIcon)
                 .join(map).on(curationMap.eq(map))
-                .where(mapIdLt(lastCurationMapId))
+                .where(
+                        mapIdLt(lastCurationMapId),
+                        curationMap.isDeleted.isFalse()
+                )
                 .where(
                         curationMapKeywordEq(searchRequestDto.getKeyword()),
                         placeEq(searchRequestDto.getPlace()),
@@ -295,7 +305,10 @@ public class MapCustomRepositoryImpl implements MapCustomRepository {
                 .join(map.icon, icon)
                 .join(themeMap).on(themeMap.eq(map))
                 .join(curationMap).on(curationMap.eq(map))
-                .where(mapIdLt(lastMapId))
+                .where(
+                        mapIdLt(lastMapId),
+                        map.isDeleted.isFalse()
+                )
                 .where(
                         keywordEqAccordingToType(searchRequestDto.getKeyword()),
                         categoriesEqAccordingToType(searchRequestDto.getCategories()),
@@ -385,7 +398,10 @@ public class MapCustomRepositoryImpl implements MapCustomRepository {
                 ))
                 .from(comment)
                 .join(comment.location, location)
-                .where(location.id.in(locationIds))
+                .where(
+                        location.id.in(locationIds),
+                        comment.isDeleted.isFalse()
+                )
                 .orderBy(comment.content.length().desc())
                 .fetch();
     }
@@ -486,6 +502,7 @@ public class MapCustomRepositoryImpl implements MapCustomRepository {
         return queryFactory
                 .select(themeMap.count())
                 .from(themeMap)
+                .where(themeMap.isDeleted.isFalse())
                 .fetchOne();
     }
 
@@ -493,6 +510,7 @@ public class MapCustomRepositoryImpl implements MapCustomRepository {
         return queryFactory
                 .select(curationMap.count())
                 .from(curationMap)
+                .where(curationMap.isDeleted.isFalse())
                 .fetchOne();
     }
 
@@ -500,6 +518,7 @@ public class MapCustomRepositoryImpl implements MapCustomRepository {
         return queryFactory
                 .select(map.count())
                 .from(map)
+                .where(map.isDeleted.isFalse())
                 .fetchOne();
     }
 
