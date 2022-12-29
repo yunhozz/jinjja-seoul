@@ -36,11 +36,28 @@ public class Comment extends BaseEntity {
 
     private String content;
 
+    private boolean isDeleted;
+
     @Builder
     private Comment(User user, Location location, Icon icon, String content) {
         this.user = user;
         this.location = location;
         this.icon = icon;
         this.content = content;
+    }
+
+    public void addUserNumOfComment() {
+        user.addNumOfComment();
+    }
+
+    public void subtractUserNumOfComment() {
+        user.subtractNumOfComment();
+    }
+
+    public void delete() {
+        if (!isDeleted) {
+            isDeleted = true;
+
+        } else throw new IllegalStateException("이미 삭제된 코멘트입니다.");
     }
 }

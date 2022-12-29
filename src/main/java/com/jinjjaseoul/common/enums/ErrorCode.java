@@ -38,7 +38,9 @@ public enum ErrorCode {
 
     // location
     IMAGE_CANNOT_ATTACH(400, "L-001", "이미지 등록에 실패하였습니다."),
+    COMMENT_ALREADY_WRITTEN(400, "L-002", "해당 장소에 대한 코멘트가 이미 작성되었습니다."),
     IMAGE_NOT_FOUND(404, "L-041", "이미지를 찾을 수 없습니다."),
+    COMMENT_NOT_FOUND(404, "L-042", "코멘트를 찾을 수 없습니다."),
 
     ;
 
