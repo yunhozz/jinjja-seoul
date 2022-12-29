@@ -25,14 +25,14 @@ public class ImageController {
     private final ImageService imageService;
 
     // 여러 이미지 조회 -> 이미지 id 를 포함한 dto 리스트 반환
-    @GetMapping("/view")
+    @GetMapping
     public Response viewImagesOnLocation(@RequestParam Long locationId) {
         List<ImageResponseDto> imageResponseDtoList = imageService.getImageDtoList(locationId);
         return Response.success(HttpStatus.OK, imageResponseDtoList);
     }
 
     // 단일 이미지 조회
-    @GetMapping(value = "/view/{id}", produces = {MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_PNG_VALUE})
+    @GetMapping(value = "/{id}", produces = {MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_PNG_VALUE})
     public ResponseEntity<byte[]> viewImageOnLocation(@PathVariable("id") Long imageId) {
         byte[] image = imageService.getImage(imageId);
         return ResponseEntity.ok(image);
