@@ -8,7 +8,7 @@ public enum ErrorCode {
     NOT_VALID(400, "G-001", "잘못된 요청입니다."),
     UNAUTHORIZED(401, "G-011", "사용자에 대한 권한이 없습니다."),
     FORBIDDEN(403, "G-031", "접근이 거부된 사용자입니다."),
-    NOT_FOUND(404, "G-041", "페이지를 찾을 수 없습니다."),
+    NOT_FOUND(404, "G-041", "데이터를 찾을 수 없습니다."),
     INTER_SERVER_ERROR(500, "G-051", "서버 에러가 발생했습니다."),
 
     // user

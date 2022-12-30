@@ -13,6 +13,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,22 +23,25 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(RuntimeException.class)
     public Response handleRuntimeException(RuntimeException e) {
+        // 접근이 거부된 사용자가 접근할 때 예외 발생
         if (e instanceof AccessDeniedException) {
             return failure(e, ErrorCode.FORBIDDEN);
         }
-
+        // 권한이 없는 사용자가 요청할 때 예외 발생
         if (e instanceof AuthenticationException) {
             return failure(e, ErrorCode.UNAUTHORIZED);
         }
-
+        // 런타임 예외 발생
         return failure(e, ErrorCode.INTER_SERVER_ERROR);
     }
 
+    // 커스텀 예외 발생
     @ExceptionHandler(JinjjaSeoulException.class)
     public Response handleJinjjaSeoulException(JinjjaSeoulException e) {
         return failure(e, e.getErrorCode());
     }
 
+    // @Valid 를 통과하지 못하면 예외 발생
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public Response handleRuntimeException(MethodArgumentNotValidException e) {
         List<FieldError> fieldErrors = e.getFieldErrors();
@@ -54,6 +58,12 @@ public class GlobalExceptionHandler {
 
         ErrorResponseDto errorResponseDto = new ErrorResponseDto(ErrorCode.NOT_VALID, notValidResponseDtoList);
         return Response.failure(HttpStatus.valueOf(errorResponseDto.getStatus()), errorResponseDto);
+    }
+
+    // getReferenceById 로 엔티티 프록시 조회에 실패했을 때 예외 발생
+    @ExceptionHandler(EntityNotFoundException.class)
+    public Response handleEntityNotFoundException(EntityNotFoundException e) {
+        return failure(e, ErrorCode.NOT_FOUND);
     }
 
     private Response failure(Exception e, ErrorCode errorCode) {
