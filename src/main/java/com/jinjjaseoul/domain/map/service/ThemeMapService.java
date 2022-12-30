@@ -115,14 +115,8 @@ public class ThemeMapService {
 
     @Transactional
     public void deleteThemeMap(Long themeMapId) {
-        try {
-            ThemeMap themeMap = findThemeMap(themeMapId);
-            themeMap.delete();
-
-        } catch (ClassCastException e) {
-            throw new ThemeMapNotFoundException();
-        }
-
+        ThemeMap themeMap = findThemeMap(themeMapId);
+        themeMap.delete();
         updateTablesByDeletingThemeMap(themeMapId);
     }
 
@@ -161,8 +155,13 @@ public class ThemeMapService {
     }
 
     private ThemeMap findThemeMap(Long themeMapId) {
-        return themeMapRepository.findById(themeMapId)
-                .orElseThrow(ThemeMapNotFoundException::new);
+        try {
+            return themeMapRepository.findById(themeMapId)
+                    .orElseThrow(ThemeMapNotFoundException::new);
+
+        } catch (ClassCastException e) {
+            throw new ThemeMapNotFoundException();
+        }
     }
 
     private Icon determineIcon(Long iconId) {

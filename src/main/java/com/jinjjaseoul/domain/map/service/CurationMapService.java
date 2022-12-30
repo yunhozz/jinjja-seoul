@@ -75,14 +75,8 @@ public class CurationMapService {
 
     @Transactional
     public void deleteCurationMap(Long curationMapId) {
-        try {
-            CurationMap curationMap = findCurationMap(curationMapId);
-            curationMap.delete();
-
-        } catch (ClassCastException e) {
-            throw new CurationMapNotFoundException();
-        }
-
+        CurationMap curationMap = findCurationMap(curationMapId);
+        curationMap.delete();
         updateTableByDeletingCurationMap(curationMapId);
     }
 
@@ -108,8 +102,13 @@ public class CurationMapService {
     }
 
     private CurationMap findCurationMap(Long curationMapId) {
-        return curationMapRepository.findById(curationMapId)
-                .orElseThrow(CurationMapNotFoundException::new);
+        try {
+            return curationMapRepository.findById(curationMapId)
+                    .orElseThrow(CurationMapNotFoundException::new);
+
+        } catch (ClassCastException e) {
+            throw new CurationMapNotFoundException();
+        }
     }
 
     private Icon determineIcon(Long iconId) {
