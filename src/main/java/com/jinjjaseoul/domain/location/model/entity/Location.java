@@ -1,6 +1,5 @@
 package com.jinjjaseoul.domain.location.model.entity;
 
-import com.jinjjaseoul.domain.BaseEntity;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -15,7 +14,7 @@ import javax.persistence.Id;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Location extends BaseEntity {
+public class Location {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
