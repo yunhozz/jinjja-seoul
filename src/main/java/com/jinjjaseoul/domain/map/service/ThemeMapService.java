@@ -1,7 +1,6 @@
 package com.jinjjaseoul.domain.map.service;
 
 import com.jinjjaseoul.auth.model.UserPrincipal;
-import com.jinjjaseoul.common.converter.MapConverter;
 import com.jinjjaseoul.common.enums.Category;
 import com.jinjjaseoul.common.utils.RedisUtils;
 import com.jinjjaseoul.domain.icon.model.Icon;
@@ -25,6 +24,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -67,7 +68,7 @@ public class ThemeMapService {
 
         User user = userRepository.getReferenceById(userId);
         Icon icon = determineIcon((Long) dataList.get(1));
-        ThemeMap themeMap = MapConverter.convertToThemeMapEntity(themeMapRequestDto, user, icon);
+        ThemeMap themeMap = createThemeMap(themeMapRequestDto, user, icon);
         Location location = locationRepository.getReferenceById(themeMapRequestDto.getLocationId());
 
         ThemeLocation themeLocation = createThemeLocation(user, themeMap, location);
@@ -135,6 +136,21 @@ public class ThemeMapService {
 
         themeLocationRepository.deleteAllByIds(themeLocationIds); // 해당 테마 지도의 테마 장소 전체 삭제
         userRepository.subtractNumOfRecommendInIds(userIds); // 해당 테마 지도의 유저들의 추천수 -1
+    }
+
+    private ThemeMap createThemeMap(ThemeMapRequestDto themeMapRequestDto, User user, Icon icon) {
+        List<String> keywordList = new ArrayList<>() {{
+            String[] keyword = themeMapRequestDto.getKeywordStr().split(",");
+            this.addAll(Arrays.asList(keyword));
+        }};
+
+        return ThemeMap.builder()
+                .user(user)
+                .name(themeMapRequestDto.getName())
+                .icon(icon)
+                .categories(themeMapRequestDto.getCategories())
+                .keywordList(keywordList)
+                .build();
     }
 
     private ThemeLocation createThemeLocation(User user, ThemeMap themeMap, Location location) {

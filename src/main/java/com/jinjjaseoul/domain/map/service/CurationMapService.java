@@ -1,7 +1,6 @@
 package com.jinjjaseoul.domain.map.service;
 
 import com.jinjjaseoul.auth.model.UserPrincipal;
-import com.jinjjaseoul.common.converter.MapConverter;
 import com.jinjjaseoul.domain.icon.model.Icon;
 import com.jinjjaseoul.domain.icon.model.IconRepository;
 import com.jinjjaseoul.domain.location.model.entity.Location;
@@ -39,7 +38,7 @@ public class CurationMapService {
 
         User user = userPrincipal.getUser();
         Icon icon = determineIcon(curationMapRequestDto.getIconId());
-        CurationMap curationMap = MapConverter.convertToCurationMapEntity(curationMapRequestDto, user, icon);
+        CurationMap curationMap = createCurationMap(curationMapRequestDto, user, icon);
 
         curationMapRepository.save(curationMap);
         curationMap.updateRedirectUrl("localhost:8080/curation/" + curationMap.getId());
@@ -91,6 +90,17 @@ public class CurationMapService {
     private void updateTableByDeletingCurationMap(Long curationMapId) {
         List<Long> curationLocationIds = curationLocationRepository.findIdsByCurationMapId(curationMapId);
         curationLocationRepository.deleteAllByIds(curationLocationIds); // 해당 큐레이션 지도의 큐레이션 장소 전체 삭제
+    }
+
+    private CurationMap createCurationMap(CurationMapRequestDto curationMapRequestDto, User user, Icon icon) {
+        return CurationMap.builder()
+                .user(user)
+                .name(curationMapRequestDto.getName())
+                .icon(icon)
+                .isMakeTogether(curationMapRequestDto.getIsMakeTogether())
+                .isProfileDisplay(curationMapRequestDto.getIsProfileDisplay())
+                .isShared(curationMapRequestDto.getIsShared())
+                .build();
     }
 
     private CurationLocation createCurationLocation(User user, CurationMap curationMap, Location location) {
