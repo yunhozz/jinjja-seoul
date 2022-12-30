@@ -80,7 +80,7 @@ public class CurationMapController {
     }
 
     @Secured({"ROLE_ADMIN", "ROLE_USER"})
-    @DeleteMapping("/{id}/delete")
+    @DeleteMapping("/location/{id}/delete")
     public Response deleteThemeLocation(@PathVariable("id") Long curationLocationId) {
         curationMapService.deleteCurationLocation(curationLocationId);
         return Response.success(HttpStatus.NO_CONTENT, "큐레이션 장소를 성공적으로 삭제했습니다.");

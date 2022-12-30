@@ -100,7 +100,7 @@ public class ThemeMapController {
     }
 
     @Secured({"ROLE_ADMIN", "ROLE_USER"})
-    @DeleteMapping("/{id}/delete")
+    @DeleteMapping("/location/{id}/delete")
     public Response deleteThemeLocation(@PathVariable("id") Long themeLocationId) {
         themeMapService.deleteThemeLocation(themeLocationId);
         return Response.success(HttpStatus.NO_CONTENT, "테마 장소를 성공적으로 삭제했습니다.");
