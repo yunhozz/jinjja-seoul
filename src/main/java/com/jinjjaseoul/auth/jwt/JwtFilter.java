@@ -42,6 +42,7 @@ public class JwtFilter extends OncePerRequestFilter {
                 }
                 // access token 로그아웃 상태 확인
                 if (!StringUtils.hasText(logout)) {
+                    log.info("Verifying Success!!");
                     Authentication authentication = jwtService.getAuthentication(token);
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                 }
