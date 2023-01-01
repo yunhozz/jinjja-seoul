@@ -39,7 +39,7 @@ public class SecurityConfig {
                 .cors().disable()
                 .authorizeRequests()
                 .antMatchers("/", "/error", "/favicon.ico").permitAll()
-                .antMatchers("/api/comments/**", "/api/curation/likes/**", "/api/images/**", "/api/location/bookmarks/**").hasRole("USER")
+                .antMatchers("/api/comments/**", "/api/curation/likes/**", "/api/images/**", "/api/location/bookmarks/**").hasAnyRole("ADMIN", "USER")
                 .anyRequest().permitAll();
 
         httpSecurity
