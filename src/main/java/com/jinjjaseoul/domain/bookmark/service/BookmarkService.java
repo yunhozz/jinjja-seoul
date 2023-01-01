@@ -69,7 +69,7 @@ public class BookmarkService {
     }
 
     @Transactional(readOnly = true)
-    public List<LocationCardResponseDto> findLocationCardListByUSerId(Long userId) {
+    public List<LocationCardResponseDto> findLocationCardListByUserId(Long userId) {
         List<Long> locationIds = locationBookmarkRepository.findLocationIdsByUserId(userId);
         List<Location> locations = locationRepository.findAllById(locationIds);
 

@@ -26,7 +26,7 @@ public class LocationBookmarkController {
 
     @GetMapping
     public Response getLocationBookmarkListByUser(@AuthenticationPrincipal UserPrincipal userPrincipal) {
-        List<LocationCardResponseDto> locationCardList = bookmarkService.findLocationCardListByUSerId(userPrincipal.getId());
+        List<LocationCardResponseDto> locationCardList = bookmarkService.findLocationCardListByUserId(userPrincipal.getId());
         return Response.success(HttpStatus.OK, locationCardList);
     }
 
