@@ -41,6 +41,13 @@ public class CurationMap extends Map {
         this.isShared = isShared;
     }
 
+    public void updateInfo(String name, Icon icon, boolean isMakeTogether, boolean isProfileDisplay, boolean isShared) {
+        super.updateInfo(name, icon);
+        this.isMakeTogether = isMakeTogether;
+        this.isProfileDisplay = isProfileDisplay;
+        this.isShared = isShared;
+    }
+
     public void updateRedirectUrl(String redirectUrl) {
         this.redirectUrl = redirectUrl;
     }

@@ -57,6 +57,20 @@ public class CurationMapService {
         curationLocationRepository.save(curationLocation);
     }
 
+    @Transactional
+    public void updateCurationMapInfo(Long curationMapId, CurationMapRequestDto curationMapRequestDto) {
+        CurationMap curationMap = findCurationMap(curationMapId);
+        Icon icon = determineIcon(curationMapRequestDto.getIconId());
+
+        curationMap.updateInfo(
+                curationMapRequestDto.getName(),
+                icon,
+                curationMapRequestDto.getIsMakeTogether(),
+                curationMapRequestDto.getIsProfileDisplay(),
+                curationMapRequestDto.getIsShared()
+        );
+    }
+
     // 검색용 테이블 업데이트 (운영자)
     @Transactional
     public void updateMapSearchTable(Long curationMapId, MapSearchRequestDto mapSearchRequestDto) {

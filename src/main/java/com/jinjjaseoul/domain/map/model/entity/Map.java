@@ -52,6 +52,11 @@ public abstract class Map extends BaseEntity {
         this.icon = icon;
     }
 
+    public void updateInfo(String name, Icon icon) {
+        this.name = name;
+        this.icon = icon;
+    }
+
     public void updateMapSearch(MapSearch mapSearch) {
         this.mapSearch = mapSearch;
     }

@@ -72,6 +72,13 @@ public class CurationMapController {
         return Response.success(HttpStatus.CREATED, "검색 조건을 업데이트 했습니다.");
     }
 
+    @Secured("ROLE_USER")
+    @PatchMapping("/{id}/update")
+    public Response updateCurationMap(@PathVariable("id") Long curationMapId, @Valid @RequestBody CurationMapRequestDto curationMapRequestDto) {
+        curationMapService.updateCurationMapInfo(curationMapId, curationMapRequestDto);
+        return Response.success(HttpStatus.CREATED, "정보를 업데이트 했습니다.");
+    }
+
     @Secured({"ROLE_ADMIN", "ROLE_USER"})
     @PatchMapping("/{id}/delete")
     public Response deleteCurationMap(@PathVariable("id") Long curationMapId) {
