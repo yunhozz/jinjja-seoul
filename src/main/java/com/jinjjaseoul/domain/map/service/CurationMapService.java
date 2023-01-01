@@ -59,6 +59,7 @@ public class CurationMapService {
 
     @Transactional
     public void updateCurationMapInfo(Long curationMapId, CurationMapRequestDto curationMapRequestDto) {
+        validateCurationMapNameDuplicate(curationMapRequestDto); // 중복되는 이름 검증
         CurationMap curationMap = findCurationMap(curationMapId);
         Icon icon = determineIcon(curationMapRequestDto.getIconId());
 
