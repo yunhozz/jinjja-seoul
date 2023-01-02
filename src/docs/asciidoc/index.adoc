@@ -1,0 +1,27 @@
+= API Document
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 3
+:sectlinks:
+
+ifndef::snippets[]
+:snippets: ./build/generated-snippets
+endif::[]
+
+[[introduction]]
+== 소개
+Jinjja-Seoul Spring Rest Docs API
+
+== Health Check
+=== Request
+Request:
+include::{snippets}/healthcheck/http-request.adoc[]
+
+CURL:
+include::{snippets}/healthcheck/curl-request.adoc[]
+
+=== Response
+Response:
+include::{snippets}/healthcheck/http-response.adoc[]
