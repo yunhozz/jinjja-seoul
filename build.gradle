@@ -9,11 +9,24 @@ plugins {
 	id 'org.springframework.boot' version '2.7.6'
 	id 'io.spring.dependency-management' version '1.0.15.RELEASE'
 	id 'com.ewerk.gradle.plugins.querydsl' version '1.0.10'
+	id "org.asciidoctor.jvm.convert" version '3.3.2'
 }
 
 group = 'com'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '11'
+
+ext {
+	snippetsDir = file('build/generated-snippets')
+}
+
+bootJar {
+	dependsOn asciidoctor
+	copy {
+		from "${asciidoctor.outputDir}"
+		into 'BOOT-INF/classes/static/docs'
+	}
+}
 
 configurations {
 	compileOnly {
@@ -48,6 +61,7 @@ dependencies {
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
+	testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
 }
 
 tasks.named('test') {
@@ -74,4 +88,23 @@ configurations {
 		extendsFrom annotationProcessor
 	}
 	querydsl.extendsFrom compileClasspath
+}
+
+asciidoctor {
+	dependsOn test
+	inputs.dir snippetsDir
+}
+
+asciidoctor.doFirst {
+	delete file('src/main/resources/static/docs')
+}
+
+task copyDocument(type: Copy) {
+	dependsOn asciidoctor
+	from file("build/docs/asciidoc")
+	into file("src/main/resources/static/docs")
+}
+
+build {
+	dependsOn copyDocument
 }
