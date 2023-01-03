@@ -18,6 +18,7 @@ Jinjja-Seoul Spring Rest Docs API
 ResponseBody
 include::{snippets}/healthcheck/response-fields.adoc[]
 HTTP
+include::{snippets}/healthcheck/curl-request.adoc[]
 include::{snippets}/healthcheck/http-request.adoc[]
 include::{snippets}/healthcheck/http-response.adoc[]
 
@@ -26,6 +27,7 @@ include::{snippets}/healthcheck/http-response.adoc[]
 ResponseBody
 include::{snippets}/get_diligent_users/response-fields.adoc[]
 HTTP
+include::{snippets}/get_diligent_users/curl-request.adoc[]
 include::{snippets}/get_diligent_users/http-request.adoc[]
 include::{snippets}/get_diligent_users/http-response.adoc[]
 
@@ -33,6 +35,7 @@ include::{snippets}/get_diligent_users/http-response.adoc[]
 ResponseBody
 include::{snippets}/get_my_info/response-fields.adoc[]
 HTTP
+include::{snippets}/get_my_info/curl-request.adoc[]
 include::{snippets}/get_my_info/http-request.adoc[]
 include::{snippets}/get_my_info/http-response.adoc[]
 
@@ -40,6 +43,7 @@ include::{snippets}/get_my_info/http-response.adoc[]
 ResponseBody
 include::{snippets}/get_user_info/response-fields.adoc[]
 HTTP
+include::{snippets}/get_user_info/curl-request.adoc[]
 include::{snippets}/get_user_info/http-request.adoc[]
 include::{snippets}/get_user_info/http-response.adoc[]
 
@@ -49,6 +53,7 @@ include::{snippets}/join_request/request-fields.adoc[]
 ResponseBody
 include::{snippets}/join_request/response-fields.adoc[]
 HTTP
+include::{snippets}/join_request/curl-request.adoc[]
 include::{snippets}/join_request/http-request.adoc[]
 include::{snippets}/join_request/http-response.adoc[]
 
@@ -58,5 +63,40 @@ include::{snippets}/update_profile/request-fields.adoc[]
 ResponseBody
 include::{snippets}/update_profile/response-fields.adoc[]
 HTTP
+include::{snippets}/update_profile/curl-request.adoc[]
 include::{snippets}/update_profile/http-request.adoc[]
 include::{snippets}/update_profile/http-response.adoc[]
+
+=== 로그인
+RequestBody
+include::{snippets}/login_request/request-fields.adoc[]
+ResponseBody
+include::{snippets}/login_request/response-fields.adoc[]
+HTTP
+include::{snippets}/login_request/curl-request.adoc[]
+include::{snippets}/login_request/http-request.adoc[]
+include::{snippets}/login_request/http-response.adoc[]
+
+=== JWT 토큰 재발급
+ResponseBody
+include::{snippets}/token_reissue/response-fields.adoc[]
+HTTP
+include::{snippets}/token_reissue/curl-request.adoc[]
+include::{snippets}/token_reissue/http-request.adoc[]
+include::{snippets}/token_reissue/http-response.adoc[]
+
+=== 로그아웃
+ResponseBody
+include::{snippets}/logout_request/response-fields.adoc[]
+HTTP
+include::{snippets}/logout_request/curl-request.adoc[]
+include::{snippets}/logout_request/http-request.adoc[]
+include::{snippets}/logout_request/http-response.adoc[]
+
+=== 회원 탈퇴
+ResponseBody
+include::{snippets}/withdraw_request/response-fields.adoc[]
+HTTP
+include::{snippets}/withdraw_request/curl-request.adoc[]
+include::{snippets}/withdraw_request/http-request.adoc[]
+include::{snippets}/withdraw_request/http-response.adoc[]
