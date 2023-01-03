@@ -30,6 +30,14 @@ public class UserPrincipal implements UserDetails, OAuth2User {
         this.attributes = attributes;
     }
 
+    // 테스트용 인증 유저 생성
+    public UserPrincipal(String email, Role role) {
+        user = User.builder()
+                .email(email)
+                .role(role)
+                .build();
+    }
+
     public User getUser() {
         return user;
     }
