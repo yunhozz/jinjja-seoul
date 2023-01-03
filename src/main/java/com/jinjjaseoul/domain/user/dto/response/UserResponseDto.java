@@ -3,6 +3,7 @@ package com.jinjjaseoul.domain.user.dto.response;
 import com.jinjjaseoul.common.enums.Provider;
 import com.jinjjaseoul.common.enums.Role;
 import com.jinjjaseoul.domain.user.model.User;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -10,6 +11,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
 public class UserResponseDto {
 
     private Long id;
