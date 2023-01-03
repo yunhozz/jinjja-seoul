@@ -15,13 +15,48 @@ endif::[]
 Jinjja-Seoul Spring Rest Docs API
 
 == Health Check
-=== Request
-Request:
+ResponseBody
+include::{snippets}/healthcheck/response-fields.adoc[]
+HTTP
 include::{snippets}/healthcheck/http-request.adoc[]
-
-CURL:
-include::{snippets}/healthcheck/curl-request.adoc[]
-
-=== Response
-Response:
 include::{snippets}/healthcheck/http-response.adoc[]
+
+== User
+=== 열혈 큐레이터 리스트 조회
+ResponseBody
+include::{snippets}/get_diligent_users/response-fields.adoc[]
+HTTP
+include::{snippets}/get_diligent_users/http-request.adoc[]
+include::{snippets}/get_diligent_users/http-response.adoc[]
+
+=== 자신의 정보 조회
+ResponseBody
+include::{snippets}/get_my_info/response-fields.adoc[]
+HTTP
+include::{snippets}/get_my_info/http-request.adoc[]
+include::{snippets}/get_my_info/http-response.adoc[]
+
+=== 특정 유저 정보 조회
+ResponseBody
+include::{snippets}/get_user_info/response-fields.adoc[]
+HTTP
+include::{snippets}/get_user_info/http-request.adoc[]
+include::{snippets}/get_user_info/http-response.adoc[]
+
+=== 회원가입
+RequestBody
+include::{snippets}/join_request/request-fields.adoc[]
+ResponseBody
+include::{snippets}/join_request/response-fields.adoc[]
+HTTP
+include::{snippets}/join_request/http-request.adoc[]
+include::{snippets}/join_request/http-response.adoc[]
+
+=== 프로필 업데이트
+RequestBody
+include::{snippets}/update_profile/request-fields.adoc[]
+ResponseBody
+include::{snippets}/update_profile/response-fields.adoc[]
+HTTP
+include::{snippets}/update_profile/http-request.adoc[]
+include::{snippets}/update_profile/http-response.adoc[]
