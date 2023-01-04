@@ -25,7 +25,7 @@ public class OAuth2Provider {
         switch (registrationId) {
             case "google": return ofGoogle(userNameAttributeName, attributes);
             case "kakao": return ofKakao(userNameAttributeName, attributes);
-            case "apple": return ofApple(userNameAttributeName, attributes);
+            case "naver": return ofNaver(userNameAttributeName, attributes);
             default: return null;
         }
     }
@@ -55,9 +55,15 @@ public class OAuth2Provider {
                 .build();
     }
 
-    // TODO: 2022-12-01 Apple OAuth2 추가
-    private static OAuth2Provider ofApple(String userNameAttributeName, Map<String, Object> attributes) {
+    private static OAuth2Provider ofNaver(String userNameAttributeName, Map<String, Object> attributes) {
+        Map<String, Object> response = (Map<String, Object>) attributes.get("response");
         return OAuth2Provider.builder()
+                .email((String) response.get("email"))
+                .name((String) response.get("name"))
+                .imageUrl((String) response.get("profile"))
+                .provider(Provider.NAVER)
+                .userNameAttributeName(userNameAttributeName)
+                .attributes(attributes)
                 .build();
     }
 }

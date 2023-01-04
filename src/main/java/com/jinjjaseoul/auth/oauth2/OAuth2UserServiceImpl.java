@@ -34,7 +34,7 @@ public class OAuth2UserServiceImpl implements OAuth2UserService<OAuth2UserReques
         DefaultOAuth2UserService delegate = new DefaultOAuth2UserService();
         OAuth2User oAuth2User = delegate.loadUser(userRequest);
 
-        String registrationId = userRequest.getClientRegistration().getRegistrationId(); // google, kakao, apple
+        String registrationId = userRequest.getClientRegistration().getRegistrationId(); // google, kakao, naver
         String userNameAttributeName = userRequest.getClientRegistration().getProviderDetails().getUserInfoEndpoint().getUserNameAttributeName();
         Map<String, Object> attributes = oAuth2User.getAttributes();
         OAuth2Provider oAuth2Provider = OAuth2Provider.of(registrationId, userNameAttributeName, attributes);
