@@ -7,11 +7,13 @@ import com.jinjjaseoul.common.enums.Food;
 import com.jinjjaseoul.common.enums.Place;
 import com.jinjjaseoul.common.enums.Somebody;
 import com.jinjjaseoul.common.enums.Something;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
 public class MapSearchRequestDto {
 
     private Place place;
