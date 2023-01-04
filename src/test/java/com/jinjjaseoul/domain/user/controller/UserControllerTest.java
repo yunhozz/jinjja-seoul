@@ -4,17 +4,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jinjjaseoul.annotation.WithAuthUser;
 import com.jinjjaseoul.auth.jwt.JwtService;
 import com.jinjjaseoul.auth.model.UserDetailsServiceImpl;
+import com.jinjjaseoul.auth.model.UserPrincipal;
 import com.jinjjaseoul.common.enums.Provider;
 import com.jinjjaseoul.common.enums.Role;
 import com.jinjjaseoul.common.utils.RedisUtils;
-import com.jinjjaseoul.domain.icon.model.Icon;
-import com.jinjjaseoul.domain.icon.model.IconRepository;
 import com.jinjjaseoul.domain.user.dto.query.ProfileQueryDto;
 import com.jinjjaseoul.domain.user.dto.query.UserCardQueryDto;
 import com.jinjjaseoul.domain.user.dto.request.UpdateRequestDto;
 import com.jinjjaseoul.domain.user.dto.request.UserRequestDto;
 import com.jinjjaseoul.domain.user.dto.response.UserResponseDto;
-import com.jinjjaseoul.domain.user.model.User;
 import com.jinjjaseoul.domain.user.model.repository.UserRepository;
 import com.jinjjaseoul.domain.user.service.UserService;
 import org.junit.jupiter.api.DisplayName;
@@ -28,6 +26,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -35,10 +35,9 @@ import org.springframework.test.web.servlet.ResultActions;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.willDoNothing;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
@@ -73,9 +72,6 @@ class UserControllerTest {
     UserRepository userRepository;
 
     @MockBean
-    IconRepository iconRepository;
-
-    @MockBean
     JwtService jwtService;
 
     @MockBean
@@ -88,10 +84,7 @@ class UserControllerTest {
     @DisplayName("[GET] /api/users : 열혈 큐레이터 리스트 조회")
     void getDiligentCuratorsTest() throws Exception {
         //given
-        Icon icon = new Icon("test-icon.ico", anyString());
-        given(iconRepository.getReferenceById(1L)).willReturn(icon);
-
-        UserCardQueryDto userCardQueryDto = new UserCardQueryDto(1L, "tester", 0, icon.getImageUrl());
+        UserCardQueryDto userCardQueryDto = new UserCardQueryDto(1L, "tester", 0, "user.ico");
         given(userRepository.findDiligentCurators()).willReturn(List.of(userCardQueryDto));
 
         //when
@@ -120,22 +113,16 @@ class UserControllerTest {
     @DisplayName("[GET] /api/users/me : 자신의 정보 조회")
     void getMyInfoTest() throws Exception {
         //given
-        User user = User.builder()
-                .email("test@gmail.com")
-                .name("tester")
-                .role(Role.USER)
-                .build();
-        given(userService.join(any())).willReturn(user.getId());
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
 
-        Icon icon = new Icon("test.ico", anyString());
-        given(iconRepository.getReferenceById(1L)).willReturn(icon);
-
-        ProfileQueryDto profileQueryDto = new ProfileQueryDto(1L, "tester", "This is test", icon.getImageUrl());
-        given(userRepository.findProfileById(user.getId())).willReturn(profileQueryDto);
+        ProfileQueryDto profileQueryDto = new ProfileQueryDto(1L, "tester", "This is test", "user.ico");
+        given(userRepository.findProfileById(userPrincipal.getId())).willReturn(profileQueryDto);
 
         //when
         ResultActions result = mockMvc.perform(get("/api/users/me")
                 .contentType(MediaType.APPLICATION_JSON)
+                .requestAttr("userPrincipal", userPrincipal)
         );
 
         //then
@@ -160,7 +147,7 @@ class UserControllerTest {
     void getUserInfoTest() throws Exception {
         //given
         UserResponseDto userResponseDto = new UserResponseDto(1L, "test@gmail.com", "123", "tester", "This is test", Role.USER, Provider.LOCAL, LocalDateTime.now(), LocalDateTime.now());
-        given(userService.findUserDtoById(1L)).willReturn(userResponseDto);
+        given(userService.findUserDtoById(anyLong())).willReturn(userResponseDto);
 
         //when
         ResultActions result = mockMvc.perform(RestDocumentationRequestBuilders.get("/api/users/{id}", 1L)
@@ -193,7 +180,7 @@ class UserControllerTest {
     void joinTest() throws Exception {
         //given
         UserRequestDto userRequestDto = new UserRequestDto("test@gmail.com", "123", "tester");
-        given(userService.join(userRequestDto)).willReturn(1L);
+        given(userService.join(userRequestDto)).willReturn(anyLong());
 
         //when
         ResultActions result = mockMvc.perform(post("/api/users/join")
@@ -224,7 +211,11 @@ class UserControllerTest {
     @DisplayName("[PATCH] /api/users/update : 프로필 업데이트")
     void updateProfileTest() throws Exception {
         //given
-        UpdateRequestDto updateRequestDto = new UpdateRequestDto("tester", anyString(), anyLong());
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
+
+        UpdateRequestDto updateRequestDto = new UpdateRequestDto("tester", "This is test", 1L);
+        willDoNothing().given(userService).updateProfile(userPrincipal.getId(), updateRequestDto);
 
         //when
         ResultActions result = mockMvc.perform(patch("/api/users/update")
