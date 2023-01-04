@@ -7,6 +7,7 @@ import com.jinjjaseoul.common.enums.Food;
 import com.jinjjaseoul.common.enums.Place;
 import com.jinjjaseoul.common.enums.Somebody;
 import com.jinjjaseoul.common.enums.Something;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -14,6 +15,7 @@ import java.util.List;
 
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
 public class SearchRequestDto {
 
     private String keyword;
