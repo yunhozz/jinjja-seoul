@@ -86,7 +86,7 @@ public class ThemeMapController {
     }
 
     @Secured("ROLE_ADMIN")
-    @PostMapping("/{id}/condition")
+    @PatchMapping("/{id}/condition")
     public Response updateSearchCondition(@PathVariable("id") Long themeMapId, @RequestBody MapSearchRequestDto mapSearchRequestDto) {
         themeMapService.updateMapSearchTable(themeMapId, mapSearchRequestDto);
         return Response.success(HttpStatus.CREATED, "검색 조건을 업데이트 했습니다.");
