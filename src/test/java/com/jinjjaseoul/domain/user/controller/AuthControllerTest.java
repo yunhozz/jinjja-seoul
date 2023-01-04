@@ -9,10 +9,7 @@ import com.jinjjaseoul.common.dto.TokenResponseDto;
 import com.jinjjaseoul.common.enums.Role;
 import com.jinjjaseoul.common.utils.RedisUtils;
 import com.jinjjaseoul.domain.user.dto.request.LoginRequestDto;
-import com.jinjjaseoul.domain.user.model.User;
-import com.jinjjaseoul.domain.user.model.repository.UserRepository;
 import com.jinjjaseoul.domain.user.service.AuthService;
-import com.jinjjaseoul.domain.user.service.UserService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -65,12 +62,6 @@ class AuthControllerTest {
     AuthService authService;
 
     @MockBean
-    UserService userService;
-
-    @MockBean
-    UserRepository userRepository;
-
-    @MockBean
     JwtService jwtService;
 
     @MockBean
@@ -86,14 +77,6 @@ class AuthControllerTest {
     @DisplayName("[POST] /api/auth/login : 유저 로그인")
     void loginTest() throws Exception {
         //given
-        User user = User.builder()
-                .email("test@gmail.com")
-                .password(encoder.encode("123"))
-                .name("tester")
-                .role(Role.USER)
-                .build();
-        given(userService.join(any())).willReturn(user.getId());
-
         LoginRequestDto loginRequestDto = new LoginRequestDto("test@gmail.com", "123");
         TokenResponseDto tokenResponseDto = new TokenResponseDto("type", "atk", "rtk", 10L);
         given(authService.login(any(), any())).willReturn(tokenResponseDto);
