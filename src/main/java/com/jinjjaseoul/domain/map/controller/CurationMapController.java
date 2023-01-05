@@ -66,7 +66,7 @@ public class CurationMapController {
     }
 
     @Secured("ROLE_ADMIN")
-    @PostMapping("/{id}/condition")
+    @PatchMapping("/{id}/condition")
     public Response updateSearchCondition(@PathVariable("id") Long curationMapId, @RequestBody MapSearchRequestDto mapSearchRequestDto) {
         curationMapService.updateMapSearchTable(curationMapId, mapSearchRequestDto);
         return Response.success(HttpStatus.CREATED, "검색 조건을 업데이트 했습니다.");
