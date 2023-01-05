@@ -103,8 +103,9 @@ include::{snippets}/withdraw_request/curl-request.adoc[]
 include::{snippets}/withdraw_request/http-request.adoc[]
 include::{snippets}/withdraw_request/http-response.adoc[]
 
-== Theme Map
-=== 테마 지도 추천 리스트
+== Map
+=== Theme Map
+==== 테마 지도 추천 리스트
 ResponseBody
 include::{snippets}/get_theme_map_recommend_list/response-fields.adoc[]
 HTTP
@@ -112,7 +113,7 @@ include::{snippets}/get_theme_map_recommend_list/curl-request.adoc[]
 include::{snippets}/get_theme_map_recommend_list/http-request.adoc[]
 include::{snippets}/get_theme_map_recommend_list/http-response.adoc[]
 
-=== 테마 지도 최신 리스트
+==== 테마 지도 최신 리스트
 ResponseBody
 include::{snippets}/get_theme_map_latest_list/response-fields.adoc[]
 HTTP
@@ -120,7 +121,7 @@ include::{snippets}/get_theme_map_latest_list/curl-request.adoc[]
 include::{snippets}/get_theme_map_latest_list/http-request.adoc[]
 include::{snippets}/get_theme_map_latest_list/http-response.adoc[]
 
-=== 테마 지도 인기 리스트
+==== 테마 지도 인기 리스트
 ResponseBody
 include::{snippets}/get_theme_map_popular_list/response-fields.adoc[]
 HTTP
@@ -128,7 +129,7 @@ include::{snippets}/get_theme_map_popular_list/curl-request.adoc[]
 include::{snippets}/get_theme_map_popular_list/http-request.adoc[]
 include::{snippets}/get_theme_map_popular_list/http-response.adoc[]
 
-=== 테마 지도 조회
+==== 테마 지도 조회
 PathParameters
 include::{snippets}/get_theme_location_list/path-parameters.adoc[]
 ResponseBody
@@ -138,7 +139,7 @@ include::{snippets}/get_theme_location_list/curl-request.adoc[]
 include::{snippets}/get_theme_location_list/http-request.adoc[]
 include::{snippets}/get_theme_location_list/http-response.adoc[]
 
-=== 테마 지도 생성
+==== 테마 지도 생성
 RequestBody
 include::{snippets}/create_theme_map/request-fields.adoc[]
 ResponseBody
@@ -148,7 +149,7 @@ include::{snippets}/create_theme_map/curl-request.adoc[]
 include::{snippets}/create_theme_map/http-request.adoc[]
 include::{snippets}/create_theme_map/http-response.adoc[]
 
-=== 테마 장소 추가
+==== 테마 장소 추가
 RequestParameters
 include::{snippets}/update_theme_location/request-parameters.adoc[]
 RequestBody
@@ -160,7 +161,7 @@ include::{snippets}/update_theme_location/curl-request.adoc[]
 include::{snippets}/update_theme_location/http-request.adoc[]
 include::{snippets}/update_theme_location/http-response.adoc[]
 
-=== 테마 지도 검색 조건 업데이트
+==== 테마 지도 검색 조건 업데이트
 PathParameters
 include::{snippets}/update_theme_map_search_condition/path-parameters.adoc[]
 RequestBody
@@ -172,7 +173,7 @@ include::{snippets}/update_theme_map_search_condition/curl-request.adoc[]
 include::{snippets}/update_theme_map_search_condition/http-request.adoc[]
 include::{snippets}/update_theme_map_search_condition/http-response.adoc[]
 
-=== 테마 지도 삭제
+==== 테마 지도 삭제
 PathParameters
 include::{snippets}/delete_theme_map/path-parameters.adoc[]
 ResponseBody
@@ -182,7 +183,7 @@ include::{snippets}/delete_theme_map/curl-request.adoc[]
 include::{snippets}/delete_theme_map/http-request.adoc[]
 include::{snippets}/delete_theme_map/http-response.adoc[]
 
-=== 테마 장소 삭제
+==== 테마 장소 삭제
 PathParameters
 include::{snippets}/delete_theme_location/path-parameters.adoc[]
 ResponseBody
@@ -191,3 +192,100 @@ HTTP
 include::{snippets}/delete_theme_location/curl-request.adoc[]
 include::{snippets}/delete_theme_location/http-request.adoc[]
 include::{snippets}/delete_theme_location/http-response.adoc[]
+
+=== Curation Map
+==== 큐레이션 지도 리스트
+ResponseBody
+include::{snippets}/get_curation_map_list/response-fields.adoc[]
+HTTP
+include::{snippets}/get_curation_map_list/curl-request.adoc[]
+include::{snippets}/get_curation_map_list/http-request.adoc[]
+include::{snippets}/get_curation_map_list/http-response.adoc[]
+
+==== 큐레이션 지도 조회
+PathParameters
+include::{snippets}/get_curation_location_list/path-parameters.adoc[]
+ResponseBody
+include::{snippets}/get_curation_location_list/response-fields.adoc[]
+HTTP
+include::{snippets}/get_curation_location_list/curl-request.adoc[]
+include::{snippets}/get_curation_location_list/http-request.adoc[]
+include::{snippets}/get_curation_location_list/http-response.adoc[]
+
+==== 큐레이션 지도 생성
+RequestBody
+include::{snippets}/create_curation_map/request-fields.adoc[]
+ResponseBody
+include::{snippets}/create_curation_map/response-fields.adoc[]
+HTTP
+include::{snippets}/create_curation_map/curl-request.adoc[]
+include::{snippets}/create_curation_map/http-request.adoc[]
+include::{snippets}/create_curation_map/http-response.adoc[]
+
+==== 큐레이션 장소 추가
+PathParameters
+include::{snippets}/update_curation_location/path-parameters.adoc[]
+RequestBody
+include::{snippets}/update_curation_location/request-fields.adoc[]
+ResponseBody
+include::{snippets}/update_curation_location/response-fields.adoc[]
+HTTP
+include::{snippets}/update_curation_location/curl-request.adoc[]
+include::{snippets}/update_curation_location/http-request.adoc[]
+include::{snippets}/update_curation_location/http-response.adoc[]
+
+==== 큐레이션 지도 검색 조건 업데이트
+PathParameters
+include::{snippets}/update_curation_map_search_condition/path-parameters.adoc[]
+RequestBody
+include::{snippets}/update_curation_map_search_condition/request-fields.adoc[]
+ResponseBody
+include::{snippets}/update_curation_map_search_condition/response-fields.adoc[]
+HTTP
+include::{snippets}/update_curation_map_search_condition/curl-request.adoc[]
+include::{snippets}/update_curation_map_search_condition/http-request.adoc[]
+include::{snippets}/update_curation_map_search_condition/http-response.adoc[]
+
+==== 큐레이션 지도 정보 수정
+PathParameters
+include::{snippets}/update_curation_map_info/path-parameters.adoc[]
+RequestBody
+include::{snippets}/update_curation_map_info/request-fields.adoc[]
+ResponseBody
+include::{snippets}/update_curation_map_info/response-fields.adoc[]
+HTTP
+include::{snippets}/update_curation_map_info/curl-request.adoc[]
+include::{snippets}/update_curation_map_info/http-request.adoc[]
+include::{snippets}/update_curation_map_info/http-response.adoc[]
+
+==== 큐레이션 지도 삭제
+PathParameters
+include::{snippets}/delete_curation_map/path-parameters.adoc[]
+ResponseBody
+include::{snippets}/delete_curation_map/response-fields.adoc[]
+HTTP
+include::{snippets}/delete_curation_map/curl-request.adoc[]
+include::{snippets}/delete_curation_map/http-request.adoc[]
+include::{snippets}/delete_curation_map/http-response.adoc[]
+
+==== 큐레이션 장소 삭제
+PathParameters
+include::{snippets}/delete_curation_location/path-parameters.adoc[]
+ResponseBody
+include::{snippets}/delete_curation_location/response-fields.adoc[]
+HTTP
+include::{snippets}/delete_curation_location/curl-request.adoc[]
+include::{snippets}/delete_curation_location/http-request.adoc[]
+include::{snippets}/delete_curation_location/http-response.adoc[]
+
+=== Map Search
+RequestParameters
+include::{snippets}/search_whole_map/request-parameters.adoc[]
+RequestBody
+include::{snippets}/search_whole_map/request-fields.adoc[]
+ResponseBody
+include::{snippets}/search_whole_map/response-fields.adoc[]
+HTTP
+include::{snippets}/search_whole_map/curl-request.adoc[]
+include::{snippets}/search_whole_map/http-request.adoc[]
+include::{snippets}/search_whole_map/http-response.adoc[]
