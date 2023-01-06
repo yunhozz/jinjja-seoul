@@ -1,11 +1,13 @@
 package com.jinjjaseoul.domain.bookmark.dto;
 
 import com.jinjjaseoul.domain.location.model.entity.Location;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
 public class LocationCardResponseDto {
 
     private Long locationId;
