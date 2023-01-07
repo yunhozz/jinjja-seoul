@@ -1,6 +1,7 @@
 package com.jinjjaseoul.domain.location.dto.response;
 
 import com.jinjjaseoul.domain.location.model.entity.Image;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -8,6 +9,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
 public class ImageResponseDto {
 
     private Long id;

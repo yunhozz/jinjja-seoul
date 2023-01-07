@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -40,7 +41,7 @@ public class ImageController {
 
     // 이미지 업로드
     @PostMapping("/upload")
-    public Response uploadImagesOnLocation(@RequestParam Long locationId, @RequestParam("images") List<MultipartFile> files) {
+    public Response uploadImagesOnLocation(@RequestParam Long locationId, @RequestPart(value = "images", required = false) List<MultipartFile> files) {
         List<Long> imageIds = imageService.uploadImages(files, locationId);
         return Response.success(HttpStatus.CREATED, imageIds);
     }
