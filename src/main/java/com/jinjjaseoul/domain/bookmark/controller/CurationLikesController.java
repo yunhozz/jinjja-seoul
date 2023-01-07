@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class CurationLikesController {
 
-    private BookmarkService bookmarkService;
+    private final BookmarkService bookmarkService;
 
     @PostMapping
     public Response makeLikesOfCurationMap(@AuthenticationPrincipal UserPrincipal userPrincipal, @RequestParam Long curationMapId) {
