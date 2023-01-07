@@ -357,3 +357,34 @@ HTTP
 include::{snippets}/delete_comment/curl-request.adoc[]
 include::{snippets}/delete_comment/http-request.adoc[]
 include::{snippets}/delete_comment/http-response.adoc[]
+
+== Image
+=== 이미지 리스트 조회
+RequestParameters
+include::{snippets}/get_image_list/request-parameters.adoc[]
+ResponseBody
+include::{snippets}/get_image_list/response-fields.adoc[]
+HTTP
+include::{snippets}/get_image_list/curl-request.adoc[]
+include::{snippets}/get_image_list/http-request.adoc[]
+include::{snippets}/get_image_list/http-response.adoc[]
+
+=== 이미지 단건 조회
+PathParameters
+include::{snippets}/get_image/path-parameters.adoc[]
+HTTP
+include::{snippets}/get_image/curl-request.adoc[]
+include::{snippets}/get_image/http-request.adoc[]
+include::{snippets}/get_image/http-response.adoc[]
+
+=== 이미지 업로드
+RequestParts
+include::{snippets}/upload_image/request-parts.adoc[]
+RequestParameters
+include::{snippets}/upload_image/request-parameters.adoc[]
+ResponseBody
+include::{snippets}/upload_image/response-fields.adoc[]
+HTTP
+include::{snippets}/upload_image/curl-request.adoc[]
+include::{snippets}/upload_image/http-request.adoc[]
+include::{snippets}/upload_image/http-response.adoc[]
