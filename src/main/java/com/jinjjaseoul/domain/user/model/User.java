@@ -44,7 +44,7 @@ public class User extends BaseEntity {
     private Role role; // ROLE_ADMIN, ROLE_USER
 
     @Enumerated(EnumType.STRING)
-    private Provider provider; // GOOGLE, KAKAO, APPLE
+    private Provider provider; // GOOGLE, KAKAO, NAVER
 
     private int numOfRecommend; // 테마 지도에서의 장소 추천 개수
 
