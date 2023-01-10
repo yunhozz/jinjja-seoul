@@ -3,6 +3,14 @@ spring:
     active: dev
     include: oauth, redis, file
 
+  mvc:
+    view:
+      prefix: /WEB-INF/jsp/
+      suffix: .jsp
+
+  thymeleaf:
+    enabled: false
+
 ---
 
 spring:

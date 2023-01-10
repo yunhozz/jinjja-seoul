@@ -55,6 +55,13 @@ dependencies {
 	// MultipartFile request 처리
 	implementation 'commons-io:commons-io:2.6'
 	implementation 'commons-fileupload:commons-fileupload:1.4'
+	// jsp, jstl, tomcat
+	implementation 'org.apache.tomcat.embed:tomcat-embed-jasper'
+	implementation 'javax.servlet:jstl'
+	implementation 'org.springframework.boot:spring-boot-starter-tomcat'
+	// webjars(jquery, bootstrap)
+	implementation group: 'org.webjars', name: 'jquery', version: '3.3.1'
+	implementation group: 'org.webjars', name: 'bootstrap', version: '4.3.1'
 
 	compileOnly 'org.projectlombok:lombok'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
