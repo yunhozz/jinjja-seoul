@@ -1,0 +1,63 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>회원가입 - 진짜서울</title>
+    <script async src="${pageContext.request.contextPath}/webjars/jquery/3.3.1/jquery.min.js"></script>
+</head>
+
+<body>
+<div class="wrapper">
+    <div class="title"><h1 style="font-size: 21px;">회원가입</h1></div>
+    <div class="email">
+        <input id="email" type="text" placeholder="이메일을 입력해 주세요.">
+        <div id="emailError" class="error"></div>
+    </div>
+    <div class="password">
+        <input id="password" type="password" placeholder="비밀번호를 입력해 주세요.">
+        <div id="passwordError" class="error"></div>
+    </div>
+    <div class="name">
+        <input id="name"  type="text" placeholder="이름을 입력해 주세요.">
+        <div id="nameError" class="error"></div>
+    </div>
+    <div class="line">
+        <hr>
+    </div>
+    <div class="signUp">
+        <button id="btn-save" onclick="signUp()">가입하기</button>
+    </div>
+</div>
+</body>
+
+<script type="text/javascript">
+    function signUp() {
+        let data = {
+            email: $("#email").val(),
+            password: $("#password").val(),
+            name: $("#name").val()
+        };
+
+        $.ajax({
+            type: "POST",
+            url: "/api/users/join",
+            async: true,
+            contentType: "application/json; charset=utf-8",
+            dataType: "text",
+            data: JSON.stringify(data),
+            success: function (response) {
+                response = JSON.parse(response);
+                let success = response.success;
+
+                if (success) {
+                    alert("회원가입이 완료되었습니다.")
+                    location.href = "/";
+                } else {
+                    alert("회원가입에 실패하였습니다.");
+                    location.href = "redirect:/sign-up";
+                }
+            }
+        });
+    }
+</script>
