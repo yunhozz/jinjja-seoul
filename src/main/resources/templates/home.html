@@ -19,7 +19,8 @@
     <div>
         <h3>열혈 큐레이터</h3>
         <h5>최근 1주일간 활발히 활동한 큐레이터를 소개합니다.</h5>
-        <div class="diligent-curators"></div>
+        <div id="diligent-curators"></div>
+        <button type="button" onclick="getDiligentCurators()">불러오기</button>
     </div>
     <div>
         <h3>요즘 뜨는 장소들</h3>
@@ -38,11 +39,7 @@
     <div>
         <h3>최근 만들어진 테마지도</h3>
         <h5>취향 가득한 큐레이터를 기다리고 있는 테마들입니다.</h5>
-        <table>
-            <script>
-                getLatestThemeMapList();
-            </script>
-        </table>
+        <table></table>
     </div>
     <div>
         <h3>인기있는 테마지도</h3>
@@ -67,16 +64,15 @@
         $.ajax({
             type: "POST",
             url: "/api/maps/search",
-            async: true,
             contentType: "application/json; charset=UTF-8",
-            dataType: "text",
+            dataType: "json",
             data: JSON.stringify(data),
-            success: function (response) {
-                let json = JSON.parse(response);
+            success: function (json) {
                 let success = json.success;
+                let data = json.result.data.content;
 
                 if (success) {
-                    alert(JSON.stringify(json));
+                    alert(JSON.stringify(data));
                     location.href = "/map-finder";
 
                 } else {
@@ -87,43 +83,57 @@
         });
     }
 
-    $(function () {
+    function getDiligentCurators() {
+        let $diligentCurators = $("#diligent-curators");
+
         $.ajax({
             type: "GET",
             url: "/api/users",
-            async: true,
-            contentType: "application/json; charset=UTF-8",
             dataType: "json",
             success: function (json) {
-                console.log(json);
                 let success = json.success;
+                let data = json.result.data;
 
                 if (success) {
-                    let str = '<table><tr>';
-
-                    $(json).each(function (i) {
-                        str += '<td>' + json[i].id + '</td>' +
-                            '<td>' + json[i].name + '</td>' +
-                            '<td>' + json[i].numOfRecommend + '</td>' +
-                            '<td>' + json[i].imageUrl + '</td>';
-                        str += '</tr></table>';
-                    });
-
-                    // $.each(json, function (i) {
-                    //     str += `<td>` + json[i].id + `</td>` +
-                    //         `<td>` + json[i].name + `</td>` +
-                    //         `<td>` + json[i].numOfRecommend + `</td>` +
-                    //         `<td>` + json[i].imageUrl + `</td>`;
-                    //     str += `</tr></table>`;
-                    // });
-
-                    $('.diligent-curators').html(str);
+                    $.each(data, function (index, item) {
+                        $diligentCurators.append(item.id + " ")
+                            .append(item.name + " ")
+                            .append(item.numOfRecommend + " ")
+                            .append(item.imageUrl + "<br>");
+                    })
 
                 } else {
-                    alert("조회에 실패하였습니다.");
+                    console.log("조회에 실패하였습니다.");
                     location.href = "redirect:/";
                 }
             }
         })
-    })
+    }
+
+    // $(function () {
+    //     let $diligentCurators = $("#diligent-curators");
+    //
+    //     $.ajax({
+    //         type: "GET",
+    //         url: "/api/users",
+    //         dataType: "json",
+    //         success: function (json) {
+    //             let success = json.success;
+    //             let data = json.result.data;
+    //
+    //             if (success) {
+    //                 $.each(data, function (index, item) {
+    //                     $diligentCurators.append(item.id + " ")
+    //                         .append(item.name + " ")
+    //                         .append(item.numOfRecommend + " ")
+    //                         .append(item.imageUrl + "<br>");
+    //                 })
+    //
+    //             } else {
+    //                 console.log("조회에 실패하였습니다.");
+    //                 location.href = "redirect:/";
+    //             }
+    //         }
+    //     })
+    // })
 </script>
