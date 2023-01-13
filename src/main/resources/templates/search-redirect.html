@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title>지도 찾기 - 진짜서울</title>
+    <script src="/webjars/jquery/3.3.1/jquery.min.js"></script>
+</head>
+
+<body>
+<form id="form" name="form" method="post" th:action="@{/map-finder}">
+    <input type="hidden" name="keyword" th:value="${keyword}">
+</form>
+</body>
+
+<script>
+    $(function () {
+        $("#form").submit();
+    });
+</script>
