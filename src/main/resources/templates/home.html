@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <title>진짜서울</title>
-    <script async src="/webjars/jquery/3.3.1/jquery.min.js"></script>
+    <script src="/webjars/jquery/3.3.1/jquery.min.js"></script>
 </head>
 
 <body>
@@ -13,79 +13,45 @@
 </header>
 <section>
     <div>
-        <input type="text" name="keyword" placeholder="지도를 검색해보세요">
-        <button type="submit" onclick="searchMapsByKeyword()">검색</button>
+        <form method="get" action="/map-finder">
+            <input type="text" name="keyword" placeholder="지도를 검색해보세요">
+            <button type="submit">검색</button>
+        </form>
     </div>
     <div>
         <h3>열혈 큐레이터</h3>
         <h5>최근 1주일간 활발히 활동한 큐레이터를 소개합니다.</h5>
         <div id="diligent-curators"></div>
-        <button type="button" onclick="getDiligentCurators()">불러오기</button>
     </div>
     <div>
         <h3>요즘 뜨는 장소들</h3>
         <h5>진짜서울에서 사랑받는 장소들을 소개합니다.</h5>
+        <div id="famous-location"></div>
     </div>
     <div>
         <h3>큐레이션 지도</h3>
         <h5>큐레이션 지도는 마음껏 장소를 추천할 수 있는 지도입니다. (장소 추천 횟수 제한이 없습니다)</h5>
-        <table></table>
+        <div id="curation-maps"></div>
     </div>
     <div>
         <h3>추천 테마지도</h3>
         <h5>특징이 명확하고 개성있는 테마들을 추천합니다.</h5>
-        <table></table>
+        <div id="recommend-themes"></div>
     </div>
     <div>
         <h3>최근 만들어진 테마지도</h3>
         <h5>취향 가득한 큐레이터를 기다리고 있는 테마들입니다.</h5>
-        <table></table>
+        <div id="latest-themes"></div>
     </div>
     <div>
         <h3>인기있는 테마지도</h3>
-        <table></table>
+        <div id="popular-themes"></div>
     </div>
 </section>
 </body>
 
 <script>
-    function searchMapsByKeyword() {
-        let data = {
-            keyword: $("input[name=keyword]").val(),
-            place: null,
-            somebody: null,
-            something: null,
-            characteristics: null,
-            food: null,
-            beverage: null,
-            categories: null
-        };
-
-        $.ajax({
-            type: "POST",
-            url: "/api/maps/search",
-            contentType: "application/json; charset=UTF-8",
-            dataType: "json",
-            data: JSON.stringify(data),
-            success: function (json) {
-                let success = json.success;
-                let data = json.result.data.content;
-
-                if (success) {
-                    alert(JSON.stringify(data));
-                    location.href = "/map-finder";
-
-                } else {
-                    alert("조회에 실패하였습니다.");
-                    location.href = "redirect:/";
-                }
-            }
-        });
-    }
-
-    function getDiligentCurators() {
-        let $diligentCurators = $("#diligent-curators");
-
+    $(function () {
         $.ajax({
             type: "GET",
             url: "/api/users",
@@ -93,14 +59,18 @@
             success: function (json) {
                 let success = json.success;
                 let data = json.result.data;
+                let str = "<table>";
 
                 if (success) {
                     $.each(data, function (index, item) {
-                        $diligentCurators.append(item.id + " ")
-                            .append(item.name + " ")
-                            .append(item.numOfRecommend + " ")
-                            .append(item.imageUrl + "<br>");
+                        str += "<tr><td>" + item.id + "</td>" +
+                            "<td>" + item.name + "</td>" +
+                            "<td>" + item.numOfRecommend + "</td>" +
+                            "<td>" + item.imageUrl + "</td></tr>";
                     })
+
+                    str += "</table>";
+                    $("#diligent-curators").append(str);
 
                 } else {
                     console.log("조회에 실패하였습니다.");
@@ -108,32 +78,115 @@
                 }
             }
         })
-    }
 
-    // $(function () {
-    //     let $diligentCurators = $("#diligent-curators");
-    //
-    //     $.ajax({
-    //         type: "GET",
-    //         url: "/api/users",
-    //         dataType: "json",
-    //         success: function (json) {
-    //             let success = json.success;
-    //             let data = json.result.data;
-    //
-    //             if (success) {
-    //                 $.each(data, function (index, item) {
-    //                     $diligentCurators.append(item.id + " ")
-    //                         .append(item.name + " ")
-    //                         .append(item.numOfRecommend + " ")
-    //                         .append(item.imageUrl + "<br>");
-    //                 })
-    //
-    //             } else {
-    //                 console.log("조회에 실패하였습니다.");
-    //                 location.href = "redirect:/";
-    //             }
-    //         }
-    //     })
-    // })
+        $.ajax({
+            type: "GET",
+            url: "/api/themes/recommend",
+            dataType: "json",
+            success: function (json) {
+                let success = json.success;
+                let data = json.result.data;
+                let str = "<table>";
+
+                if (success) {
+                    $.each(data, function (index, item) {
+                        str += "<tr><td>" + item.id + "</td>" +
+                            "<td>" + item.name + "</td>" +
+                            "<td>" + item.imageUrl + "</td>" +
+                            "<td>" + item.curatorNum + "</td></tr>";
+                    })
+
+                    str += "</table>";
+                    $("#recommend-themes").append(str);
+
+                } else {
+                    console.log("조회에 실패하였습니다.");
+                    location.href = "redirect:/";
+                }
+            }
+        })
+
+        $.ajax({
+            type: "GET",
+            url: "/api/themes/latest",
+            dataType: "json",
+            success: function (json) {
+                let success = json.success;
+                let data = json.result.data;
+                let str = "<table>";
+
+                if (success) {
+                    $.each(data, function (index, item) {
+                        str += "<tr><td>" + item.id + "</td>" +
+                            "<td>" + item.name + "</td>" +
+                            "<td>" + item.imageUrl + "</td>" +
+                            "<td>" + item.curatorNum + "</td></tr>";
+                    })
+
+                    str += "</table>";
+                    $("#latest-themes").append(str);
+
+                } else {
+                    console.log("조회에 실패하였습니다.");
+                    location.href = "redirect:/";
+                }
+            }
+        })
+
+        $.ajax({
+            type: "GET",
+            url: "/api/themes/popular",
+            dataType: "json",
+            success: function (json) {
+                let success = json.success;
+                let data = json.result.data;
+                let str = "<table>";
+
+                if (success) {
+                    $.each(data, function (index, item) {
+                        str += "<tr><td>" + item.id + "</td>" +
+                            "<td>" + item.name + "</td>" +
+                            "<td>" + item.imageUrl + "</td>" +
+                            "<td>" + item.curatorNum + "</td></tr>";
+                    })
+
+                    str += "</table>";
+                    $("#popular-themes").append(str);
+
+                } else {
+                    console.log("조회에 실패하였습니다.");
+                    location.href = "redirect:/";
+                }
+            }
+        })
+
+        $.ajax({
+            type: "GET",
+            url: "/api/curations",
+            dataType: "json",
+            success: function (json) {
+                let success = json.success;
+                let data = json.result.data;
+                let str = "<table>";
+
+                if (success) {
+                    $.each(data, function (index, item) {
+                        str += "<tr><td>" + item.id + "</td>" +
+                            "<td>" + item.name + "</td>" +
+                            "<td>" + item.curationMapImageUrl + "</td>" +
+                            "<td>" + item.userName + "</td>" +
+                            "<td>" + item.userImageUrl + "</td>" +
+                            "<td>" + item.locationNum + "</td></tr>";
+                    })
+
+                    str += "</table>";
+                    $("#curation-maps").append(str);
+
+                } else {
+                    console.log("조회에 실패하였습니다.");
+                    location.href = "redirect:/";
+                }
+            }
+        })
+    })
 </script>
