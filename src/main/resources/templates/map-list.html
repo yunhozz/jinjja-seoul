@@ -101,7 +101,7 @@
                 let data = json.result.data.content;
 
                 if (success) {
-                    let table = createTable(data);
+                    let table = createTable(data, "전체");
                     $("#map-table").append(table);
 
                 } else {
@@ -137,7 +137,7 @@
                 let data = json.result.data.content;
 
                 if (success) {
-                    let table = createTable(data);
+                    let table = createTable(data, mapKind);
                     $("#map-table").append(table);
 
                 } else {
@@ -173,7 +173,7 @@
                 let data = json.result.data.content;
 
                 if (success) {
-                    let table = createTable(data);
+                    let table = createTable(data, mapKind);
                     $("#map-table").append(table);
 
                 } else {
@@ -184,18 +184,46 @@
         });
     }
 
-    function createTable(data) {
+    function createTable(data, mapKind) {
         $("#map-table").empty();
         let table = "<table>";
 
-        $.each(data, function (index, item) {
-            table += "<tr><td>" + item.id + "</td>" +
-                "<td>" + item.name + "</td>" +
-                "<td>" + item.mapIconImgUrl + "</td>" +
-                "<td>" + item.curatorNum + "</td>" +
-                "<td>" + item.userInfo + "</td>" +
-                "<td>" + item.locationNum + "</td></tr>";
-        });
+        switch (mapKind) {
+            case "전체" : {
+                $.each(data, function (index, item) {
+                    table += "<tr><td>" + item.id + "</td>" +
+                        "<td>" + item.name + "</td>" +
+                        "<td>" + item.mapIconImgUrl + "</td>" +
+                        "<td>" + item.curatorNum + "</td>" +
+                        "<td>" + item.userInfo + "</td>" +
+                        "<td>" + item.locationNum + "</td></tr>";
+                });
+
+                break;
+            }
+
+            case "테마지도" : {
+                $.each(data, function (index, item) {
+                    table += "<tr><td>" + item.id + "</td>" +
+                        "<td>" + item.name + "</td>" +
+                        "<td>" + item.imageUrl + "</td>" +
+                        "<td>" + item.curatorNum + "</td></tr>";
+                });
+
+                break;
+            }
+
+            case "큐레이션지도" : {
+                $.each(data, function (index, item) {
+                    table += "<tr><td>" + item.id + "</td>" +
+                        "<td>" + item.name + "</td>" +
+                        "<td>" + item.curationMapImageUrl + "</td>" +
+                        "<td>" + item.userName + "</td>" +
+                        "<td>" + item.userImageUrl + "</td>" +
+                        "<td>" + item.locationNum + "</td></tr>";
+                });
+            }
+        }
 
         table += "</table>";
         return table;
