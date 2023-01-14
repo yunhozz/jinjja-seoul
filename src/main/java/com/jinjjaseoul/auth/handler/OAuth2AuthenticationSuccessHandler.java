@@ -2,6 +2,7 @@ package com.jinjjaseoul.auth.handler;
 
 import com.jinjjaseoul.auth.jwt.JwtService;
 import com.jinjjaseoul.auth.model.UserPrincipal;
+import com.jinjjaseoul.auth.oauth2.AppProperties;
 import com.jinjjaseoul.common.dto.TokenResponseDto;
 import com.jinjjaseoul.common.utils.CookieUtils;
 import com.jinjjaseoul.common.utils.RedisUtils;
@@ -10,13 +11,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
+import org.springframework.web.util.UriComponentsBuilder;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.net.URI;
 import java.time.Duration;
+import java.util.Optional;
 
 import static com.jinjjaseoul.auth.handler.OAuth2AuthorizationRequestCookieRepository.REDIRECT_URI_PARAM_COOKIE_NAME;
 
@@ -27,23 +30,28 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
     private final JwtService jwtService;
     private final RedisUtils redisUtils;
+    private final AppProperties appProperties;
     private final OAuth2AuthorizationRequestCookieRepository oAuth2AuthorizationRequestCookieRepository;
 
     @Override
-    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
+    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
+        Optional<String> redirectUri = CookieUtils.getCookie(request, REDIRECT_URI_PARAM_COOKIE_NAME)
+                .map(Cookie::getValue);
+
+        if (redirectUri.isPresent() && isAuthorizedRedirectUri(redirectUri.get())) {
+            throw new IllegalArgumentException("Sorry! We've got an Unauthorized Redirect URI and can't proceed with the authentication");
+        }
+
+        String targetUrl = redirectUri.orElse(getDefaultTargetUrl());
         UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
         TokenResponseDto tokenResponseDto = jwtService.createTokenDto(userPrincipal.getUsername(), userPrincipal.getRole());
 
-        String redirectUri = CookieUtils.getCookie(request, REDIRECT_URI_PARAM_COOKIE_NAME)
-                .map(Cookie::getValue)
-                .orElse(getDefaultTargetUrl());
-
-//        String targetUri = UriComponentsBuilder.fromUriString(redirectUri)
-//                .queryParam("token", tokenResponseDto.getAccessToken())
-//                .build().toString();
+        String targetUri = UriComponentsBuilder.fromUriString(targetUrl)
+                .queryParam("token", tokenResponseDto.getAccessToken())
+                .build().toString();
 
         if (response.isCommitted()) {
-            logger.debug("Response has already been committed. Unable to redirect to " + redirectUri);
+            logger.debug("Response has already been committed. Unable to redirect to " + targetUri);
             return;
         }
 
@@ -51,7 +59,17 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         saveRefreshTokenOnRedis(userPrincipal, tokenResponseDto);
 
         clearAuthenticationAttributes(request, response);
-        getRedirectStrategy().sendRedirect(request, response, redirectUri);
+        getRedirectStrategy().sendRedirect(request, response, targetUri);
+    }
+
+    private boolean isAuthorizedRedirectUri(String uri) {
+        URI clientRedirectUri = URI.create(uri);
+
+        return appProperties.getOAuth2().getAuthorizedRedirectUris().stream()
+                .anyMatch(authorizedRedirectUri -> {
+                    URI authorizedURI = URI.create(authorizedRedirectUri);
+                    return authorizedURI.getHost().equalsIgnoreCase(clientRedirectUri.getHost()) && authorizedURI.getPort() == clientRedirectUri.getPort();
+                });
     }
 
     private void saveAccessTokenOnResponse(HttpServletResponse response, TokenResponseDto tokenResponseDto) {
