@@ -559,11 +559,11 @@ public class MapCustomRepositoryImpl implements MapCustomRepository {
     }
 
     private BooleanExpression themeMapCategoriesEq(List<Category> categories) {
-        return categories != null ? themeMap.categories.any().in(categories) : null;
+        return !categories.isEmpty() ? themeMap.categories.any().in(categories) : null;
     }
 
     private BooleanExpression curationMapCategoriesEq(List<Category> categories) {
-        return categories != null ? curationMap.dtype.eq("CM").and(curationMap.mapSearch.category.in(categories)) : null;
+        return !categories.isEmpty() ? curationMap.dtype.eq("CM").and(curationMap.mapSearch.category.in(categories)) : null;
     }
 
     private BooleanBuilder keywordEqAccordingToType(String keyword) {
