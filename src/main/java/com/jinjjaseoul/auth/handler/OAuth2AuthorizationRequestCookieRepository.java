@@ -12,6 +12,12 @@ import javax.servlet.http.HttpServletResponse;
 @Component
 public class OAuth2AuthorizationRequestCookieRepository implements AuthorizationRequestRepository<OAuth2AuthorizationRequest> {
 
+    /*
+     * oauth2_auth_request : 해당 Authorization request 의 고유 아이디를 담는다.
+     * redirect_uri : 해당 Authorization request 시 파라미터로 넘어온 redirect_uri 를 담는다. 이 쿠키는 나중에 application.yml 의 authorizedRedirectUri 와 일치하는지 확인시 사용된다.
+     * ex) http://localhost:8080/oauth2/authorize/google?redirect_uri=http://localhost:3000/oauth2/redirect
+     */
+
     public static final String OAUTH2_AUTHORIZATION_REQUEST_COOKIE_NAME = "oauth2_auth_request";
     public static final String REDIRECT_URI_PARAM_COOKIE_NAME = "redirect_uri";
     private static final int COOKIE_MAX_AGE = 180;
