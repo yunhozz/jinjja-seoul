@@ -1,6 +1,7 @@
 package com.jinjjaseoul.auth.jwt;
 
 import com.jinjjaseoul.auth.model.UserDetailsServiceImpl;
+import com.jinjjaseoul.auth.oauth2.AppProperties;
 import com.jinjjaseoul.common.dto.TokenResponseDto;
 import com.jinjjaseoul.common.enums.Role;
 import io.jsonwebtoken.Claims;
@@ -13,7 +14,6 @@ import io.jsonwebtoken.UnsupportedJwtException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -23,31 +23,25 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Date;
 
+import static com.jinjjaseoul.auth.oauth2.AppProperties.Jwt;
+
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class JwtService implements InitializingBean {
 
     private final UserDetailsServiceImpl userDetailsService;
+    private final AppProperties appProperties;
 
-    @Value("${jinjja-seoul.jwt.secret}")
     private String secretKey;
-
-    @Value("${jinjja-seoul.jwt.grantType}")
-    private String grantType;
-
-    @Value("${jinjja-seoul.jwt.accessTime}")
-    private Long accessTokenValidMilliSecond;
-
-    @Value("${jinjja-seoul.jwt.refreshTime}")
-    private Long refreshTokenValidMilliSecond;
 
     public static final String ACCESS_TOKEN_TYPE = "atk";
     public static final String REFRESH_TOKEN_TYPE = "rtk";
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes(StandardCharsets.UTF_8));
+        String secret = appProperties.getJwt().getSecret();
+        secretKey = Base64.getEncoder().encodeToString(secret.getBytes(StandardCharsets.UTF_8));
     }
 
     public TokenResponseDto createTokenDto(String email, Role role) {
@@ -55,14 +49,15 @@ public class JwtService implements InitializingBean {
         claims.put("role", role.getValue());
         Date now = new Date();
 
-        String accessToken = createToken(claims, ACCESS_TOKEN_TYPE, now, accessTokenValidMilliSecond);
-        String refreshToken = createToken(claims, REFRESH_TOKEN_TYPE, now, refreshTokenValidMilliSecond);
+        Jwt jwt = appProperties.getJwt();
+        String accessToken = createToken(claims, ACCESS_TOKEN_TYPE, now, jwt.getAccessTime());
+        String refreshToken = createToken(claims, REFRESH_TOKEN_TYPE, now, jwt.getRefreshTime());
 
         return TokenResponseDto.builder()
-                .grantType(grantType)
+                .grantType(jwt.getGrantType())
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
-                .refreshTokenValidTime(refreshTokenValidMilliSecond)
+                .refreshTokenValidTime(jwt.getRefreshTime())
                 .build();
     }
 
