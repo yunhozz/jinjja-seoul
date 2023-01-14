@@ -1,4 +1,4 @@
-= API Document
+= Jinjja-Seoul API Document
 :doctype: book
 :icons: font
 :source-highlighter: highlightjs
