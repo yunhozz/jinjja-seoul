@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title>지도 찾기 - 진짜서울</title>
+    <script src="/webjars/jquery/3.3.1/jquery.min.js"></script>
+</head>
+
+<body>
+<header>
+    <a th:href="@{/map-finder}">지도찾기</a>
+    <a th:href="@{/login-page}">로그인</a>
+</header>
+<section>
+    <h2>지도 찾기</h2>
+    <div id="keyword-search">
+        <p>키워드 검색</p>
+        <input id="keyword-1" type="text" th:value="${keyword}" placeholder="지도를 검색해보세요">
+        <select id="keyword-map-kind">
+            <option value="전체">전체</option>
+            <option value="테마지도">테마지도</option>
+            <option value="큐레이션지도">큐레이션지도</option>
+        </select>
+        <button type="submit" onclick="searchMapsByKeyword()">검색</button>
+    </div>
+    <hr>
+
+    <div id="detail-search">
+        <p>상세 검색</p>
+        <input id="keyword-2" type="text" placeholder="지도를 검색해보세요">
+        <select id="detail-map-kind">
+            <option value="전체">전체</option>
+            <option value="테마지도">테마지도</option>
+            <option value="큐레이션지도">큐레이션지도</option>
+        </select>
+        <br><br>
+
+        <select id="place">
+            <option value="">===장소===</option>
+            <option value="ULJIRO">을지로/충무로</option>
+        </select><br>
+
+        <select id="somebody">
+            <option value="">===누구와===</option>
+        </select><br>
+
+        <select id="something">
+            <option value="">===무엇을===</option>
+        </select><br>
+
+        <select id="characteristics">
+            <option value="">===분위기/특징===</option>
+        </select><br>
+
+        <select id="food">
+            <option value="">===음식===</option>
+        </select><br>
+
+        <select id="beverage">
+            <option value="">===술/음료===</option>
+        </select><br>
+
+        <div id="categories">
+            <span>식당</span><input type="checkbox" value="FOOD">
+            <span>카페</span><input type="checkbox" value="CAFE">
+        </div>
+        <br><br>
+
+        <button type="submit" onclick="searchMapsByDetails()">검색</button>
+    </div>
+    <hr>
+
+    <div id="map-table"></div>
+</section>
+</body>
+
+<script>
+    $(function () {
+        let $keyword = $("#keyword-1");
+        let val = $keyword != null ? $keyword.val() : null;
+
+        let searchRequestDto = {
+            keyword: val,
+            place: null,
+            somebody: null,
+            something: null,
+            characteristics: null,
+            food: null,
+            beverage: null,
+            categories: [],
+        };
+
+        $.ajax({
+            type: "POST",
+            url: "/api/maps/search",
+            contentType: "application/json; charset=UTF-8",
+            dataType: "json",
+            data: JSON.stringify(searchRequestDto),
+            success: function (json) {
+                let success = json.success;
+                let data = json.result.data.content;
+
+                if (success) {
+                    let table = createTable(data);
+                    $("#map-table").append(table);
+
+                } else {
+                    alert("검색 조건이 잘못되었습니다.");
+                    location.href = "redirect:/map-finder";
+                }
+            }
+        });
+    })
+
+    function searchMapsByKeyword() {
+        let mapKind = $("#keyword-map-kind option:selected").val();
+
+        let searchRequestDto = {
+            keyword: $("#keyword-1").val(),
+            place: null,
+            somebody: null,
+            something: null,
+            characteristics: null,
+            food: null,
+            beverage: null,
+            categories: [],
+        };
+
+        $.ajax({
+            type: "POST",
+            url: "/api/maps/search?mapKind=" + mapKind,
+            contentType: "application/json; charset=UTF-8",
+            dataType: "json",
+            data: JSON.stringify(searchRequestDto),
+            success: function (json) {
+                let success = json.success;
+                let data = json.result.data.content;
+
+                if (success) {
+                    let table = createTable(data);
+                    $("#map-table").append(table);
+
+                } else {
+                    alert("검색 조건이 잘못되었습니다.");
+                    location.href = "redirect:/map-finder";
+                }
+            }
+        });
+    }
+
+    function searchMapsByDetails() {
+        let mapKind = $("#detail-map-kind option:selected").val();
+
+        let searchRequestDto = {
+            keyword: $("#keyword-2").val(),
+            place: $("#place option:selected").val(),
+            somebody: $("#somebody option:selected").val(),
+            something: $("#something option:selected").val(),
+            characteristics: $("#characteristics option:selected").val(),
+            food: $("#food option:selected").val(),
+            beverage: $("#beverage option:selected").val(),
+            categories: [],
+        };
+
+        $.ajax({
+            type: "POST",
+            url: "/api/maps/search?mapKind=" + mapKind,
+            contentType: "application/json; charset=UTF-8",
+            dataType: "json",
+            data: JSON.stringify(searchRequestDto),
+            success: function (json) {
+                let success = json.success;
+                let data = json.result.data.content;
+
+                if (success) {
+                    let table = createTable(data);
+                    $("#map-table").append(table);
+
+                } else {
+                    alert("검색 조건이 잘못되었습니다.");
+                    location.href = "redirect:/map-finder";
+                }
+            }
+        });
+    }
+
+    function createTable(data) {
+        $("#map-table").empty();
+        let table = "<table>";
+
+        $.each(data, function (index, item) {
+            table += "<tr><td>" + item.id + "</td>" +
+                "<td>" + item.name + "</td>" +
+                "<td>" + item.mapIconImgUrl + "</td>" +
+                "<td>" + item.curatorNum + "</td>" +
+                "<td>" + item.userInfo + "</td>" +
+                "<td>" + item.locationNum + "</td></tr>";
+        });
+
+        table += "</table>";
+        return table;
+    }
+</script>
