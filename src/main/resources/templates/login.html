@@ -3,27 +3,20 @@
 <head>
     <meta charset="utf-8">
     <title>로그인 - 진짜서울</title>
-    <script src="/webjars/jquery/3.6.2/jquery.min.js"></script>
+<!--    <script src="/webjars/jquery/3.6.2/jquery.min.js"></script>-->
 </head>
 
 <body>
-<div class="wrapper">
-    <div class="title"><h1 style="font-size: 21px;">로그인</h1></div>
-    <div class="email">
-        <input id="email" type="text" placeholder="이메일을 입력해 주세요.">
-        <div id="emailError" class="error"></div>
-    </div>
-    <div class="password">
-        <input id="password" type="password" placeholder="비밀번호를 입력해 주세요.">
-        <div id="passwordError" class="error"></div>
-    </div>
-    <div class="line">
-        <hr>
-    </div>
-    <div class="signUp">
-        <button id="btn-login" onclick="signIn()">로그인</button>
-    </div>
-</div>
+<div class="title"><h1 style="font-size: 21px;">로그인</h1></div>
+<form method="post" action="/sign-in-progress">
+    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}">
+    <input type="text" id="email" name="email" class="form-control" placeholder="이메일을 입력해 주세요.">
+    <div id="emailError" class="error"></div>
+    <input type="password" id="password" name="password" class="form-control" placeholder="비밀번호를 입력해 주세요.">
+    <div id="passwordError" class="error"></div>
+    <hr>
+    <button id="btn-login" type="submit">로그인</button>
+</form>
 </body>
 
 <script>
@@ -41,11 +34,12 @@
             dataType: "json",
             data: JSON.stringify(data),
             success: function (json) {
-                let success = json.success;
+                let data = json.result.data;
 
-                if (success) {
+                if (json['success']) {
                     alert("환영합니다!");
-                    location.href = "/";
+                    // localStorage.setItem("token", data.grantType + " " + data.accessToken);
+                    window.location.href = "/";
 
                 } else {
                     alert("아이디 또는 비밀번호가 잘못되었습니다.");
