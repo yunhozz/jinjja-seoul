@@ -18,7 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 public class SearchViewController {
 
     @GetMapping
-    public String redirectPageWithKeyword(@RequestParam String keyword, Model model) {
+    public String redirectPageWithKeyword(@RequestParam(required = false) String keyword, Model model) {
         model.addAttribute("keyword", keyword);
         return "search-redirect";
     }
