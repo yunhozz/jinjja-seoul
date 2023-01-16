@@ -50,7 +50,7 @@ public class SecurityConfig {
                 .and()
 
                 .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED) // JWT
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // JWT
 
                 .and()
 
