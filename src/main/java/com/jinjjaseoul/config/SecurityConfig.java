@@ -1,5 +1,6 @@
 package com.jinjjaseoul.config;
 
+import com.jinjjaseoul.auth.handler.LoginSuccessHandler;
 import com.jinjjaseoul.auth.handler.OAuth2AuthenticationFailureHandler;
 import com.jinjjaseoul.auth.handler.OAuth2AuthenticationSuccessHandler;
 import com.jinjjaseoul.auth.handler.OAuth2AuthorizationRequestCookieRepository;
@@ -24,6 +25,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class SecurityConfig {
 
+    private final LoginSuccessHandler loginSuccessHandler;
     private final JwtFilter jwtFilter;
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
@@ -56,7 +58,11 @@ public class SecurityConfig {
 
                 .formLogin()
                 .loginPage("/sign-in")
-                .defaultSuccessUrl("/")
+                .loginProcessingUrl("/sign-in-progress")
+                .usernameParameter("email")
+                .passwordParameter("password")
+                .successHandler(loginSuccessHandler)
+                .permitAll()
 
                 .and()
 
