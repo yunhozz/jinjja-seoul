@@ -50,7 +50,18 @@ public class SecurityConfig {
                 .and()
 
                 .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED) // JWT
+
+                .and()
+
+                .formLogin()
+                .loginPage("/sign-in")
+                .defaultSuccessUrl("/")
+
+                .and()
+
+                .logout()
+                .logoutSuccessUrl("/")
 
                 .and()
 
