@@ -1,10 +1,7 @@
 package com.jinjjaseoul.config;
 
 import io.jsonwebtoken.Header;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.web.DefaultRedirectStrategy;
-import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -31,15 +28,5 @@ public class WebMvcConfig implements WebMvcConfigurer {
         registry.addViewController("/login-page").setViewName("login-page");
         registry.addViewController("/sign-up").setViewName("join");
         registry.addViewController("/sign-in").setViewName("login");
-    }
-
-    @Bean
-    public HttpSessionRequestCache httpSessionRequestCache() {
-        return new HttpSessionRequestCache();
-    }
-
-    @Bean
-    public DefaultRedirectStrategy defaultRedirectStrategy() {
-        return new DefaultRedirectStrategy();
     }
 }

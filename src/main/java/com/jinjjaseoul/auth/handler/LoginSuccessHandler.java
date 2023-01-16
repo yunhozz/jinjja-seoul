@@ -1,13 +1,12 @@
 package com.jinjjaseoul.auth.handler;
 
 import com.jinjjaseoul.auth.jwt.JwtService;
-import com.jinjjaseoul.common.dto.TokenResponseDto;
 import com.jinjjaseoul.auth.model.UserPrincipal;
+import com.jinjjaseoul.common.dto.TokenResponseDto;
 import com.jinjjaseoul.common.utils.RedisUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.web.DefaultRedirectStrategy;
 import org.springframework.security.web.WebAttributes;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
@@ -28,15 +27,12 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
 
     private final JwtService jwtService;
     private final RedisUtils redisUtils;
-    private final HttpSessionRequestCache requestCache;
-    private final DefaultRedirectStrategy redirectStrategy;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
         TokenResponseDto tokenResponseDto = jwtService.createTokenDto(userPrincipal.getUsername(), userPrincipal.getRole());
 
-        // access token -> Authorization 헤더에 저장 & refresh token -> redis 에 저장
         saveAccessTokenOnResponse(response, tokenResponseDto);
         redisUtils.setValue(userPrincipal.getUsername(), tokenResponseDto.getRefreshToken(), Duration.ofMillis(tokenResponseDto.getRefreshTokenValidTime()));
 
@@ -45,15 +41,16 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
     }
 
     private void resultRedirectStrategy(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        String targetUrl = "/";
+        HttpSessionRequestCache requestCache = new HttpSessionRequestCache();
         SavedRequest savedRequest = requestCache.getRequest(request, response);
-        log.info("saved request = " + savedRequest);
+        String targetUrl = "/";
 
         if (savedRequest != null) {
             targetUrl = savedRequest.getRedirectUrl();
+            requestCache.removeRequest(request, response);
         }
 
-        redirectStrategy.sendRedirect(request, response, targetUrl);
+        response.sendRedirect(targetUrl);
     }
 
     private void clearAuthenticationAttributes(HttpServletRequest request) {
