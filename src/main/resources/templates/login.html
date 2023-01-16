@@ -38,14 +38,13 @@
             url: "/api/auth/login",
             async: true,
             contentType: "application/json; charset=utf-8",
-            dataType: "text",
+            dataType: "json",
             data: JSON.stringify(data),
-            success: function (response) {
-                let json = JSON.parse(response);
+            success: function (json) {
                 let success = json.success;
 
                 if (success) {
-                    alert("환영합니다!")
+                    alert("환영합니다!");
                     location.href = "/";
 
                 } else {

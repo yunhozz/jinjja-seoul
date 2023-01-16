@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="utf-8">
     <title>진짜서울</title>
@@ -8,8 +10,9 @@
 
 <body>
 <header>
-    <a href="/map-finder">지도찾기</a>
-    <a href="/login-page">로그인</a>
+    <a th:href="@{/map-finder}">지도찾기</a>
+    <a sec:authorize="isAnonymous()" href="/login-page">로그인</a>
+    <a sec:authorize="isAuthenticated()" onclick="logout()">로그아웃</a>
 </header>
 <section>
     <div>
@@ -195,4 +198,30 @@
             }
         })
     })
+
+    function logout() {
+        let httpRequest = new XMLHttpRequest();
+        let auth = httpRequest.getResponseHeader("Authorization");
+
+        $.ajax({
+            type: "POST",
+            url: "/api/auth/logout",
+            dataType: "json",
+            headers: {
+                "Authorization": auth
+            },
+            success: function (json) {
+                let success = json.success;
+                let data = json.result.data;
+
+                if (success) {
+                    alert(data);
+                    location.href = "/";
+
+                } else {
+                    console.log("로그아웃에 실패하였습니다.");
+                }
+            }
+        })
+    }
 </script>
