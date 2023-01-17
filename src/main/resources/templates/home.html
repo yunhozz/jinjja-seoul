@@ -11,8 +11,12 @@
 <body>
 <header>
     <a th:href="@{/map-finder}">지도찾기</a>
-    <a sec:authorize="isAnonymous()" href="/login-page">로그인</a>
-    <a sec:authorize="isAuthenticated()" onclick="logout()">로그아웃</a>
+    <div sec:authorize="isAnonymous()">
+        <a href="/login-page">로그인</a>
+    </div>
+    <div sec:authorize="isAuthenticated()">
+        <a onclick="logout()">로그아웃</a>
+    </div>
 </header>
 <section>
     <div>
@@ -197,18 +201,19 @@
                 }
             }
         })
-    })
+    });
 
     function logout() {
-        let httpRequest = new XMLHttpRequest();
-        let auth = httpRequest.getResponseHeader("Authorization");
+        // let httpRequest = new XMLHttpRequest();
+        // let auth = httpRequest.getResponseHeader("Authorization");
+        let token = localStorage.getItem("token");
 
         $.ajax({
             type: "POST",
             url: "/api/auth/logout",
             dataType: "json",
             headers: {
-                "Authorization": auth
+                "Authorization": token
             },
             success: function (json) {
                 let success = json.success;
