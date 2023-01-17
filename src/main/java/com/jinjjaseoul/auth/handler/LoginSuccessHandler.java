@@ -7,6 +7,7 @@ import com.jinjjaseoul.common.utils.RedisUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.web.DefaultRedirectStrategy;
 import org.springframework.security.web.WebAttributes;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
@@ -42,6 +43,7 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
 
     private void resultRedirectStrategy(HttpServletRequest request, HttpServletResponse response) throws IOException {
         HttpSessionRequestCache requestCache = new HttpSessionRequestCache();
+        DefaultRedirectStrategy strategy = new DefaultRedirectStrategy();
         SavedRequest savedRequest = requestCache.getRequest(request, response);
         String targetUrl = "/";
 
@@ -50,7 +52,7 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
             requestCache.removeRequest(request, response);
         }
 
-        response.sendRedirect(targetUrl);
+        strategy.sendRedirect(request, response, targetUrl);
     }
 
     private void clearAuthenticationAttributes(HttpServletRequest request) {
