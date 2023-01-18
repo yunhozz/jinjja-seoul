@@ -56,10 +56,11 @@ public class AuthService {
     }
 
     // access token 만료 -> 재요청 -> Authorization 헤더에 refresh token 검증 -> redis 에 존재하는지 검증 -> 재발급
-    public TokenResponseDto reissue(String refreshToken, UserPrincipal userPrincipal, HttpServletResponse response) {
+    public TokenResponseDto reissue(String refreshToken, HttpServletResponse response) {
         String token = refreshToken.split(" ")[1];
         validateRefreshToken(token);
 
+        UserPrincipal userPrincipal = getUserPrincipal(token);
         String redisToken = redisUtils.getValue(userPrincipal.getUsername())
                 .orElseThrow(JwtTokenNotFoundException::new);
         validateRedisToken(token, redisToken);
@@ -73,9 +74,11 @@ public class AuthService {
 
     // refresh token 삭제, access token 값을 redis 에 key 로 저장
     // 로그아웃된 access token 으로 요청이 들어왔을 때, 해당 토큰의 유효성이 남아있는 동안은 redis 에 블랙리스트로 등록되어 있을 것이기 때문에 로그인 불가
-    public void logout(String accessToken, UserPrincipal userPrincipal) {
+    public void logout(String accessToken) {
         String token = accessToken.split(" ")[1];
         validateAccessToken(token);
+
+        UserPrincipal userPrincipal = getUserPrincipal(token);
         Long expirationTime = jwtService.getExpirationTime(token);
         updateRedisData(userPrincipal, token, ACCESS_TOKEN_REDIS_DATA, expirationTime);
     }
@@ -89,13 +92,17 @@ public class AuthService {
     public String findNameOfUser(String accessToken) {
         if (Strings.hasText(accessToken)) {
             String token = accessToken.split(" ")[1];
-            Authentication authentication = jwtService.getAuthentication(token);
-            UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
+            UserPrincipal userPrincipal = getUserPrincipal(token);
 
             return userPrincipal.getName();
         }
 
         return null;
+    }
+
+    private UserPrincipal getUserPrincipal(String token) {
+        Authentication authentication = jwtService.getAuthentication(token);
+        return (UserPrincipal) authentication.getPrincipal();
     }
 
     private void validatePasswordAndLoginCondition(LoginRequestDto loginRequestDto, UserResponseDto userResponseDto) {

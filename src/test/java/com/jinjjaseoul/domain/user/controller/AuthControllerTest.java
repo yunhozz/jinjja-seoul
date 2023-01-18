@@ -112,17 +112,13 @@ class AuthControllerTest {
     @DisplayName("[POST] /api/auth/issue : JWT 토큰 재발급")
     void tokenReissueTest() throws Exception {
         //given
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
-
         TokenResponseDto tokenResponseDto = new TokenResponseDto("type", "atk", "rtk", 10L);
-        given(authService.reissue(anyString(), any(), any())).willReturn(tokenResponseDto);
+        given(authService.reissue(anyString(), any())).willReturn(tokenResponseDto);
 
         //when
         ResultActions result = mockMvc.perform(post("/api/auth/issue")
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("Authorization", tokenResponseDto.getRefreshToken())
-                .requestAttr("userPrincipal", userPrincipal)
         );
 
         //then
@@ -146,17 +142,13 @@ class AuthControllerTest {
     @DisplayName("[POST] /api/auth/logout : 유저 로그아웃")
     void logoutTest() throws Exception {
         //given
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
-
         TokenResponseDto tokenResponseDto = new TokenResponseDto("type", "atk", "rtk", 10L);
-        willDoNothing().given(authService).logout(tokenResponseDto.getAccessToken(), userPrincipal);
+        willDoNothing().given(authService).logout(tokenResponseDto.getAccessToken());
 
         //when
         ResultActions result = mockMvc.perform(post("/api/auth/logout")
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("Authorization", tokenResponseDto.getAccessToken())
-                .requestAttr("userPrincipal", userPrincipal)
         );
 
         //then
