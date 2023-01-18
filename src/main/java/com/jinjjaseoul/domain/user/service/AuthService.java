@@ -14,7 +14,9 @@ import com.jinjjaseoul.domain.user.service.exception.JwtTokenNotFoundException;
 import com.jinjjaseoul.domain.user.service.exception.PasswordDifferentException;
 import com.jinjjaseoul.domain.user.service.exception.RefreshTokenDifferentException;
 import com.jinjjaseoul.domain.user.service.exception.TokenTypeNotValidException;
+import io.jsonwebtoken.lang.Strings;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -82,6 +84,18 @@ public class AuthService {
     public void withdraw(Long userId) {
         User user = userRepository.getReferenceById(userId);
         user.withdraw(); // soft delete
+    }
+
+    public String findNameOfUser(String accessToken) {
+        if (Strings.hasText(accessToken)) {
+            String token = accessToken.split(" ")[1];
+            Authentication authentication = jwtService.getAuthentication(token);
+            UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
+
+            return userPrincipal.getName();
+        }
+
+        return null;
     }
 
     private void validatePasswordAndLoginCondition(LoginRequestDto loginRequestDto, UserResponseDto userResponseDto) {
