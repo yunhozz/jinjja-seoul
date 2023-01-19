@@ -47,10 +47,11 @@
                 let data = json.result.data;
 
                 if (json['success']) {
-                    alert("환영합니다!");
-                    $.cookie('atk', data.grantType + data.accessToken, {path: '/'});
-                    $.cookie('rtk', data.grantType + data.refreshToken, {path: '/'});
-                    location.href = "/";
+                    let now = new Date();
+                    let expDate = new Date(now + (30 * 60 * 1000)); // add 30 minutes
+                    $.cookie('atk', data.grantType + data.accessToken, { path: '/', expires: expDate });
+
+                    location.href = $.cookie('prevPage');
 
                 } else {
                     alert("아이디 또는 비밀번호가 잘못되었습니다.");
