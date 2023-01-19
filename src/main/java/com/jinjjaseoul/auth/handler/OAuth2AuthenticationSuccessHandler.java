@@ -5,22 +5,22 @@ import com.jinjjaseoul.auth.model.UserPrincipal;
 import com.jinjjaseoul.auth.oauth2.AppProperties;
 import com.jinjjaseoul.common.dto.TokenResponseDto;
 import com.jinjjaseoul.common.utils.CookieUtils;
+import com.jinjjaseoul.common.utils.EncodingUtils;
 import com.jinjjaseoul.common.utils.RedisUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
+import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
+import org.springframework.security.web.savedrequest.SavedRequest;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URI;
 import java.time.Duration;
-import java.util.Optional;
-
-import static com.jinjjaseoul.auth.handler.OAuth2AuthorizationRequestCookieRepository.REDIRECT_URI_PARAM_COOKIE_NAME;
 
 @Slf4j
 @Component
@@ -34,14 +34,23 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
-        Optional<String> redirectUri = CookieUtils.getCookie(request, REDIRECT_URI_PARAM_COOKIE_NAME)
-                .map(Cookie::getValue);
+        HttpSessionRequestCache requestCache = new HttpSessionRequestCache();
+        SavedRequest savedRequest = requestCache.getRequest(request, response);
+        String prevPage = (String) request.getSession().getAttribute("prevPage");
+        String targetUri = "/";
 
-        if (redirectUri.isPresent() && isAuthorizedRedirectUri(redirectUri.get())) {
-            throw new IllegalArgumentException("Sorry! We've got an Unauthorized Redirect URI and can't proceed with the authentication");
+        if (prevPage != null) {
+            request.getSession().removeAttribute("prevPage");
         }
 
-        String targetUri = redirectUri.orElse(getDefaultTargetUrl());
+        if (savedRequest != null) {
+            targetUri = savedRequest.getRedirectUrl();
+            requestCache.removeRequest(request, response);
+
+        } else if (StringUtils.hasText(prevPage)) {
+            targetUri = prevPage;
+        }
+
         UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
         TokenResponseDto tokenResponseDto = jwtService.createTokenDto(userPrincipal.getUsername(), userPrincipal.getRole());
 
@@ -56,6 +65,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
         saveAccessTokenOnResponse(response, tokenResponseDto);
         saveRefreshTokenOnRedis(userPrincipal, tokenResponseDto);
+        CookieUtils.addCookie(response, "atk", EncodingUtils.encodeURIComponent(tokenResponseDto.getGrantType() + tokenResponseDto.getAccessToken()));
 
         clearAuthenticationAttributes(request, response);
         getRedirectStrategy().sendRedirect(request, response, targetUri);
