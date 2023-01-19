@@ -17,7 +17,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .allowedOriginPatterns("*")
                 .allowedHeaders("*")
                 .allowedMethods("*")
-                .allowCredentials(false)
+                .allowCredentials(true)
                 .exposedHeaders(Header.JWT_TYPE)
                 .maxAge(MAX_AGE_SECS);
     }

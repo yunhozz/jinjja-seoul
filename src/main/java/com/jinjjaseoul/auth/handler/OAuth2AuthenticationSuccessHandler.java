@@ -16,6 +16,7 @@ import org.springframework.security.web.savedrequest.SavedRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -36,8 +37,11 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
         HttpSessionRequestCache requestCache = new HttpSessionRequestCache();
         SavedRequest savedRequest = requestCache.getRequest(request, response);
-        String prevPage = (String) request.getSession().getAttribute("prevPage");
-        String targetUri = "/";
+
+        String targetUri = getDefaultTargetUrl();
+        String prevPage = CookieUtils.getCookie(request, "prevPage")
+                .map(Cookie::getValue)
+                .orElse(null);
 
         if (prevPage != null) {
             request.getSession().removeAttribute("prevPage");
@@ -54,18 +58,9 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
         TokenResponseDto tokenResponseDto = jwtService.createTokenDto(userPrincipal.getUsername(), userPrincipal.getRole());
 
-//        String targetUrl = UriComponentsBuilder.fromUriString(targetUri)
-//                .queryParam("token", tokenResponseDto.getAccessToken())
-//                .build().toString();
-//
-//        if (response.isCommitted()) {
-//            logger.debug("Response has already been committed. Unable to redirect to " + targetUrl);
-//            return;
-//        }
-
         saveAccessTokenOnResponse(response, tokenResponseDto);
         saveRefreshTokenOnRedis(userPrincipal, tokenResponseDto);
-        CookieUtils.addCookie(response, "atk", EncodingUtils.encodeURIComponent(tokenResponseDto.getGrantType() + tokenResponseDto.getAccessToken()));
+        CookieUtils.addCookie(response, "atk", EncodingUtils.encodeURIComponent(tokenResponseDto.getGrantType() + tokenResponseDto.getAccessToken()), 1800);
 
         clearAuthenticationAttributes(request, response);
         getRedirectStrategy().sendRedirect(request, response, targetUri);
