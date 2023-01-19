@@ -2,6 +2,8 @@ package com.jinjjaseoul.common.enums;
 
 import org.springframework.security.core.GrantedAuthority;
 
+import java.util.Arrays;
+
 public enum Role implements GrantedAuthority {
 
     ADMIN("ROLE_ADMIN", "운영자"),
@@ -24,5 +26,12 @@ public enum Role implements GrantedAuthority {
 
     public String getValue() {
         return value;
+    }
+
+    public static Role findByValue(String value) {
+        return Arrays.stream(Role.values())
+                .filter(role -> role.name().equals(value))
+                .findFirst()
+                .orElse(null);
     }
 }

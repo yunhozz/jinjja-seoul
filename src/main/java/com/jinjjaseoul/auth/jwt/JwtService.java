@@ -61,10 +61,17 @@ public class JwtService implements InitializingBean {
                 .build();
     }
 
+    public TokenResponseDto tokenReissue(String refreshToken) {
+        Claims claims = parseToken(refreshToken);
+        String roleValue = (String) claims.get("role");
+        Role role = Role.findByValue(roleValue);
+
+        return createTokenDto(claims.getSubject(), role);
+    }
+
     public Authentication getAuthentication(String token) {
         String email = parseToken(token).getSubject();
         UserDetails userDetails = userDetailsService.loadUserByUsername(email);
-
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
 
@@ -75,7 +82,6 @@ public class JwtService implements InitializingBean {
     public Long getExpirationTime(String token) {
         Long now = new Date().getTime();
         Long expirationTime = parseToken(token).getExpiration().getTime();
-
         return expirationTime - now;
     }
 
@@ -86,13 +92,10 @@ public class JwtService implements InitializingBean {
 
         } catch (ExpiredJwtException e) {
             log.error("만료된 토큰입니다.");
-
         } catch (SecurityException | MalformedJwtException e) {
             log.error("잘못된 Jwt 서명입니다.");
-
         } catch (UnsupportedJwtException e) {
             log.error("지원하지 않는 토큰입니다.");
-
         } catch (IllegalArgumentException e) {
             log.error("잘못된 토큰입니다.");
         }

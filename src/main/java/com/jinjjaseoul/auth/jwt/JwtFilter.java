@@ -1,5 +1,7 @@
 package com.jinjjaseoul.auth.jwt;
 
+import com.jinjjaseoul.auth.model.UserPrincipal;
+import com.jinjjaseoul.common.dto.TokenResponseDto;
 import com.jinjjaseoul.common.utils.RedisUtils;
 import io.jsonwebtoken.lang.Strings;
 import lombok.RequiredArgsConstructor;
@@ -15,8 +17,10 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.time.Duration;
 import java.util.Optional;
 
+import static com.jinjjaseoul.auth.jwt.JwtService.ACCESS_TOKEN_TYPE;
 import static com.jinjjaseoul.auth.jwt.JwtService.REFRESH_TOKEN_TYPE;
 
 @Slf4j
@@ -37,12 +41,29 @@ public class JwtFilter extends OncePerRequestFilter {
                 String logout = redisUtils.getValue(token).orElse(null);
                 String requestURI = request.getRequestURI();
 
+                // access token 만료 시 refresh token 검증
                 if (jwtService.getTokenType(token).equals(REFRESH_TOKEN_TYPE) && !requestURI.equals("/api/auth/issue")) {
                     throw new IllegalStateException("JWT 토큰을 확인해주세요.");
                 }
-                // access token 로그아웃 상태 확인
+
+                // access token 만료 5분전 재발급 로직 생성
+                if (jwtService.getTokenType(token).equals(ACCESS_TOKEN_TYPE) && jwtService.getExpirationTime(token) < 3000000L) {
+                    Authentication authentication = jwtService.getAuthentication(token);
+                    UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
+                    Optional<String> redisToken = redisUtils.getValue(userPrincipal.getUsername());
+
+                    if (redisToken.isEmpty()) {
+                        throw new IllegalStateException("재발급 토큰이 존재하지 않습니다.");
+                    }
+
+                    TokenResponseDto tokenResponseDto = jwtService.tokenReissue(redisToken.get());
+                    token = tokenResponseDto.getAccessToken();
+                    saveTokenOnResponse(response, tokenResponseDto);
+                    updateRedisData(userPrincipal, userPrincipal.getUsername(), tokenResponseDto.getRefreshToken(), tokenResponseDto.getRefreshTokenValidTime());
+                }
+
+                // access token 로그아웃 상태 확인 -> SecurityContext 에 인증객체 저장 -> @AuthenticationPrincipal
                 if (!StringUtils.hasText(logout)) {
-                    log.info("Verifying Success!!");
                     Authentication authentication = jwtService.getAuthentication(token);
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                 }
@@ -60,5 +81,15 @@ public class JwtFilter extends OncePerRequestFilter {
     private Optional<String> resolveParts(String token) {
         String[] parts = token.split(" ");
         return parts.length == 2 && parts[0].equals("Bearer") ? Optional.ofNullable(parts[1]) : Optional.empty();
+    }
+
+    private void saveTokenOnResponse(HttpServletResponse response, TokenResponseDto tokenResponseDto) {
+        response.setContentType("application/json;charset=UTF-8");
+        response.addHeader("Authorization", tokenResponseDto.getGrantType() + tokenResponseDto.getAccessToken());
+    }
+
+    private void updateRedisData(UserPrincipal userPrincipal, String key, String data, Long timeMills) {
+        redisUtils.deleteData(userPrincipal.getUsername());
+        redisUtils.setValue(key, data, Duration.ofMillis(timeMills));
     }
 }
