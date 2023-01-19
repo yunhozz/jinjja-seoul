@@ -50,13 +50,10 @@ public class JwtFilter extends OncePerRequestFilter {
                 if (jwtService.getTokenType(token).equals(ACCESS_TOKEN_TYPE) && jwtService.getExpirationTime(token) < 3000000L) {
                     Authentication authentication = jwtService.getAuthentication(token);
                     UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
-                    Optional<String> redisToken = redisUtils.getValue(userPrincipal.getUsername());
+                    String redisToken = redisUtils.getValue(userPrincipal.getUsername())
+                            .orElseThrow(() -> new IllegalStateException("재발급 토큰이 존재하지 않습니다."));
 
-                    if (redisToken.isEmpty()) {
-                        throw new IllegalStateException("재발급 토큰이 존재하지 않습니다.");
-                    }
-
-                    TokenResponseDto tokenResponseDto = jwtService.tokenReissue(redisToken.get());
+                    TokenResponseDto tokenResponseDto = jwtService.tokenReissue(redisToken);
                     token = tokenResponseDto.getAccessToken();
                     saveTokenOnResponse(response, tokenResponseDto);
                     updateRedisData(userPrincipal, userPrincipal.getUsername(), tokenResponseDto.getRefreshToken(), tokenResponseDto.getRefreshTokenValidTime());
