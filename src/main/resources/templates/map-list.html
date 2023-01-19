@@ -4,15 +4,16 @@
     <meta charset="utf-8">
     <title>지도 찾기 - 진짜서울</title>
     <script src="/webjars/jquery/3.6.2/jquery.min.js"></script>
+    <script src="/js/jquery.cookie.js"></script>
 </head>
 
 <body>
 <header>
-    <a th:href="@{/map-finder}">지도찾기</a>
-    <a th:href="@{/login-page}">로그인</a>
+    <h2>지도 찾기</h2>
+    <div id="auth-area"></div>
+    <hr>
 </header>
 <section>
-    <h2>지도 찾기</h2>
     <div id="keyword-search">
         <p>키워드 검색</p>
         <input id="keyword-1" type="text" th:value="${keyword}" placeholder="지도를 검색해보세요">
@@ -76,6 +77,32 @@
 
 <script>
     $(function () {
+        $.ajax({
+            type: "GET",
+            url: "/api/auth/me",
+            dataType: "json",
+            headers: {
+                "Authorization" : $.cookie('atk')
+            },
+            success: function (json) {
+                let name = json.result.data;
+
+                if (json['success']) {
+                    let str = "";
+
+                    if (name !== null) {
+                        str += "<a " + "onclick='logout()'" + ">로그아웃</a><br><br>";
+                        str += "<span>" + name + "님, 환영합니다!</span>";
+
+                    } else {
+                        str += "<a href='/login-page'>로그인</a>"
+                    }
+
+                    $("#auth-area").append(str);
+                }
+            }
+        });
+
         let $keyword = $("#keyword-1");
         let val = $keyword != null ? $keyword.val() : null;
 
@@ -227,5 +254,29 @@
 
         table += "</table>";
         return table;
+    }
+
+    function logout() {
+        $.ajax({
+            type: "POST",
+            url: "/api/auth/logout",
+            dataType: "json",
+            headers: {
+                "Authorization" : $.cookie('atk')
+            },
+            success: function (json) {
+                let data = json.result.data;
+
+                if (json['success']) {
+                    alert(data);
+                    $.removeCookie('atk');
+                    $.removeCookie('rtk');
+                    location.href = "/";
+
+                } else {
+                    console.log("로그아웃에 실패하였습니다.");
+                }
+            }
+        });
     }
 </script>
