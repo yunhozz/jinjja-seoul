@@ -27,7 +27,7 @@ public class AuthController {
 
     private final AuthService authService;
 
-    @GetMapping("/isAuth")
+    @GetMapping("/me")
     public Response getNameOfUser(@RequestHeader(value = "Authorization", required = false) String accessToken) {
         String name = authService.findNameOfUser(accessToken);
         return Response.success(HttpStatus.OK, name);

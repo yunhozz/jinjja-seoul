@@ -93,7 +93,6 @@ public class AuthService {
         if (Strings.hasText(accessToken)) {
             String token = accessToken.split(" ")[1];
             UserPrincipal userPrincipal = getUserPrincipal(token);
-
             return userPrincipal.getName();
         }
 
