@@ -10,23 +10,23 @@
 <body>
 <div class="title"><h1 style="font-size: 21px;">로그인</h1></div>
 <!--form 형식-->
-<!--<form method="post" action="/sign-in-progress">-->
-<!--    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}">-->
-<!--    <input type="text" id="email" name="email" class="form-control" placeholder="이메일을 입력해 주세요.">-->
-<!--    <div id="emailError" class="error"></div>-->
-<!--    <input type="password" id="password" name="password" class="form-control" placeholder="비밀번호를 입력해 주세요.">-->
-<!--    <div id="passwordError" class="error"></div>-->
-<!--    <hr>-->
-<!--    <button id="btn-login" type="submit">로그인</button>-->
-<!--</form>-->
+<form id="form-login" method="post" action="/sign-in-progress">
+    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}">
+    <input type="text" id="email" name="email" class="form-control" placeholder="이메일을 입력해 주세요.">
+    <div id="emailError" class="error"></div>
+    <input type="password" id="password" name="password" class="form-control" placeholder="비밀번호를 입력해 주세요.">
+    <div id="passwordError" class="error"></div>
+    <hr>
+    <button id="btn-login" type="submit">로그인</button>
+</form>
 
 <!--ajax 형식-->
-<input type="text" id="email" name="email" placeholder="이메일을 입력해 주세요.">
-<div id="emailError" class="error"></div>
-<input type="password" id="password" name="password" placeholder="비밀번호를 입력해 주세요.">
-<div id="passwordError" class="error"></div>
-<hr>
-<button id="btn-login" type="submit" onclick="signIn()">로그인</button>
+<!--<input type="text" id="email" name="email" placeholder="이메일을 입력해 주세요.">-->
+<!--<div id="emailError" class="error"></div>-->
+<!--<input type="password" id="password" name="password" placeholder="비밀번호를 입력해 주세요.">-->
+<!--<div id="passwordError" class="error"></div>-->
+<!--<hr>-->
+<!--<button id="btn-login" type="submit" onclick="signIn()">로그인</button>-->
 
 </body>
 
