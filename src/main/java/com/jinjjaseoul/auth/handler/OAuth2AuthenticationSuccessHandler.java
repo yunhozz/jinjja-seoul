@@ -35,24 +35,26 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
-        HttpSessionRequestCache requestCache = new HttpSessionRequestCache();
-        SavedRequest savedRequest = requestCache.getRequest(request, response);
+        // 권한이 없어 강제로 인터셉트 당했을 경우 (ex. 관리자 페이지로 접근 시도 -> 로그인 페이지)
+        HttpSessionRequestCache requestCache = new HttpSessionRequestCache(); // SavedRequest 객체를 세션에 저장하는 역할
+        SavedRequest savedRequest = requestCache.getRequest(request, response); // 현재 클라이언트의 요청 과정 중에 포함된 쿠키, 헤더, 파라미터 값들을 추출하여 보관하는 역할
 
-        String targetUri = getDefaultTargetUrl();
+        // 로그인 버튼을 눌러 접속했을 경우
         String prevPage = CookieUtils.getCookie(request, "prevPage")
                 .map(Cookie::getValue)
                 .orElse(null);
 
-        if (prevPage != null) {
-            request.getSession().removeAttribute("prevPage");
-        }
+        String targetUrl = getDefaultTargetUrl();
 
+        // 강제 인터셉트 당했을 경우
         if (savedRequest != null) {
-            targetUri = savedRequest.getRedirectUrl();
+            targetUrl = savedRequest.getRedirectUrl();
             requestCache.removeRequest(request, response);
 
+        // 직접 로그인 페이지로 접속했을 경우
         } else if (StringUtils.hasText(prevPage)) {
-            targetUri = prevPage;
+            targetUrl = prevPage;
+            CookieUtils.deleteCookie(request, response, "prevPage");
         }
 
         UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
@@ -63,7 +65,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         CookieUtils.addCookie(response, "atk", EncodingUtils.encodeURIComponent(tokenResponseDto.getGrantType() + tokenResponseDto.getAccessToken()), 1800);
 
         clearAuthenticationAttributes(request, response);
-        getRedirectStrategy().sendRedirect(request, response, targetUri);
+        getRedirectStrategy().sendRedirect(request, response, targetUrl);
     }
 
     private boolean isAuthorizedRedirectUri(String uri) {
