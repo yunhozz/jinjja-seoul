@@ -4,7 +4,6 @@ import com.jinjjaseoul.auth.jwt.JwtService;
 import com.jinjjaseoul.auth.model.UserPrincipal;
 import com.jinjjaseoul.common.dto.TokenResponseDto;
 import com.jinjjaseoul.common.utils.CookieUtils;
-import com.jinjjaseoul.common.utils.EncodingUtils;
 import com.jinjjaseoul.common.utils.RedisUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +13,7 @@ import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
 import org.springframework.security.web.savedrequest.SavedRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
@@ -57,12 +57,18 @@ public class LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
         UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
         TokenResponseDto tokenResponseDto = jwtService.createTokenDto(userPrincipal.getUsername(), userPrincipal.getRole());
 
+        // localhost:3000 으로 access token 을 보낸다고 가정
+        String redirectUrl = UriComponentsBuilder.fromUriString("/login")
+                .queryParam("token", tokenResponseDto.getAccessToken())
+                .queryParam("target", targetUrl)
+                .build().toString();
+
         saveAccessTokenOnResponse(response, tokenResponseDto);
         saveRefreshTokenOnRedis(userPrincipal, tokenResponseDto);
-        CookieUtils.addCookie(response, "atk", EncodingUtils.encodeURIComponent(tokenResponseDto.getGrantType() + tokenResponseDto.getAccessToken()), 1800);
+//        CookieUtils.addCookie(response, "atk", EncodingUtils.encodeURIComponent(tokenResponseDto.getGrantType() + tokenResponseDto.getAccessToken()), 1800);
 
         clearAuthenticationAttributes(request);
-        getRedirectStrategy().sendRedirect(request, response, targetUrl);
+        getRedirectStrategy().sendRedirect(request, response, redirectUrl);
     }
 
     private void saveAccessTokenOnResponse(HttpServletResponse response, TokenResponseDto tokenResponseDto) {
