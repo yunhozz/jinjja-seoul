@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title>지도 찾기 - 진짜서울</title>
+    <script src="/webjars/jquery/3.6.2/jquery.min.js"></script>
+    <script src="/js/jquery.cookie.js"></script>
+</head>
+
+<body>
+<input type="hidden" id="atk" th:value="${token}">
+<input type="hidden" id="target-url" th:value="${target}">
+</body>
+
+<script>
+    $(function () {
+        let now = new Date();
+        let expDate = new Date(now + (30 * 60 * 1000)); // add 30 minutes
+        $.cookie('atk', 'Bearer ' + $("#atk").val(), { path: '/', expires: expDate });
+
+        window.location.href = $("#target-url").val();
+    });
+</script>
