@@ -38,32 +38,35 @@ public class JwtFilter extends OncePerRequestFilter {
 
         resolveToken(request).ifPresent(token -> {
             if (jwtService.isValidatedToken(token)) {
-                String logout = redisUtils.getValue(token).orElse(null);
                 String requestURI = request.getRequestURI();
+                // access token
+                if (jwtService.getTokenType(token).equals(ACCESS_TOKEN_TYPE)) {
+                    // 만료 시간이 5분 이내면 재발급
+                    if (jwtService.getExpirationTime(token) < 30000) {
+                        log.info("===== token reissue =====");
+                        Authentication authentication = jwtService.getAuthentication(token);
+                        UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
+                        String refreshToken = redisUtils.getValue(userPrincipal.getUsername())
+                                .orElseThrow(() -> new IllegalStateException("재발급 토큰이 존재하지 않습니다."));
 
-                // access token 만료 시 refresh token 검증
-                if (jwtService.getTokenType(token).equals(REFRESH_TOKEN_TYPE) && !requestURI.equals("/api/auth/issue")) {
-                    throw new IllegalStateException("JWT 토큰을 확인해주세요.");
-                }
+                        TokenResponseDto tokenResponseDto = jwtService.tokenReissue(refreshToken);
+                        token = tokenResponseDto.getAccessToken();
+                        saveTokenOnResponse(response, tokenResponseDto);
+                        updateRedisData(userPrincipal, userPrincipal.getUsername(), tokenResponseDto.getRefreshToken(), tokenResponseDto.getRefreshTokenValidTime());
+                    }
 
-                // access token 만료 5분전 재발급 로직 생성
-                if (jwtService.getTokenType(token).equals(ACCESS_TOKEN_TYPE) && jwtService.getExpirationTime(token) < 30000) {
-                    log.info("===== token reissue =====");
-                    Authentication authentication = jwtService.getAuthentication(token);
-                    UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
-                    String refreshToken = redisUtils.getValue(userPrincipal.getUsername())
-                            .orElseThrow(() -> new IllegalStateException("재발급 토큰이 존재하지 않습니다."));
-
-                    TokenResponseDto tokenResponseDto = jwtService.tokenReissue(refreshToken);
-                    token = tokenResponseDto.getAccessToken();
-                    saveTokenOnResponse(response, tokenResponseDto);
-                    updateRedisData(userPrincipal, userPrincipal.getUsername(), tokenResponseDto.getRefreshToken(), tokenResponseDto.getRefreshTokenValidTime());
-                }
-
-                // access token 로그아웃 상태 확인 -> SecurityContext 에 인증객체 저장 -> @AuthenticationPrincipal
-                if (!StringUtils.hasText(logout)) {
+                    String logout = redisUtils.getValue(token).orElse(null);
+                    // access token 로그아웃 상태 확인
+                    if (StringUtils.hasText(logout)) {
+                        throw new IllegalStateException("로그아웃 상태입니다. 토큰을 다시 발급해주세요.");
+                    }
+                    // SecurityContext 에 인증객체 저장 -> @AuthenticationPrincipal
                     Authentication authentication = jwtService.getAuthentication(token);
                     SecurityContextHolder.getContext().setAuthentication(authentication);
+
+                // refresh token
+                } else if (jwtService.getTokenType(token).equals(REFRESH_TOKEN_TYPE) && !requestURI.equals("/api/auth/issue")) {
+                    throw new IllegalStateException("재발급 토큰으로 접근이 불가합니다.");
                 }
             }
         });
