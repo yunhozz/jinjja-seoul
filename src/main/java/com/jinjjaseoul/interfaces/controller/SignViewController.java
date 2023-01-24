@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 @RequiredArgsConstructor
 public class SignViewController {
 
-    @GetMapping("/login-page")
+    @GetMapping("/sign-in")
     public String loginPage(HttpServletRequest request, HttpServletResponse response) {
         String referer = request.getHeader("Referer");
         // 로그인 페이지 직전 페이지를 쿠키에 저장
@@ -22,7 +22,7 @@ public class SignViewController {
             CookieUtils.addCookie(response, "prevPage", referer, 3600);
         }
 
-        return "login-page";
+        return "login";
     }
 
     @GetMapping("/login")

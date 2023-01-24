@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="utf-8">
     <title>로그인 - 진짜서울</title>
@@ -16,7 +16,6 @@
     <div id="emailError" class="error"></div>
     <input type="password" id="password" name="password" class="form-control" placeholder="비밀번호를 입력해 주세요.">
     <div id="passwordError" class="error"></div>
-    <hr>
     <button id="btn-login" type="submit">로그인</button>
 </form>
 
@@ -27,7 +26,13 @@
 <!--<div id="passwordError" class="error"></div>-->
 <!--<hr>-->
 <!--<button id="btn-login" type="submit" onclick="signIn()">로그인</button>-->
+<button type="submit" onclick="location.href='/sign-up'">회원가입</button>
 
+<hr>
+
+<a th:href="@{/oauth2/authorization/google}">구글 로그인</a><br>
+<a th:href="@{/oauth2/authorization/kakao}">카카오 로그인</a><br>
+<a th:href="@{/oauth2/authorization/naver}">네이버 로그인</a>
 </body>
 
 <script>
