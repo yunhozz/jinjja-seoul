@@ -9,7 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
@@ -38,13 +37,23 @@ public class JwtFilter extends OncePerRequestFilter {
 
         resolveToken(request).ifPresent(token -> {
             if (jwtService.isValidatedToken(token)) {
-                String requestURI = request.getRequestURI();
+                String requestUri = request.getRequestURI();
                 // access token
                 if (jwtService.getTokenType(token).equals(ACCESS_TOKEN_TYPE)) {
+                    // access token 로그아웃 상태 확인
+                    redisUtils.getValue(token).ifPresent(s -> {
+                        try {
+                            log.debug("로그아웃 상태의 토큰입니다. 토큰을 다시 발급해주세요.");
+                            response.sendRedirect("/sign-in");
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
+
+                    Authentication authentication = jwtService.getAuthentication(token);
                     // 만료 시간이 5분 이내면 재발급
                     if (jwtService.getExpirationTime(token) < 30000) {
                         log.info("===== token reissue =====");
-                        Authentication authentication = jwtService.getAuthentication(token);
                         UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
                         String refreshToken = redisUtils.getValue(userPrincipal.getUsername())
                                 .orElseThrow(() -> new IllegalStateException("재발급 토큰이 존재하지 않습니다."));
@@ -54,18 +63,11 @@ public class JwtFilter extends OncePerRequestFilter {
                         saveTokenOnResponse(response, tokenResponseDto);
                         updateRedisData(userPrincipal, userPrincipal.getUsername(), tokenResponseDto.getRefreshToken(), tokenResponseDto.getRefreshTokenValidTime());
                     }
-
-                    String logout = redisUtils.getValue(token).orElse(null);
-                    // access token 로그아웃 상태 확인
-                    if (StringUtils.hasText(logout)) {
-                        throw new IllegalStateException("로그아웃 상태입니다. 토큰을 다시 발급해주세요.");
-                    }
                     // SecurityContext 에 인증객체 저장 -> @AuthenticationPrincipal
-                    Authentication authentication = jwtService.getAuthentication(token);
                     SecurityContextHolder.getContext().setAuthentication(authentication);
 
                 // refresh token
-                } else if (jwtService.getTokenType(token).equals(REFRESH_TOKEN_TYPE) && !requestURI.equals("/api/auth/issue")) {
+                } else if (jwtService.getTokenType(token).equals(REFRESH_TOKEN_TYPE) && !requestUri.equals("/api/auth/issue")) {
                     throw new IllegalStateException("재발급 토큰으로 접근이 불가합니다.");
                 }
             }
