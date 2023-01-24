@@ -41,14 +41,18 @@ public class JwtFilter extends OncePerRequestFilter {
                 // access token
                 if (jwtService.getTokenType(token).equals(ACCESS_TOKEN_TYPE)) {
                     // access token 로그아웃 상태 확인
-                    redisUtils.getValue(token).ifPresent(s -> {
+                    Optional<String> logout = redisUtils.getValue(token);
+
+                    if (logout.isPresent()) {
                         try {
                             log.debug("로그아웃 상태의 토큰입니다. 토큰을 다시 발급해주세요.");
                             response.sendRedirect("/sign-in");
+                            return;
+
                         } catch (IOException e) {
                             throw new RuntimeException(e);
                         }
-                    });
+                    }
 
                     Authentication authentication = jwtService.getAuthentication(token);
                     // 만료 시간이 5분 이내면 재발급
@@ -59,7 +63,6 @@ public class JwtFilter extends OncePerRequestFilter {
                                 .orElseThrow(() -> new IllegalStateException("재발급 토큰이 존재하지 않습니다."));
 
                         TokenResponseDto tokenResponseDto = jwtService.tokenReissue(refreshToken);
-                        token = tokenResponseDto.getAccessToken();
                         saveTokenOnResponse(response, tokenResponseDto);
                         updateRedisData(userPrincipal, userPrincipal.getUsername(), tokenResponseDto.getRefreshToken(), tokenResponseDto.getRefreshTokenValidTime());
                     }
