@@ -1,9 +1,10 @@
 package com.jinjjaseoul.config;
 
+import com.jinjjaseoul.auth.handler.LoginFailureHandler;
 import com.jinjjaseoul.auth.handler.LoginSuccessHandler;
 import com.jinjjaseoul.auth.handler.OAuth2AuthenticationFailureHandler;
 import com.jinjjaseoul.auth.handler.OAuth2AuthenticationSuccessHandler;
-import com.jinjjaseoul.auth.handler.OAuth2AuthorizationRequestCookieRepository;
+import com.jinjjaseoul.auth.handler.OAuth2AuthorizationRequestRepository;
 import com.jinjjaseoul.auth.jwt.JwtAccessDeniedHandler;
 import com.jinjjaseoul.auth.jwt.JwtAuthenticationEntryPoint;
 import com.jinjjaseoul.auth.jwt.JwtFilter;
@@ -26,13 +27,14 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final LoginSuccessHandler loginSuccessHandler;
+    private final LoginFailureHandler loginFailureHandler;
     private final JwtFilter jwtFilter;
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final OAuth2UserServiceImpl oAuth2UserService;
     private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
     private final OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
-    private final OAuth2AuthorizationRequestCookieRepository oAuth2AuthorizationRequestCookieRepository;
+    private final OAuth2AuthorizationRequestRepository oAuth2AuthorizationRequestRepository;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
@@ -40,7 +42,7 @@ public class SecurityConfig {
                 .csrf().disable()
                 .cors().disable()
                 .authorizeRequests()
-                .antMatchers("/", "/error", "/favicon.ico").permitAll()
+                .antMatchers("/", "/error", "/favicon.ico", "/sign-in?error").permitAll()
                 .antMatchers("/api/comments/**", "/api/curation/likes/**", "/api/images/**", "/api/location/bookmarks/**").hasAnyRole("ADMIN", "USER")
                 .anyRequest().permitAll();
 
@@ -62,6 +64,7 @@ public class SecurityConfig {
                 .usernameParameter("email")
                 .passwordParameter("password")
                 .successHandler(loginSuccessHandler)
+                .failureHandler(loginFailureHandler)
                 .permitAll()
 
                 .and()
@@ -88,7 +91,7 @@ public class SecurityConfig {
 
                 .authorizationEndpoint()
                 .baseUri("/oauth2/authorization")
-                .authorizationRequestRepository(oAuth2AuthorizationRequestCookieRepository)
+                .authorizationRequestRepository(oAuth2AuthorizationRequestRepository)
 
                 .and()
 
