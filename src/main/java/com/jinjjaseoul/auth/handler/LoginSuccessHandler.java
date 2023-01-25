@@ -29,6 +29,7 @@ public class LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     private final JwtService jwtService;
     private final RedisUtils redisUtils;
+    private final HttpSessionRequestCache requestCache; // SavedRequest 객체를 세션에 저장하는 역할
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
