@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 @Component
-public class OAuth2AuthorizationRequestCookieRepository implements AuthorizationRequestRepository<OAuth2AuthorizationRequest> {
+public class OAuth2AuthorizationRequestRepository implements AuthorizationRequestRepository<OAuth2AuthorizationRequest> {
 
     /*
      * oauth2_auth_request : 해당 Authorization request 의 고유 아이디를 담는다.
@@ -18,13 +18,13 @@ public class OAuth2AuthorizationRequestCookieRepository implements Authorization
      * ex) http://localhost:8080/oauth2/authorize/google?redirect_uri=http://localhost:3000/oauth2/redirect
      */
 
-    public static final String OAUTH2_AUTHORIZATION_REQUEST_COOKIE_NAME = "oauth2_auth_request";
-    public static final String REDIRECT_URI_PARAM_COOKIE_NAME = "redirect_uri";
+    public static final String OAUTH2_AUTHORIZATION_REQUEST = "oauth2_auth_request";
+    public static final String REDIRECT_URI = "redirect_uri";
     private static final int COOKIE_MAX_AGE = 180;
 
     @Override
     public OAuth2AuthorizationRequest loadAuthorizationRequest(HttpServletRequest request) {
-        return CookieUtils.getCookie(request, OAUTH2_AUTHORIZATION_REQUEST_COOKIE_NAME)
+        return CookieUtils.getCookie(request, OAUTH2_AUTHORIZATION_REQUEST)
                 .map(cookie -> CookieUtils.deserialize(cookie, OAuth2AuthorizationRequest.class))
                 .orElse(null);
     }
@@ -36,11 +36,11 @@ public class OAuth2AuthorizationRequestCookieRepository implements Authorization
             return;
         }
 
-        CookieUtils.addCookie(response, OAUTH2_AUTHORIZATION_REQUEST_COOKIE_NAME, CookieUtils.serialize(authorizationRequest), COOKIE_MAX_AGE);
-        String redirectUriAfterLogin = request.getParameter(REDIRECT_URI_PARAM_COOKIE_NAME);
+        CookieUtils.addCookie(response, OAUTH2_AUTHORIZATION_REQUEST, CookieUtils.serialize(authorizationRequest), COOKIE_MAX_AGE);
+        String redirectUriAfterLogin = request.getParameter(REDIRECT_URI);
 
         if (StringUtils.isNotBlank(redirectUriAfterLogin)) {
-            CookieUtils.addCookie(response, REDIRECT_URI_PARAM_COOKIE_NAME, redirectUriAfterLogin, COOKIE_MAX_AGE);
+            CookieUtils.addCookie(response, REDIRECT_URI, redirectUriAfterLogin, COOKIE_MAX_AGE);
         }
     }
 
@@ -50,7 +50,7 @@ public class OAuth2AuthorizationRequestCookieRepository implements Authorization
     }
 
     public void removeAuthorizationRequestCookies(HttpServletRequest request, HttpServletResponse response) {
-        CookieUtils.deleteCookie(request, response, OAUTH2_AUTHORIZATION_REQUEST_COOKIE_NAME);
-        CookieUtils.deleteCookie(request, response, REDIRECT_URI_PARAM_COOKIE_NAME);
+        CookieUtils.deleteCookie(request, response, OAUTH2_AUTHORIZATION_REQUEST);
+        CookieUtils.deleteCookie(request, response, REDIRECT_URI);
     }
 }
