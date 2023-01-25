@@ -4,6 +4,7 @@ import com.jinjjaseoul.auth.jwt.JwtService;
 import com.jinjjaseoul.auth.model.UserPrincipal;
 import com.jinjjaseoul.common.dto.TokenResponseDto;
 import com.jinjjaseoul.common.utils.CookieUtils;
+import com.jinjjaseoul.common.utils.EncodingUtils;
 import com.jinjjaseoul.common.utils.RedisUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,7 +14,6 @@ import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
 import org.springframework.security.web.savedrequest.SavedRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
@@ -33,8 +33,8 @@ public class LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
+        String redirectUrl = getDefaultTargetUrl();
         // 권한이 없어 강제로 인터셉트 당했을 경우 (ex. 관리자 페이지로 접근 시도 -> 로그인 페이지)
-        HttpSessionRequestCache requestCache = new HttpSessionRequestCache(); // SavedRequest 객체를 세션에 저장하는 역할
         SavedRequest savedRequest = requestCache.getRequest(request, response); // 현재 클라이언트의 요청 과정 중에 포함된 쿠키, 헤더, 파라미터 값들을 추출하여 보관하는 역할
 
         // 로그인 버튼을 눌러 접속했을 경우
@@ -42,31 +42,28 @@ public class LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
                 .map(Cookie::getValue)
                 .orElse(null);
 
-        String targetUrl = getDefaultTargetUrl();
-
         // 강제 인터셉트 당했을 경우
         if (savedRequest != null) {
-            targetUrl = savedRequest.getRedirectUrl();
+            redirectUrl = savedRequest.getRedirectUrl();
             requestCache.removeRequest(request, response);
 
         // 직접 로그인 페이지로 접속했을 경우
         } else if (StringUtils.hasText(prevPage)) {
-            targetUrl = prevPage;
+            redirectUrl = prevPage;
             CookieUtils.deleteCookie(request, response, "prevPage");
         }
 
         UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
         TokenResponseDto tokenResponseDto = jwtService.createTokenDto(userPrincipal.getUsername(), userPrincipal.getRole());
 
-        // localhost:3000 으로 access token 을 보낸다고 가정
-        String redirectUrl = UriComponentsBuilder.fromUriString("/login")
-                .queryParam("token", tokenResponseDto.getAccessToken())
-                .queryParam("target", targetUrl)
-                .build().toString();
-
         saveAccessTokenOnResponse(response, tokenResponseDto);
         saveRefreshTokenOnRedis(userPrincipal, tokenResponseDto);
-//        CookieUtils.addCookie(response, "atk", EncodingUtils.encodeURIComponent(tokenResponseDto.getGrantType() + tokenResponseDto.getAccessToken()), 1800);
+        CookieUtils.addCookie(response, "atk", EncodingUtils.encodeURIComponent(tokenResponseDto.getGrantType() + tokenResponseDto.getAccessToken()), 1800);
+
+        if (response.isCommitted()) {
+            log.debug("Response has already been committed. Unable to redirect to " + redirectUrl);
+            return;
+        }
 
         clearAuthenticationAttributes(request);
         getRedirectStrategy().sendRedirect(request, response, redirectUrl);

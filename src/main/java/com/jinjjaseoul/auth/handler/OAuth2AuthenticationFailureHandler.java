@@ -14,18 +14,16 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-import static com.jinjjaseoul.auth.handler.OAuth2AuthorizationRequestCookieRepository.OAUTH2_AUTHORIZATION_REQUEST_COOKIE_NAME;
-
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class OAuth2AuthenticationFailureHandler extends SimpleUrlAuthenticationFailureHandler {
 
-    private final OAuth2AuthorizationRequestCookieRepository oAuth2AuthorizationRequestCookieRepository;
+    private final OAuth2AuthorizationRequestRepository oAuth2AuthorizationRequestRepository;
 
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
-        String targetUri = CookieUtils.getCookie(request, OAUTH2_AUTHORIZATION_REQUEST_COOKIE_NAME)
+        String targetUri = CookieUtils.getCookie(request, OAuth2AuthorizationRequestRepository.OAUTH2_AUTHORIZATION_REQUEST)
                 .map(Cookie::getValue)
                 .orElse("/");
 
@@ -34,7 +32,7 @@ public class OAuth2AuthenticationFailureHandler extends SimpleUrlAuthenticationF
                 .queryParam("error", exception.getLocalizedMessage())
                 .build().toUriString();
 
-        oAuth2AuthorizationRequestCookieRepository.removeAuthorizationRequest(request, response);
+        oAuth2AuthorizationRequestRepository.removeAuthorizationRequest(request, response);
         getRedirectStrategy().sendRedirect(request, response, targetUri);
     }
 }

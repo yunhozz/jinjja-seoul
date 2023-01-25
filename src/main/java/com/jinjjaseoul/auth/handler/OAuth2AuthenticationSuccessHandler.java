@@ -5,13 +5,16 @@ import com.jinjjaseoul.auth.model.UserPrincipal;
 import com.jinjjaseoul.auth.oauth2.AppProperties;
 import com.jinjjaseoul.common.dto.TokenResponseDto;
 import com.jinjjaseoul.common.utils.CookieUtils;
+import com.jinjjaseoul.common.utils.EncodingUtils;
 import com.jinjjaseoul.common.utils.RedisUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
+import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
+import org.springframework.security.web.savedrequest.SavedRequest;
 import org.springframework.stereotype.Component;
-import org.springframework.web.util.UriComponentsBuilder;
+import org.springframework.util.StringUtils;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -19,9 +22,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URI;
 import java.time.Duration;
-import java.util.Optional;
-
-import static com.jinjjaseoul.auth.handler.OAuth2AuthorizationRequestCookieRepository.REDIRECT_URI_PARAM_COOKIE_NAME;
 
 @Slf4j
 @Component
@@ -36,35 +36,43 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
-        // redirect_uri 쿠키의 값 확인 (ex. http://localhost:3000/oauth2/redirect)
-        Optional<String> redirectUri = CookieUtils.getCookie(request, REDIRECT_URI_PARAM_COOKIE_NAME)
-                .map(Cookie::getValue);
-
-        if (redirectUri.isPresent() && !isAuthorizedRedirectUri(redirectUri.get())) {
-            throw new IllegalArgumentException("Sorry! We've got an Unauthorized Redirect URI and can't proceed with the authentication");
-        }
+//        String redirectUri = CookieUtils.getCookie(request, OAuth2AuthorizationRequestRepository.REDIRECT_URI)
+//                .map(Cookie::getValue)
+//                .orElse("");
+//
+//        if (StringUtils.hasText(redirectUri) && !isAuthorizedRedirectUri(redirectUri)) {
+//            throw new IllegalStateException("Sorry! We've got an Unauthorized Redirect URI and can't proceed with the authentication");
+//        }
+        String redirectUrl = getDefaultTargetUrl();
+        // 권한이 없어 강제로 인터셉트 당했을 경우 (ex. 관리자 페이지로 접근 시도 -> 로그인 페이지)
+        SavedRequest savedRequest = requestCache.getRequest(request, response); // 현재 클라이언트의 요청 과정 중에 포함된 쿠키, 헤더, 파라미터 값들을 추출하여 보관하는 역할
 
         // 로그인 버튼을 눌러 접속했을 경우의 이전 페이지 정보를 담은 쿠키의 값 확인
-        String targetUrl = CookieUtils.getCookie(request, "prevPage")
+        String prevPage = CookieUtils.getCookie(request, "prevPage")
                 .map(Cookie::getValue)
                 .orElse(null);
+
+        // 강제 인터셉트 당했을 경우
+        if (savedRequest != null) {
+            redirectUrl = savedRequest.getRedirectUrl();
+            requestCache.removeRequest(request, response);
+
+        // 직접 로그인 페이지로 접속했을 경우
+        } else if (StringUtils.hasText(prevPage)) {
+            redirectUrl = prevPage;
+            CookieUtils.deleteCookie(request, response, "prevPage");
+        }
 
         UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
         TokenResponseDto tokenResponseDto = jwtService.createTokenDto(userPrincipal.getUsername(), userPrincipal.getRole());
 
         saveAccessTokenOnResponse(response, tokenResponseDto);
         saveRefreshTokenOnRedis(userPrincipal, tokenResponseDto);
-//        CookieUtils.addCookie(response, "atk", EncodingUtils.encodeURIComponent(tokenResponseDto.getGrantType() + tokenResponseDto.getAccessToken()), 1800);
+        CookieUtils.addCookie(response, "atk", EncodingUtils.encodeURIComponent(tokenResponseDto.getGrantType() + tokenResponseDto.getAccessToken()), 1800);
 
-        // redirect uri 가 존재하면 그곳으로 redirect(프론트와 협업시), 존재하지 않으면 커스텀 uri 로 redirect
-        String redirectUrl = redirectUri
-                .map(uri -> UriComponentsBuilder.fromUriString(uri)
-                        .queryParam("token", tokenResponseDto.getAccessToken())
-                        .build().toString())
-                .orElseGet(() -> UriComponentsBuilder.fromUriString("/login")
-                        .queryParam("token", tokenResponseDto.getAccessToken())
-                        .queryParam("target", targetUrl)
-                        .build().toString());
+//        String redirectUrl = UriComponentsBuilder.fromUriString(redirectUri)
+//                .queryParam("token", tokenResponseDto.getAccessToken())
+//                .build().toString();
 
         if (response.isCommitted()) {
             log.debug("Response has already been committed. Unable to redirect to " + redirectUrl);
@@ -96,6 +104,6 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
     private void clearAuthenticationAttributes(HttpServletRequest request, HttpServletResponse response) {
         super.clearAuthenticationAttributes(request);
-        oAuth2AuthorizationRequestCookieRepository.removeAuthorizationRequest(request, response);
+        oAuth2AuthorizationRequestRepository.removeAuthorizationRequest(request, response);
     }
 }
