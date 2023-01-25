@@ -18,7 +18,7 @@ public class SignViewController {
     public String loginPage(HttpServletRequest request, HttpServletResponse response) {
         String referer = request.getHeader("Referer");
         // 로그인 페이지 직전 페이지를 쿠키에 저장
-        if (referer != null && !referer.contains("/login-page")) {
+        if (referer != null && !referer.contains("/sign-in")) {
             CookieUtils.addCookie(response, "prevPage", referer, 3600);
         }
 
