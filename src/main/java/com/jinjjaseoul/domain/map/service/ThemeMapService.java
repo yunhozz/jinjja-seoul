@@ -130,7 +130,7 @@ public class ThemeMapService {
     }
 
     @Transactional
-    private void updateTablesByDeletingThemeMap(Long themeMapId) {
+    protected void updateTablesByDeletingThemeMap(Long themeMapId) {
         List<Long> themeLocationIds = themeLocationRepository.findIdsByThemeMapId(themeMapId);
         List<Long> userIds = userRepository.findIdsByThemeLocationIds(themeLocationIds);
 
