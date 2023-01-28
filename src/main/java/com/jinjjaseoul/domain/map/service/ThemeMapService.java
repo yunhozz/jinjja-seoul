@@ -20,6 +20,7 @@ import com.jinjjaseoul.domain.map.service.exception.ThemeMapNameDuplicateExcepti
 import com.jinjjaseoul.domain.map.service.exception.ThemeMapNotFoundException;
 import com.jinjjaseoul.domain.user.model.User;
 import com.jinjjaseoul.domain.user.model.repository.UserRepository;
+import com.jinjjaseoul.domain.user.service.exception.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -82,7 +83,8 @@ public class ThemeMapService {
     // 하나의 테마맵 당 하나의 장소만 추천 가능
     @Transactional
     public void updateThemeLocation(Long userId, Long themeMapId, LocationSimpleRequestDto locationSimpleRequestDto) {
-        User user = userRepository.getReferenceById(userId);
+        User user = userRepository.findById(userId)
+                .orElseThrow(UserNotFoundException::new);
         ThemeMap themeMap = findThemeMap(themeMapId);
         Location location = locationRepository.getReferenceById(locationSimpleRequestDto.getLocationId());
 

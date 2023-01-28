@@ -43,7 +43,7 @@ public class ThemeMap extends Map {
     }
 
     public boolean isMadeByUser(User user) {
-        return super.getUser().getId().equals(user.getId());
+        return super.getUser().equals(user);
     }
 
     public void updateSearchCondition(Place place, Somebody somebody, Something something, Characteristics characteristics, Food food, Beverage beverage) {
