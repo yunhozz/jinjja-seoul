@@ -102,7 +102,7 @@ public class CurationMapService {
     }
 
     @Transactional
-    private void updateTableByDeletingCurationMap(Long curationMapId) {
+    protected void updateTableByDeletingCurationMap(Long curationMapId) {
         List<Long> curationLocationIds = curationLocationRepository.findIdsByCurationMapId(curationMapId);
         curationLocationRepository.deleteAllByIds(curationLocationIds); // 해당 큐레이션 지도의 큐레이션 장소 전체 삭제
     }
